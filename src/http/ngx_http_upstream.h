@@ -87,8 +87,8 @@ typedef struct {
 
 
 typedef struct {
-    ngx_addr_t                      *addrs;
-    ngx_uint_t                       naddrs;
+    ngx_addr_t                      *addrs;     /*数组指针，指向一个ip地址数组，因为一个域名可能有多个ip地址*/
+    ngx_uint_t                       naddrs;    /*指定ip地址数组元素的个数*/
     ngx_uint_t                       weight;
     ngx_uint_t                       max_fails;
     time_t                           fail_timeout;

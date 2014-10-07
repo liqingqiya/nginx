@@ -55,18 +55,18 @@ ngx_http_upstream_init_round_robin(ngx_conf_t *cf,
                           &us->host, us->file_name, us->line);
             return NGX_ERROR;
         }
-
+        /*分配非后备服务器列表的内存*/
         peers = ngx_pcalloc(cf->pool, sizeof(ngx_http_upstream_rr_peers_t)
                               + sizeof(ngx_http_upstream_rr_peer_t) * (n - 1));
         if (peers == NULL) {
             return NGX_ERROR;
         }
-
+        /*初始化非后服务器列表*/
         peers->single = (n == 1);
         peers->number = n;
         peers->weighted = (w != n);
         peers->total_weight = w;
-        peers->name = &us->host;
+        peers->name = &us->host;        /*服务器名字为解析之后的主机名*/
 
         n = 0;
 
@@ -74,7 +74,7 @@ ngx_http_upstream_init_round_robin(ngx_conf_t *cf,
             if (server[i].backup) {
                 continue;
             }
-
+            /*将解析完配置文件的值存入我们nginx的变量中?????????????????*/
             for (j = 0; j < server[i].naddrs; j++) {
                 peers->peer[n].sockaddr = server[i].addrs[j].sockaddr;
                 peers->peer[n].socklen = server[i].addrs[j].socklen;
@@ -89,7 +89,7 @@ ngx_http_upstream_init_round_robin(ngx_conf_t *cf,
             }
         }
 
-        us->peer.data = peers;
+        us->peer.data = peers;      /*挂载非后备服务器列表*/
 
         /* backup servers */
 
@@ -142,7 +142,7 @@ ngx_http_upstream_init_round_robin(ngx_conf_t *cf,
                 n++;
             }
         }
-
+        /*挂载后备服务器列表*/
         peers->next = backup;
 
         return NGX_OK;
@@ -392,29 +392,29 @@ ngx_http_upstream_get_round_robin_peer(ngx_peer_connection_t *pc, void *data)
     pc->cached = 0;
     pc->connection = NULL;
 
-    if (rrp->peers->single) {
-        peer = &rrp->peers->peer[0];
+    if (rrp->peers->single) {       /*判断时候只有一台服务器*/
+        peer = &rrp->peers->peer[0];    /*yes , 选择他*/
 
-        if (peer->down) {
+        if (peer->down) {           /*只有一台，确是宕机，则选择失败*/
             goto failed;
         }
 
     } else {
 
-        /* there are several peers */
+        /*有多台服务器可用*/
 
-        peer = ngx_http_upstream_get_peer(rrp);
+        peer = ngx_http_upstream_get_peer(rrp);     /*选择权值最高的一台服务器*/
 
-        if (peer == NULL) {
+        if (peer == NULL) { /*选择失败*/
             goto failed;
         }
 
         ngx_log_debug2(NGX_LOG_DEBUG_HTTP, pc->log, 0,
                        "get rr peer, current: %ui %i",
-                       rrp->current, peer->current_weight);
+                       rrp->current, peer->current_weight); /*打印日志信息,定义在/src/core/ngx_log.h模块中*/
     }
 
-    pc->sockaddr = peer->sockaddr;
+    pc->sockaddr = peer->sockaddr;  /*赋值当前选到的服务器信息*/
     pc->socklen = peer->socklen;
     pc->name = &peer->name;
 
@@ -480,39 +480,39 @@ ngx_http_upstream_get_peer(ngx_http_upstream_rr_peer_data_t *rrp)
 
     now = ngx_time();
 
-    best = NULL;
+    best = NULL;        /* 存储选出的服务器 */
     total = 0;
 
-    for (i = 0; i < rrp->peers->number; i++) {
+    for (i = 0; i < rrp->peers->number; i++) {      /*遍历非后备服务器*/
 
         n = i / (8 * sizeof(uintptr_t));
         m = (uintptr_t) 1 << i % (8 * sizeof(uintptr_t));
 
-        if (rrp->tried[n] & m) {
+        if (rrp->tried[n] & m) {    /* ????? */
             continue;
         }
 
         peer = &rrp->peers->peer[i];
 
-        if (peer->down) {
+        if (peer->down) {       /*宕机，那么就不考虑该服务器，跳过本次循环*/
             continue;
         }
 
-        if (peer->max_fails
+        if (peer->max_fails     /*连接失败次数达到最大，并且还在fail_timeout时间内，则跳过本次循环*/
             && peer->fails >= peer->max_fails
             && now - peer->checked <= peer->fail_timeout)
         {
             continue;
         }
 
-        peer->current_weight += peer->effective_weight;
+        peer->current_weight += peer->effective_weight;     /* effective_weight是代表什么？current_weight呢？ */
         total += peer->effective_weight;
 
-        if (peer->effective_weight < peer->weight) {
+        if (peer->effective_weight < peer->weight) {        /* ??? */
             peer->effective_weight++;
         }
 
-        if (best == NULL || peer->current_weight > best->current_weight) {
+        if (best == NULL || peer->current_weight > best->current_weight) {  /* 选出的指标是current_weight,那么effective_weight有什么作用？ */
             best = peer;
         }
     }
@@ -528,15 +528,15 @@ ngx_http_upstream_get_peer(ngx_http_upstream_rr_peer_data_t *rrp)
     n = i / (8 * sizeof(uintptr_t));
     m = (uintptr_t) 1 << i % (8 * sizeof(uintptr_t));
 
-    rrp->tried[n] |= m;
+    rrp->tried[n] |= m;     /* ???  位图又是什么东东？？？ */
 
-    best->current_weight -= total;
+    best->current_weight -= total;      /* ??? */
 
     if (now - best->checked > best->fail_timeout) {
         best->checked = now;
     }
 
-    return best;
+    return best;        /*返回权值最大的，最佳的服务器*/
 }
 
 
@@ -554,8 +554,8 @@ ngx_http_upstream_free_round_robin_peer(ngx_peer_connection_t *pc, void *data,
 
     /* TODO: NGX_PEER_KEEPALIVE */
 
-    if (rrp->peers->single) {
-        pc->tries = 0;
+    if (rrp->peers->single) {   /*一台服务器*/
+        pc->tries = 0;          /*这就释放了？？？*/
         return;
     }
 
