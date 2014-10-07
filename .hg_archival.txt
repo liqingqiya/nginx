@@ -1,0 +1,5 @@
+repo: 4eff17414a4378feaba42876e0d3a6a50646cdee
+node: d0e39ec4f23fdafc424760075ff08733512e536e
+branch: stable-1.6
+latesttag: release-1.6.2
+latesttagdistance: 1
