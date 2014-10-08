@@ -284,7 +284,7 @@ ngx_log_init(u_char *prefix)
     size_t   nlen, plen;
 
     ngx_log.file = &ngx_log_file;
-    ngx_log.log_level = NGX_LOG_NOTICE;
+    ngx_log.log_level = NGX_LOG_NOTICE;     /*设置日志打印的默认级别*/
 
     name = (u_char *) NGX_ERROR_LOG_PATH;
 
@@ -340,7 +340,7 @@ ngx_log_init(u_char *prefix)
 
     ngx_log_file.fd = ngx_open_file(name, NGX_FILE_APPEND,
                                     NGX_FILE_CREATE_OR_OPEN,
-                                    NGX_FILE_DEFAULT_ACCESS);
+                                    NGX_FILE_DEFAULT_ACCESS);   /*创建日志文件*/
 
     if (ngx_log_file.fd == NGX_INVALID_FILE) {
         ngx_log_stderr(ngx_errno,

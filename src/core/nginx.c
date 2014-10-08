@@ -189,7 +189,7 @@ ngx_uint_t          ngx_max_module;
 static ngx_uint_t   ngx_show_help;
 static ngx_uint_t   ngx_show_version;
 static ngx_uint_t   ngx_show_configure;
-static u_char      *ngx_prefix;
+static u_char      *ngx_prefix;         //服务器程序安装路径
 static u_char      *ngx_conf_file;
 static u_char      *ngx_conf_params;
 static char        *ngx_signal;
@@ -271,11 +271,11 @@ main(int argc, char *const *argv)
 
     ngx_time_init();      /*初始化时间*/
 
-#if (NGX_PCRE)
-    ngx_regex_init();
+#if (NGX_PCRE)            /*是否支持正则表达式*/
+    ngx_regex_init();     /*完成支持正则表达式的准备工作*/
 #endif
 
-    ngx_pid = ngx_getpid();   /**/
+    ngx_pid = ngx_getpid();   /*获取当前nginx进程的进程号*/
 
     log = ngx_log_init(ngx_prefix);   /*初始化日志*/
     if (log == NULL) {
@@ -293,19 +293,19 @@ main(int argc, char *const *argv)
      */
 
     ngx_memzero(&init_cycle, sizeof(ngx_cycle_t));    /*给ngx_cycle_t结构体内存块赋零值，定义在ngx_string.h*/
-    init_cycle.log = log;
-    ngx_cycle = &init_cycle;
+    init_cycle.log = log;       /*初始化cycle结构的log*/
+    ngx_cycle = &init_cycle;    
 
-    init_cycle.pool = ngx_create_pool(1024, log);     /*创建内存管理器*/
+    init_cycle.pool = ngx_create_pool(1024, log);     /*创建内存池，初始化cycle结构的pool*/
     if (init_cycle.pool == NULL) {
         return 1;
     }
 
-    if (ngx_save_argv(&init_cycle, argc, argv) != NGX_OK) { /*存储命令行参数*/
+    if (ngx_save_argv(&init_cycle, argc, argv) != NGX_OK) { /*存储命令行参数到全局变量*/
         return 1;
     }
 
-    if (ngx_process_options(&init_cycle) != NGX_OK) {
+    if (ngx_process_options(&init_cycle) != NGX_OK) {     /*存储传入的参数到 init_cycle 结构*/
         return 1;
     }
 
@@ -321,16 +321,16 @@ main(int argc, char *const *argv)
         return 1;
     }
 
-    if (ngx_add_inherited_sockets(&init_cycle) != NGX_OK) {
+    if (ngx_add_inherited_sockets(&init_cycle) != NGX_OK) { /*继承socket描述符*/
         return 1;
     }
 
     ngx_max_module = 0;
-    for (i = 0; ngx_modules[i]; i++) {
+    for (i = 0; ngx_modules[i]; i++) {    /*遍历所有的模块，简历模块索引*/
         ngx_modules[i]->index = ngx_max_module++;
     }
 
-    cycle = ngx_init_cycle(&init_cycle);
+    cycle = ngx_init_cycle(&init_cycle);  /*创建新的cycle结构*/
     if (cycle == NULL) {
         if (ngx_test_config) {
             ngx_log_stderr(0, "configuration file %s test failed",
@@ -418,7 +418,7 @@ ngx_add_inherited_sockets(ngx_cycle_t *cycle)
     ngx_int_t         s;
     ngx_listening_t  *ls;
 
-    inherited = (u_char *) getenv(NGINX_VAR);
+    inherited = (u_char *) getenv(NGINX_VAR);   /*设置nginx的环境变量*/
 
     if (inherited == NULL) {
         return NGX_OK;
@@ -447,7 +447,7 @@ ngx_add_inherited_sockets(ngx_cycle_t *cycle)
 
             v = p + 1;
 
-            ls = ngx_array_push(&cycle->listening);
+            ls = ngx_array_push(&cycle->listening); /*解析出socket，构造listening数组*/
             if (ls == NULL) {
                 return NGX_ERROR;
             }
@@ -458,7 +458,7 @@ ngx_add_inherited_sockets(ngx_cycle_t *cycle)
         }
     }
 
-    ngx_inherited = 1;
+    ngx_inherited = 1;      /*继承完毕，标志结束*/
 
     return ngx_set_inherited_sockets(cycle);
 }
@@ -835,7 +835,7 @@ ngx_process_options(ngx_cycle_t *cycle)
     u_char  *p;
     size_t   len;
 
-    if (ngx_prefix) {
+    if (ngx_prefix) {         //ngx_prefix存储服务器程序安装路径
         len = ngx_strlen(ngx_prefix);
         p = ngx_prefix;
 
@@ -849,7 +849,7 @@ ngx_process_options(ngx_cycle_t *cycle)
             p[len++] = '/';
         }
 
-        cycle->conf_prefix.len = len;
+        cycle->conf_prefix.len = len;   //conf_prefix存放的是服务器配置文件的路径
         cycle->conf_prefix.data = p;
         cycle->prefix.len = len;
         cycle->prefix.data = p;
