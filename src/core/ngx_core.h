@@ -9,18 +9,18 @@
 #define _NGX_CORE_H_INCLUDED_
 
 
-typedef struct ngx_module_s      ngx_module_t;
-typedef struct ngx_conf_s        ngx_conf_t;
+typedef struct ngx_module_s      ngx_module_t;		/*模块结构*/
+typedef struct ngx_conf_s        ngx_conf_t;			/**/
 typedef struct ngx_cycle_s       ngx_cycle_t;
-typedef struct ngx_pool_s        ngx_pool_t;
+typedef struct ngx_pool_s        ngx_pool_t;			/*内存管理结构*/
 typedef struct ngx_chain_s       ngx_chain_t;
 typedef struct ngx_log_s         ngx_log_t;
 typedef struct ngx_open_file_s   ngx_open_file_t;
-typedef struct ngx_command_s     ngx_command_t;
+typedef struct ngx_command_s     ngx_command_t;		/*指令结构*/
 typedef struct ngx_file_s        ngx_file_t;
 typedef struct ngx_event_s       ngx_event_t;
 typedef struct ngx_event_aio_s   ngx_event_aio_t;
-typedef struct ngx_connection_s  ngx_connection_t;
+typedef struct ngx_connection_s  ngx_connection_t;	/*连接结构*/
 
 typedef void (*ngx_event_handler_pt)(ngx_event_t *ev);
 typedef void (*ngx_connection_handler_pt)(ngx_connection_t *c);

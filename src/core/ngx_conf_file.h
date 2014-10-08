@@ -82,9 +82,9 @@ struct ngx_command_s {
     ngx_uint_t            conf;
     ngx_uint_t            offset;
     void                 *post;
-};
+};      /*该结构描述模块支持的指令，一个指令对应一个配置指令。*/
 
-#define ngx_null_command  { ngx_null_string, 0, NULL, 0, 0, NULL }
+#define ngx_null_command  { ngx_null_string, 0, NULL, 0, 0, NULL }  /*初始化一个空指令*/
 
 
 struct ngx_open_file_s {
@@ -100,30 +100,30 @@ struct ngx_open_file_s {
 #define NGX_MODULE_V1_PADDING  0, 0, 0, 0, 0, 0, 0, 0
 
 struct ngx_module_s {
-    ngx_uint_t            ctx_index;
-    ngx_uint_t            index;
+    ngx_uint_t            ctx_index;        /*分类标志*/
+    ngx_uint_t            index;            /*模块计数器*/
 
-    ngx_uint_t            spare0;
+    ngx_uint_t            spare0;           /*预留*/
     ngx_uint_t            spare1;
     ngx_uint_t            spare2;
     ngx_uint_t            spare3;
 
-    ngx_uint_t            version;
+    ngx_uint_t            version;          /*版本*/
 
-    void                 *ctx;
-    ngx_command_t        *commands;
-    ngx_uint_t            type;
+    void                 *ctx;               /*模块上下文结构，对应一个特殊的模块*/
+    ngx_command_t        *commands;        /*模块支持的指令集合*/
+    ngx_uint_t            type;             /*模块的种类*/
+                                                            /*以下为回调函数*/
+    ngx_int_t           (*init_master)(ngx_log_t *log);     /*主进程初始化时调用*/
 
-    ngx_int_t           (*init_master)(ngx_log_t *log);
+    ngx_int_t           (*init_module)(ngx_cycle_t *cycle);     /*模块初始化时调用*/
 
-    ngx_int_t           (*init_module)(ngx_cycle_t *cycle);
+    ngx_int_t           (*init_process)(ngx_cycle_t *cycle);        /*工作进程初始化时调用*/
+    ngx_int_t           (*init_thread)(ngx_cycle_t *cycle);     /*线程初始化时候调用*/
+    void                (*exit_thread)(ngx_cycle_t *cycle);     /*线程退出时调用*/
+    void                (*exit_process)(ngx_cycle_t *cycle);        /*退出工作进程时候调用*/
 
-    ngx_int_t           (*init_process)(ngx_cycle_t *cycle);
-    ngx_int_t           (*init_thread)(ngx_cycle_t *cycle);
-    void                (*exit_thread)(ngx_cycle_t *cycle);
-    void                (*exit_process)(ngx_cycle_t *cycle);
-
-    void                (*exit_master)(ngx_cycle_t *cycle);
+    void                (*exit_master)(ngx_cycle_t *cycle);     /*退出主进程时候调用*/
 
     uintptr_t             spare_hook0;
     uintptr_t             spare_hook1;
@@ -133,21 +133,21 @@ struct ngx_module_s {
     uintptr_t             spare_hook5;
     uintptr_t             spare_hook6;
     uintptr_t             spare_hook7;
-};
+};      /*对应一个模块*/
 
 
 typedef struct {
     ngx_str_t             name;
     void               *(*create_conf)(ngx_cycle_t *cycle);
     char               *(*init_conf)(ngx_cycle_t *cycle, void *conf);
-} ngx_core_module_t;
+} ngx_core_module_t;        /*core模块的上下文结构*/
 
 
 typedef struct {
     ngx_file_t            file;
     ngx_buf_t            *buffer;
     ngx_uint_t            line;
-} ngx_conf_file_t;
+} ngx_conf_file_t;          /**/
 
 
 typedef char *(*ngx_conf_handler_pt)(ngx_conf_t *cf,

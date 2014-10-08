@@ -69,7 +69,7 @@ struct ngx_cycle_s {
     ngx_str_t                 prefix;
     ngx_str_t                 lock_file;
     ngx_str_t                 hostname;
-};
+};      /*nginx的主要结构体，存储了所需的全局变量*/
 
 
 typedef struct {

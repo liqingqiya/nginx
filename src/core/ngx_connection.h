@@ -189,7 +189,7 @@ struct ngx_connection_s {
 #if (NGX_THREADS)
     ngx_atomic_t        lock;
 #endif
-};
+};      /*对应一个socket连接*/
 
 
 ngx_listening_t *ngx_create_listening(ngx_conf_t *cf, void *sockaddr,

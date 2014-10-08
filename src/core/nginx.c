@@ -203,16 +203,16 @@ main(int argc, char *const *argv)
 {
     ngx_int_t         i;
     ngx_log_t        *log;
-    ngx_cycle_t      *cycle, init_cycle;
+    ngx_cycle_t      *cycle, init_cycle;    /*这里两个ngx_cycle_t的原因是为了平滑升级，cycle保存升级后的信息，init_cycle保存升级前的信息*/
     ngx_core_conf_t  *ccf;
 
-    ngx_debug_init();
+    ngx_debug_init();   /**/
 
-    if (ngx_strerror_init() != NGX_OK) {
+    if (ngx_strerror_init() != NGX_OK) {    /*初始化nginx自定义的错误输出列表*/
         return 1;
     }
 
-    if (ngx_get_options(argc, argv) != NGX_OK) {
+    if (ngx_get_options(argc, argv) != NGX_OK) {    /*解析获取命令行参数*/
         return 1;
     }
 
@@ -269,15 +269,15 @@ main(int argc, char *const *argv)
 
     /* TODO */ ngx_max_sockets = -1;
 
-    ngx_time_init();
+    ngx_time_init();      /*初始化时间*/
 
 #if (NGX_PCRE)
     ngx_regex_init();
 #endif
 
-    ngx_pid = ngx_getpid();
+    ngx_pid = ngx_getpid();   /**/
 
-    log = ngx_log_init(ngx_prefix);
+    log = ngx_log_init(ngx_prefix);   /*初始化日志*/
     if (log == NULL) {
         return 1;
     }
@@ -292,16 +292,16 @@ main(int argc, char *const *argv)
      * ngx_process_options()
      */
 
-    ngx_memzero(&init_cycle, sizeof(ngx_cycle_t));
+    ngx_memzero(&init_cycle, sizeof(ngx_cycle_t));    /*给ngx_cycle_t结构体内存块赋零值，定义在ngx_string.h*/
     init_cycle.log = log;
     ngx_cycle = &init_cycle;
 
-    init_cycle.pool = ngx_create_pool(1024, log);
+    init_cycle.pool = ngx_create_pool(1024, log);     /*创建内存管理器*/
     if (init_cycle.pool == NULL) {
         return 1;
     }
 
-    if (ngx_save_argv(&init_cycle, argc, argv) != NGX_OK) {
+    if (ngx_save_argv(&init_cycle, argc, argv) != NGX_OK) { /*存储命令行参数*/
         return 1;
     }
 
@@ -788,7 +788,7 @@ ngx_get_options(int argc, char *const *argv)
 
 
 static ngx_int_t
-ngx_save_argv(ngx_cycle_t *cycle, int argc, char *const *argv)
+ngx_save_argv(ngx_cycle_t *cycle, int argc, char *const *argv)  /*存储命令行参数*/
 {
 #if (NGX_FREEBSD)
 
