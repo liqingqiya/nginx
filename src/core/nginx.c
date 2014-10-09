@@ -365,12 +365,12 @@ main(int argc, char *const *argv)
 
 #if !(NGX_WIN32)
 
-    if (ngx_init_signals(cycle->log) != NGX_OK) {
+    if (ngx_init_signals(cycle->log) != NGX_OK) {     //初始化信号设置
         return 1;
     }
 
     if (!ngx_inherited && ccf->daemon) {
-        if (ngx_daemon(cycle->log) != NGX_OK) {
+        if (ngx_daemon(cycle->log) != NGX_OK) {   //启动 master process
             return 1;
         }
 
@@ -383,7 +383,7 @@ main(int argc, char *const *argv)
 
 #endif
 
-    if (ngx_create_pidfile(&ccf->pid, cycle->log) != NGX_OK) {
+    if (ngx_create_pidfile(&ccf->pid, cycle->log) != NGX_OK) {    //创建pid文件
         return 1;
     }
 
@@ -404,7 +404,7 @@ main(int argc, char *const *argv)
         ngx_single_process_cycle(cycle);
 
     } else {
-        ngx_master_process_cycle(cycle);
+        ngx_master_process_cycle(cycle);  // 启动 work process
     }
 
     return 0;

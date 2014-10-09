@@ -94,8 +94,8 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
     ngx_listening_t   *ls;
     ngx_core_conf_t   *ccf;
 
-    sigemptyset(&set);
-    sigaddset(&set, SIGCHLD);
+    sigemptyset(&set);                       //创建一个信号集合
+    sigaddset(&set, SIGCHLD);               //调用sigaddset()函数将关心的信号添加到信号集合
     sigaddset(&set, SIGALRM);
     sigaddset(&set, SIGIO);
     sigaddset(&set, SIGINT);
@@ -106,7 +106,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
     sigaddset(&set, ngx_signal_value(NGX_SHUTDOWN_SIGNAL));
     sigaddset(&set, ngx_signal_value(NGX_CHANGEBIN_SIGNAL));
 
-    if (sigprocmask(SIG_BLOCK, &set, NULL) == -1) {
+    if (sigprocmask(SIG_BLOCK, &set, NULL) == -1) {             //将信号集合的处理方式设置为block？？？为什么？？/
         ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
                       "sigprocmask() failed");
     }
@@ -128,7 +128,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
         p = ngx_cpystrn(p, (u_char *) ngx_argv[i], size);
     }
 
-    ngx_setproctitle(title);
+    ngx_setproctitle(title);            //设置进程标题
 
 
     ccf = (ngx_core_conf_t *) ngx_get_conf(cycle->conf_ctx, ngx_core_module);

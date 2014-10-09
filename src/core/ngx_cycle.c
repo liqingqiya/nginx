@@ -209,14 +209,14 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
 
 
     for (i = 0; ngx_modules[i]; i++) {
-        if (ngx_modules[i]->type != NGX_CORE_MODULE) {
+        if (ngx_modules[i]->type != NGX_CORE_MODULE) { /*遍历模块数组，筛选出core模块*/
             continue;
         }
 
         module = ngx_modules[i]->ctx;
 
         if (module->create_conf) {
-            rv = module->create_conf(cycle);
+            rv = module->create_conf(cycle);        /*建立cycle上下文结构*/
             if (rv == NULL) {
                 ngx_destroy_pool(pool);
                 return NULL;
@@ -228,7 +228,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
 
     senv = environ;
 
-
+    // 继续初始化core模块的上下文结构
     ngx_memzero(&conf, sizeof(ngx_conf_t));
     /* STUB: init array ? */
     conf.args = ngx_array_create(pool, 10, sizeof(ngx_str_t));
@@ -237,7 +237,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         return NULL;
     }
 
-    conf.temp_pool = ngx_create_pool(NGX_CYCLE_POOL_SIZE, log);
+    conf.temp_pool = ngx_create_pool(NGX_CYCLE_POOL_SIZE, log);     //建立一个临时内存池，用于配置文件的解析。解析完成之后，释放。
     if (conf.temp_pool == NULL) {
         ngx_destroy_pool(pool);
         return NULL;
