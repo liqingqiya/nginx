@@ -93,9 +93,9 @@ typedef struct {
     ngx_uint_t                       max_fails;
     time_t                           fail_timeout;
 
-    unsigned                         down:1;
-    unsigned                         backup:1;
-} ngx_http_upstream_server_t;
+    unsigned                         down:1;         /*宕机标记*/
+    unsigned                         backup:1;      /*后备标记*/
+} ngx_http_upstream_server_t;       /* todo 该结构体？？不懂*/
 
 
 #define NGX_HTTP_UPSTREAM_CREATE        0x0001
@@ -110,7 +110,7 @@ struct ngx_http_upstream_srv_conf_s {
     ngx_http_upstream_peer_t         peer;
     void                           **srv_conf;
 
-    ngx_array_t                     *servers;  /* ngx_http_upstream_server_t */
+    ngx_array_t                     *servers;  /* ngx_http_upstream_server_t 数组 */
 
     ngx_uint_t                       flags;
     ngx_str_t                        host;

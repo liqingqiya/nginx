@@ -59,9 +59,9 @@ struct ngx_http_upstream_rr_peers_s {
 
 
 typedef struct {
-    ngx_http_upstream_rr_peers_t   *peers;
-    ngx_uint_t                      current;
-    uintptr_t                      *tried;
+    ngx_http_upstream_rr_peers_t   *peers;      /*非后备服务器链表*/
+    ngx_uint_t                      current;      /*当前？？*/
+    uintptr_t                      *tried;        /*是否已经尝试连接？且失败？*/
     uintptr_t                       data;
 } ngx_http_upstream_rr_peer_data_t;     /*？？？*/
 
@@ -71,9 +71,9 @@ ngx_int_t ngx_http_upstream_init_round_robin(ngx_conf_t *cf,
 ngx_int_t ngx_http_upstream_init_round_robin_peer(ngx_http_request_t *r,
     ngx_http_upstream_srv_conf_t *us);/*初始化加权轮询的服务器结构*/
 ngx_int_t ngx_http_upstream_create_round_robin_peer(ngx_http_request_t *r,
-    ngx_http_upstream_resolved_t *ur);/*创建服务器？？？*/
+    ngx_http_upstream_resolved_t *ur);/*创建一个用于轮询的服务器*/
 ngx_int_t ngx_http_upstream_get_round_robin_peer(ngx_peer_connection_t *pc,
-    void *data);/*选取服务器？？？*/
+    void *data);/*选取服务器*/
 void ngx_http_upstream_free_round_robin_peer(ngx_peer_connection_t *pc,
     void *data, ngx_uint_t state);/*释放某个服务器*/
 
