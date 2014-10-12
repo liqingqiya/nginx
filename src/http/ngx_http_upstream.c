@@ -285,7 +285,7 @@ ngx_http_upstream_header_t  ngx_http_upstream_headers_in[] = {
 };
 
 
-static ngx_command_t  ngx_http_upstream_commands[] = {
+static ngx_command_t  ngx_http_upstream_commands[] = {      /*指令结构，但是现在我还没有深刻的理解？？*/
 
     { ngx_string("upstream"),
       NGX_HTTP_MAIN_CONF|NGX_CONF_BLOCK|NGX_CONF_TAKE1,
@@ -305,7 +305,7 @@ static ngx_command_t  ngx_http_upstream_commands[] = {
 };
 
 
-static ngx_http_module_t  ngx_http_upstream_module_ctx = {
+static ngx_http_module_t  ngx_http_upstream_module_ctx = {      /*模块上下文， 都是些回调函数*/
     ngx_http_upstream_add_variables,       /* preconfiguration */
     NULL,                                  /* postconfiguration */
 
@@ -320,7 +320,7 @@ static ngx_http_module_t  ngx_http_upstream_module_ctx = {
 };
 
 
-ngx_module_t  ngx_http_upstream_module = {
+ngx_module_t  ngx_http_upstream_module = {      /*http_upstream模块结构*/
     NGX_MODULE_V1,
     &ngx_http_upstream_module_ctx,         /* module context */
     ngx_http_upstream_commands,            /* module directives */
@@ -4676,7 +4676,7 @@ ngx_http_upstream(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
     cf->ctx = ctx;
     cf->cmd_type = NGX_HTTP_UPS_CONF;
 
-    rv = ngx_conf_parse(cf, NULL);
+    rv = ngx_conf_parse(cf, NULL);          /*调用ngx_conf_parse继续进行配置解析*/
 
     *cf = pcf;
 
@@ -4695,7 +4695,7 @@ ngx_http_upstream(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
 
 
 static char *
-ngx_http_upstream_server(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ngx_http_upstream_server(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)    /*解析upstream的server指令的回调函数*/
 {
     ngx_http_upstream_srv_conf_t  *uscf = conf;
 

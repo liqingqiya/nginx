@@ -16,13 +16,13 @@
 typedef struct {
     size_t      len;
     u_char     *data;
-} ngx_str_t;
+} ngx_str_t;        /*nginx 封装的字符串类型*/
 
 
 typedef struct {
     ngx_str_t   key;
     ngx_str_t   value;
-} ngx_keyval_t;
+} ngx_keyval_t;    /*nginx 封装的字典类型，也就是映射类型*/
 
 
 typedef struct {
@@ -37,7 +37,7 @@ typedef struct {
 } ngx_variable_value_t;
 
 
-#define ngx_string(str)     { sizeof(str) - 1, (u_char *) str }
+#define ngx_string(str)     { sizeof(str) - 1, (u_char *) str }     /*u_char进行转化，提高可移植性*/
 #define ngx_null_string     { 0, NULL }
 #define ngx_str_set(str, text)                                               \
     (str)->len = sizeof(text) - 1; (str)->data = (u_char *) text

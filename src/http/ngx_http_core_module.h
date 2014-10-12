@@ -151,7 +151,7 @@ typedef struct {
 
 typedef struct {
     ngx_array_t                handlers;
-} ngx_http_phase_t;
+} ngx_http_phase_t;     /*为什么要单独的生命为一个结构体？ 就声明为一个ngx_array_t不久行了吗？*/
 
 
 typedef struct {
@@ -178,7 +178,7 @@ typedef struct {
 
     ngx_uint_t                 try_files;       /* unsigned  try_files:1 */
 
-    ngx_http_phase_t           phases[NGX_HTTP_LOG_PHASE + 1];
+    ngx_http_phase_t           phases[NGX_HTTP_LOG_PHASE + 1];  /*结构体内嵌套数组*/
 } ngx_http_core_main_conf_t;
 
 

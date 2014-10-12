@@ -14,11 +14,11 @@
 
 
 typedef struct {
-    void        *elts;
-    ngx_uint_t   nelts;
-    size_t       size;
-    ngx_uint_t   nalloc;
-    ngx_pool_t  *pool;
+    void        *elts;      /* 数据元素 element，因为这里要存储的是各种类型，所以声明为了 void 类型 */
+    ngx_uint_t   nelts;     /* element 元素个数 */
+    size_t       size;      /* 数组大小？那 nelts又是做什么的呢？ */
+    ngx_uint_t   nalloc;    /* 分配内存？ */
+    ngx_pool_t  *pool;      /* 内存池结构 */
 } ngx_array_t;
 
 
@@ -29,7 +29,7 @@ void *ngx_array_push_n(ngx_array_t *a, ngx_uint_t n);
 
 
 static ngx_inline ngx_int_t
-ngx_array_init(ngx_array_t *array, ngx_pool_t *pool, ngx_uint_t n, size_t size)
+ngx_array_init(ngx_array_t *array, ngx_pool_t *pool, ngx_uint_t n, size_t size)     /*模块初始化函数放在模块头文件里，且声明为static，具有内链接特性。*/
 {
     /*
      * set "array->nelts" before "array->elts", otherwise MSVC thinks

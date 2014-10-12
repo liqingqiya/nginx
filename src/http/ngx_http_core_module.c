@@ -1103,8 +1103,8 @@ ngx_http_core_access_phase(ngx_http_request_t *r, ngx_http_phase_handler_t *ph)
     ngx_int_t                  rc;
     ngx_http_core_loc_conf_t  *clcf;
 
-    if (r != r->main) {
-        r->phase_handler = ph->next;
+    if (r != r->main) {   /*回调函数准入判断，如果当前不是主请求，那么就无需进行访问权限检测，直接让状态机进入到下一个处理阶段*/
+        r->phase_handler = ph->next;    /*让状态机直接进入到下一个处理阶段*/
         return NGX_AGAIN;
     }
 
@@ -1113,13 +1113,13 @@ ngx_http_core_access_phase(ngx_http_request_t *r, ngx_http_phase_handler_t *ph)
 
     rc = ph->handler(r);
 
-    if (rc == NGX_DECLINED) {
-        r->phase_handler++;
+    if (rc == NGX_DECLINED) {   /*判断成功表示当前回调函数拒绝处理*/
+        r->phase_handler++;     /*将处理移到下一个回调函数*/
         return NGX_AGAIN;
     }
 
-    if (rc == NGX_AGAIN || rc == NGX_DONE) {
-        return NGX_OK;
+    if (rc == NGX_AGAIN || rc == NGX_DONE) {  /*判断成功则表示当前回调需要再次调用或者回调成功*/
+        return NGX_OK;              /*这里返回NGX_OK导致ngx_http_core_run_phases()函数里的循环处理会退出*/
     }
 
     clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);

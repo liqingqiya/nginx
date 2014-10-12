@@ -52,7 +52,7 @@ static char ngx_http_server_full_string[] = "Server: " NGINX_VER CRLF;
 
 static ngx_str_t ngx_http_status_lines[] = {
 
-    ngx_string("200 OK"),
+    ngx_string("200 OK"),               /*ngx_string是在ngx_string.h里定义的宏，这里可以替换成 {6, "200 OK"}*/
     ngx_string("201 Created"),
     ngx_string("202 Accepted"),
     ngx_null_string,  /* "203 Non-Authoritative Information" */

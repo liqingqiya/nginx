@@ -26,14 +26,14 @@ ngx_http_module_t  ngx_http_static_module_ctx = {
 
     NULL,                                  /* create location configuration */
     NULL                                   /* merge location configuration */
-};
+};  /*特有的上下文结构基本都是些回调函数*/
 
 
 ngx_module_t  ngx_http_static_module = {
-    NGX_MODULE_V1,
-    &ngx_http_static_module_ctx,           /* module context */
+    NGX_MODULE_V1,                           /*所有模块中的编号*/
+    &ngx_http_static_module_ctx,           /* module context */     /*特定模块特有的上下文结构*/
     NULL,                                  /* module directives */
-    NGX_HTTP_MODULE,                       /* module type */
+    NGX_HTTP_MODULE,                       /* module type */        /*模块类型，http,event,core,mail,null*/
     NULL,                                  /* init master */
     NULL,                                  /* init module */
     NULL,                                  /* init process */
@@ -41,7 +41,7 @@ ngx_module_t  ngx_http_static_module = {
     NULL,                                  /* exit thread */
     NULL,                                  /* exit process */
     NULL,                                  /* exit master */
-    NGX_MODULE_V1_PADDING
+    NGX_MODULE_V1_PADDING               /*在同类模块中的编号*/
 };
 
 
@@ -59,7 +59,7 @@ ngx_http_static_handler(ngx_http_request_t *r)
     ngx_open_file_info_t       of;
     ngx_http_core_loc_conf_t  *clcf;
 
-    if (!(r->method & (NGX_HTTP_GET|NGX_HTTP_HEAD|NGX_HTTP_POST))) {
+    if (!(r->method & (NGX_HTTP_GET|NGX_HTTP_HEAD|NGX_HTTP_POST))) {        /*静态请求的方法只限于这三种*/
         return NGX_HTTP_NOT_ALLOWED;
     }
 
@@ -67,14 +67,14 @@ ngx_http_static_handler(ngx_http_request_t *r)
         return NGX_DECLINED;
     }
 
-    log = r->connection->log;
+    log = r->connection->log;       /*设定日志打印*/
 
     /*
      * ngx_http_map_uri_to_path() allocates memory for terminating '\0'
      * so we do not need to reserve memory for '/' for possible redirect
      */
 
-    last = ngx_http_map_uri_to_path(r, &path, &root, 0);
+    last = ngx_http_map_uri_to_path(r, &path, &root, 0);   /*解析uri*/
     if (last == NULL) {
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
@@ -278,8 +278,8 @@ ngx_http_static_init(ngx_conf_t *cf)
     ngx_http_core_main_conf_t  *cmcf;
 
     cmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_core_module);
-
-    h = ngx_array_push(&cmcf->phases[NGX_HTTP_CONTENT_PHASE].handlers);
+    /*实现机制是通过数组*/
+    h = ngx_array_push(&cmcf->phases[NGX_HTTP_CONTENT_PHASE].handlers); /*将ngx_http_static_handler挂载到NGX_HTTP_CONTENT_PHASE阶段*/
     if (h == NULL) {
         return NGX_ERROR;
     }
