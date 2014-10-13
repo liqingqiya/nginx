@@ -5,7 +5,7 @@
  */
 
 
-#ifndef _NGX_ARRAY_H_INCLUDED_
+#ifndef _NGX_ARRAY_H_INCLUDED_      /*防止头文件多次导入的差错*/
 #define _NGX_ARRAY_H_INCLUDED_
 
 
@@ -14,12 +14,12 @@
 
 
 typedef struct {
-    void        *elts;      /* 数据元素 element，因为这里要存储的是各种类型，所以声明为了 void 类型 */
-    ngx_uint_t   nelts;     /* element 元素个数 */
-    size_t       size;      /* 数组大小？那 nelts又是做什么的呢？ */
-    ngx_uint_t   nalloc;    /* 分配内存？ */
-    ngx_pool_t  *pool;      /* 内存池结构 */
-} ngx_array_t;
+    void        *elts;      /*数组数据区域*/
+    ngx_uint_t   nelts;     /*element个数*/
+    size_t       size;      /*一个元素内存的字节大小*/
+    ngx_uint_t   nalloc;    /*数组容量*/
+    ngx_pool_t  *pool;      /*数组所在的内存池*/
+} ngx_array_t;              /*数组管理器，就代表一个数组*/
 
 
 ngx_array_t *ngx_array_create(ngx_pool_t *p, ngx_uint_t n, size_t size);
@@ -36,12 +36,12 @@ ngx_array_init(ngx_array_t *array, ngx_pool_t *pool, ngx_uint_t n, size_t size) 
      * that "array->nelts" may be used without having been initialized
      */
 
-    array->nelts = 0;
-    array->size = size;
-    array->nalloc = n;
-    array->pool = pool;
+    array->nelts = 0;        /*元素个数*/
+    array->size = size;     /*单个节点的内存大小*/
+    array->nalloc = n;      /*数组容量*/
+    array->pool = pool;     /*内存池*/
 
-    array->elts = ngx_palloc(pool, n * size);
+    array->elts = ngx_palloc(pool, n * size);   /*分配内存空间*/
     if (array->elts == NULL) {
         return NGX_ERROR;
     }
