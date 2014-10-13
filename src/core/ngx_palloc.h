@@ -75,11 +75,11 @@ typedef struct {
 void *ngx_alloc(size_t size, ngx_log_t *log);
 void *ngx_calloc(size_t size, ngx_log_t *log);
 
-ngx_pool_t *ngx_create_pool(size_t size, ngx_log_t *log);
-void ngx_destroy_pool(ngx_pool_t *pool);
+ngx_pool_t *ngx_create_pool(size_t size, ngx_log_t *log);       /*创建内存池*/
+void ngx_destroy_pool(ngx_pool_t *pool);                          /*销毁内存池*/  
 void ngx_reset_pool(ngx_pool_t *pool);
 
-void *ngx_palloc(ngx_pool_t *pool, size_t size);
+void *ngx_palloc(ngx_pool_t *pool, size_t size);                /*从内存池中分配内存*/
 void *ngx_pnalloc(ngx_pool_t *pool, size_t size);
 void *ngx_pcalloc(ngx_pool_t *pool, size_t size);
 void *ngx_pmemalign(ngx_pool_t *pool, size_t size, size_t alignment);

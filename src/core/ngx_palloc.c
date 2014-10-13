@@ -18,7 +18,7 @@ ngx_create_pool(size_t size, ngx_log_t *log)
 {
     ngx_pool_t  *p;
 
-    p = ngx_memalign(NGX_POOL_ALIGNMENT, size, log);
+    p = ngx_memalign(NGX_POOL_ALIGNMENT, size, log);    /*进行16个字节的内存对齐分配，对其处理一般是为了从性能上考虑？？todo*/
     if (p == NULL) {
         return NULL;
     }
@@ -29,7 +29,7 @@ ngx_create_pool(size_t size, ngx_log_t *log)
     p->d.failed = 0;
 
     size = size - sizeof(ngx_pool_t);
-    p->max = (size < NGX_MAX_ALLOC_FROM_POOL) ? size : NGX_MAX_ALLOC_FROM_POOL;
+    p->max = (size < NGX_MAX_ALLOC_FROM_POOL) ? size : NGX_MAX_ALLOC_FROM_POOL; /*todo*/
 
     p->current = p;
     p->chain = NULL;
@@ -117,7 +117,7 @@ ngx_reset_pool(ngx_pool_t *pool)
 
 
 void *
-ngx_palloc(ngx_pool_t *pool, size_t size)
+ngx_palloc(ngx_pool_t *pool, size_t size)   /*尝试从pool内存池里分配size大小的内存空间*/
 {
     u_char      *m;
     ngx_pool_t  *p;
