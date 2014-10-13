@@ -137,8 +137,8 @@ typedef __int64             int64_t;
 typedef unsigned __int64    uint64_t;
 
 #ifndef __WATCOMC__
-typedef int                 intptr_t;
-typedef u_int               uintptr_t;
+typedef int                 intptr_t;			/*intptr_t类型定义*/
+typedef u_int               uintptr_t;			/*uintptr_t类型定义*/
 #endif
 
 
