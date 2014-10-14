@@ -386,7 +386,7 @@ ngx_http_upstream_get_round_robin_peer(ngx_peer_connection_t *pc, void *data)
     ngx_http_upstream_rr_peers_t  *peers;
 
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, pc->log, 0,
-                   "get rr peer, try: %ui", pc->tries); /**日志打印/
+                   "get rr peer, try: %ui", pc->tries); /*日志打印*/
 
     /* ngx_lock_mutex(rrp->peers->mutex); */
 
