@@ -16,9 +16,9 @@
 
 
 static ngx_inline void ngx_rbtree_left_rotate(ngx_rbtree_node_t **root,
-    ngx_rbtree_node_t *sentinel, ngx_rbtree_node_t *node);
+    ngx_rbtree_node_t *sentinel, ngx_rbtree_node_t *node);      /*左旋*/
 static ngx_inline void ngx_rbtree_right_rotate(ngx_rbtree_node_t **root,
-    ngx_rbtree_node_t *sentinel, ngx_rbtree_node_t *node);
+    ngx_rbtree_node_t *sentinel, ngx_rbtree_node_t *node);      /*右旋*/
 
 
 void
