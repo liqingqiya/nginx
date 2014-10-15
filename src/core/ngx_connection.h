@@ -13,21 +13,21 @@
 #include <ngx_core.h>
 
 
-typedef struct ngx_listening_s  ngx_listening_t;
+typedef struct ngx_listening_s  ngx_listening_t;    /*代表一个监听端口*/
 
 struct ngx_listening_s {
-    ngx_socket_t        fd;
+    ngx_socket_t        fd;     /*套接字句柄*/
 
-    struct sockaddr    *sockaddr;
+    struct sockaddr    *sockaddr;   /*套接字地址*/
     socklen_t           socklen;    /* size of sockaddr */
     size_t              addr_text_max_len;
-    ngx_str_t           addr_text;
+    ngx_str_t           addr_text;  /*以字符串类型存储ip地址*/
 
-    int                 type;
+    int                 type;       /*套接字类型，比如SOCK_STREAM代表TCP*/
 
     int                 backlog;
-    int                 rcvbuf;
-    int                 sndbuf;
+    int                 rcvbuf;     /*内核中对于这个套接字的接收缓冲区的大小*/
+    int                 sndbuf;     /*内核中对于这个套接字的发送缓冲区的大小*/
 #if (NGX_HAVE_KEEPALIVE_TUNABLE)
     int                 keepidle;
     int                 keepintvl;
@@ -35,23 +35,23 @@ struct ngx_listening_s {
 #endif
 
     /* handler of accepted connection */
-    ngx_connection_handler_pt   handler;
+    ngx_connection_handler_pt   handler;    /*当新的TCP连接成功建立后的处理方法*/
 
     void               *servers;  /* array of ngx_http_in_addr_t, for example */
 
     ngx_log_t           log;
     ngx_log_t          *logp;
 
-    size_t              pool_size;
+    size_t              pool_size;  /*如果新的TCP 连接创建内存池，初始大小*/
     /* should be here because of the AcceptEx() preread */
     size_t              post_accept_buffer_size;
     /* should be here because of the deferred accept */
     ngx_msec_t          post_accept_timeout;
 
     ngx_listening_t    *previous;
-    ngx_connection_t   *connection;
+    ngx_connection_t   *connection; /*当前监听句柄对应着的ngx_connection_t结构体*/
 
-    unsigned            open:1;
+    unsigned            open:1; /*标志位，1表示当前监听有效*/
     unsigned            remain:1;
     unsigned            ignore:1;
 
