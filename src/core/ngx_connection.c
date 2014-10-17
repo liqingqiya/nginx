@@ -29,7 +29,7 @@ ngx_create_listening(ngx_conf_t *cf, void *sockaddr, socklen_t socklen)
         return NULL;
     }
 
-    ngx_memzero(ls, sizeof(ngx_listening_t));
+    ngx_memzero(ls, sizeof(ngx_listening_t));   /*初始化监听结构体的内存块*/
 
     sa = ngx_palloc(cf->pool, socklen);
     if (sa == NULL) {
