@@ -18,16 +18,16 @@ typedef void *            ngx_buf_tag_t;
 typedef struct ngx_buf_s  ngx_buf_t;
 
 struct ngx_buf_s {
-    u_char          *pos;
-    u_char          *last;
-    off_t            file_pos;
-    off_t            file_last;
+    u_char          *pos;   /* 当前buffer真实内容的起始位置 */
+    u_char          *last;  /* 当前buffer真实内容的结束位置 */
+    off_t            file_pos;  /* 在文件中真实内容的起始位置   */
+    off_t            file_last; /* 在文件中真实内容的结束位置   */
 
-    u_char          *start;         /* start of buffer */
-    u_char          *end;           /* end of buffer */
-    ngx_buf_tag_t    tag;
-    ngx_file_t      *file;
-    ngx_buf_t       *shadow;
+    u_char          *start;         /* start of buffer */   /* buffer内存的开始分配的位置 */
+    u_char          *end;           /* end of buffer */     /* buffer内存的结束分配的位置 */
+    ngx_buf_tag_t    tag;           /* buffer属于哪个模块的标志 */
+    ngx_file_t      *file;           /* buffer所引用的文件 */
+    ngx_buf_t       *shadow;        /* 用来引用替换过后的buffer，以便当所有buffer输出以后，这个buffer可以被释放。*/
 
 
     /* the buf's content could be changed */
@@ -42,17 +42,17 @@ struct ngx_buf_s {
     /* the buf's content is mmap()ed and must not be changed */
     unsigned         mmap:1;
 
-    unsigned         recycled:1;
-    unsigned         in_file:1;
-    unsigned         flush:1;
+    unsigned         recycled:1;    /* 内存可以被输出并回收 */
+    unsigned         in_file:1;     /* buffer的内容在文件中 */
+    unsigned         flush:1;       /* 马上全部输出buffer的内容, gzip模块里面用得比较多 */
     unsigned         sync:1;
-    unsigned         last_buf:1;
-    unsigned         last_in_chain:1;
+    unsigned         last_buf:1;    /* 所有请求里面最后一块buffer，包含子请求 */
+    unsigned         last_in_chain:1;   /* 当前请求输出链的最后一块buffer */
 
     unsigned         last_shadow:1;
-    unsigned         temp_file:1;
+    unsigned         temp_file:1;   /* 是否是暂存文件 */
 
-    /* STUB */ int   num;
+    /* STUB */ int   num;   /* 统计用，表示使用次数 */
 };
 
 

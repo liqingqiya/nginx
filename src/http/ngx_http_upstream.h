@@ -305,7 +305,7 @@ struct ngx_http_upstream_s {
     ngx_int_t                      (*create_key)(ngx_http_request_t *r);
 #endif
     ngx_int_t                      (*create_request)(ngx_http_request_t *r);
-    ngx_int_t                      (*reinit_request)(ngx_http_request_t *r);
+    ngx_int_t                      (*reinit_request)(ngx_http_request_t *r);/*某服务器出错，nginx会尝试另一服务器。选定新服务器后，会先调用此函数，以重新初始化 upstream模块的工作状态，然后再次进行upstream连接。*/
     ngx_int_t                      (*process_header)(ngx_http_request_t *r);
     void                           (*abort_request)(ngx_http_request_t *r);
     void                           (*finalize_request)(ngx_http_request_t *r,

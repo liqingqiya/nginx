@@ -36,14 +36,14 @@ static char *ngx_http_upstream_ip_hash(ngx_conf_t *cf, ngx_command_t *cmd,
 static ngx_command_t  ngx_http_upstream_ip_hash_commands[] = {
 
     { ngx_string("ip_hash"),
-      NGX_HTTP_UPS_CONF|NGX_CONF_NOARGS,
+      NGX_HTTP_UPS_CONF|NGX_CONF_NOARGS,    /*NGX_HTTP_UPS_CONF这个属性表示该指令的适用范围是upstream{}*/
       ngx_http_upstream_ip_hash,
       0,
       0,
       NULL },
 
       ngx_null_command
-};
+};      /*ip_hash指令*/
 
 
 static ngx_http_module_t  ngx_http_upstream_ip_hash_module_ctx = {
@@ -83,7 +83,7 @@ static u_char ngx_http_upstream_ip_hash_pseudo_addr[3];
 static ngx_int_t
 ngx_http_upstream_init_ip_hash(ngx_conf_t *cf, ngx_http_upstream_srv_conf_t *us)
 {
-    if (ngx_http_upstream_init_round_robin(cf, us) != NGX_OK) {
+    if (ngx_http_upstream_init_round_robin(cf, us) != NGX_OK) { /*初始化加权轮询*/
         return NGX_ERROR;
     }
 
@@ -108,13 +108,13 @@ ngx_http_upstream_init_ip_hash_peer(ngx_http_request_t *r,
         return NGX_ERROR;
     }
 
-    r->upstream->peer.data = &iphp->rrp;
+    r->upstream->peer.data = &iphp->rrp;        /*非后备服务器列表*/
 
-    if (ngx_http_upstream_init_round_robin_peer(r, us) != NGX_OK) {
+    if (ngx_http_upstream_init_round_robin_peer(r, us) != NGX_OK) { /*初始化加权轮询模块*/
         return NGX_ERROR;
     }
 
-    r->upstream->peer.get = ngx_http_upstream_get_ip_hash_peer;
+    r->upstream->peer.get = ngx_http_upstream_get_ip_hash_peer; /*设置选服务器的回调函数*/
 
     switch (r->connection->sockaddr->sa_family) {
 
@@ -267,13 +267,13 @@ ngx_http_upstream_ip_hash(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
                            "load balancing method redefined");
     }
 
-    uscf->peer.init_upstream = ngx_http_upstream_init_ip_hash;
+    uscf->peer.init_upstream = ngx_http_upstream_init_ip_hash;  /*初始回调函数*/
 
-    uscf->flags = NGX_HTTP_UPSTREAM_CREATE
-                  |NGX_HTTP_UPSTREAM_WEIGHT
-                  |NGX_HTTP_UPSTREAM_MAX_FAILS
-                  |NGX_HTTP_UPSTREAM_FAIL_TIMEOUT
-                  |NGX_HTTP_UPSTREAM_DOWN;
+    uscf->flags = NGX_HTTP_UPSTREAM_CREATE  /*创建标志，如果含有创建标志的话，nginx会检查重复创建，以及必要参数是否填写*/
+                  |NGX_HTTP_UPSTREAM_WEIGHT     /*可以在server中使用weight属性*/
+                  |NGX_HTTP_UPSTREAM_MAX_FAILS  /*可以在server中使用max_fails属性*/
+                  |NGX_HTTP_UPSTREAM_FAIL_TIMEOUT   /*可以在server中使用fail_timeout属性*/
+                  |NGX_HTTP_UPSTREAM_DOWN;  /*可以在server中使用down属性*/
 
     return NGX_CONF_OK;
 }

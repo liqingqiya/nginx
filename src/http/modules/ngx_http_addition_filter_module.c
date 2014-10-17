@@ -195,10 +195,10 @@ ngx_http_addition_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
 
 
 static ngx_int_t
-ngx_http_addition_filter_init(ngx_conf_t *cf)
+ngx_http_addition_filter_init(ngx_conf_t *cf)   /*此模块初始化*/
 {
-    ngx_http_next_header_filter = ngx_http_top_header_filter;
-    ngx_http_top_header_filter = ngx_http_addition_header_filter;
+    ngx_http_next_header_filter = ngx_http_top_header_filter;   /*存放下一个过滤模块的指针*/
+    ngx_http_top_header_filter = ngx_http_addition_header_filter;   /*设置当前过滤模块的指针到全局变量ngx_http_top_header_filter中*/
 
     ngx_http_next_body_filter = ngx_http_top_body_filter;
     ngx_http_top_body_filter = ngx_http_addition_body_filter;

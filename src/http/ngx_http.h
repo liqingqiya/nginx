@@ -177,8 +177,8 @@ extern ngx_module_t  ngx_http_module;
 extern ngx_str_t  ngx_http_html_default_types[];
 
 
-extern ngx_http_output_header_filter_pt  ngx_http_top_header_filter;
-extern ngx_http_output_body_filter_pt    ngx_http_top_body_filter;
+extern ngx_http_output_header_filter_pt  ngx_http_top_header_filter;    /*变量ngx_http_top_header_filter在ngx_http.c中定义???todo*/
+extern ngx_http_output_body_filter_pt    ngx_http_top_body_filter;  /*变量ngx_http_top_body_filter在ngx_http.c中定义???*/
 
 
 #endif /* _NGX_HTTP_H_INCLUDED_ */

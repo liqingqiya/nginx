@@ -173,15 +173,15 @@ ngx_http_memcached_handler(ngx_http_request_t *r)
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
-    if (ngx_http_upstream_create(r) != NGX_OK) {
+    if (ngx_http_upstream_create(r) != NGX_OK) {    /*创建upstream数据结构*/
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
-
+    /*设置模块的tag和schema。schema现在只会用于日志，tag会用于buf_chain管理。*/
     u = r->upstream;
 
     ngx_str_set(&u->schema, "memcached://");
     u->output.tag = (ngx_buf_tag_t) &ngx_http_memcached_module;
-
+    /*设置upstream的后端服务器列表数据结构*/
     mlcf = ngx_http_get_module_loc_conf(r, ngx_http_memcached_module);
 
     u->conf = &mlcf->upstream;
@@ -191,7 +191,7 @@ ngx_http_memcached_handler(ngx_http_request_t *r)
     u->process_header = ngx_http_memcached_process_header;
     u->abort_request = ngx_http_memcached_abort_request;
     u->finalize_request = ngx_http_memcached_finalize_request;
-
+    /*创建并设置upstream环境数据结构。*/
     ctx = ngx_palloc(r->pool, sizeof(ngx_http_memcached_ctx_t));
     if (ctx == NULL) {
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
@@ -204,7 +204,7 @@ ngx_http_memcached_handler(ngx_http_request_t *r)
     u->input_filter_init = ngx_http_memcached_filter_init;
     u->input_filter = ngx_http_memcached_filter;
     u->input_filter_ctx = ctx;
-
+    /*完成upstream初始化并进行收尾工作。*/
     r->main->count++;
 
     ngx_http_upstream_init(r);
