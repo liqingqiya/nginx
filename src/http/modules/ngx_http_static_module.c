@@ -63,7 +63,7 @@ ngx_http_static_handler(ngx_http_request_t *r)
         return NGX_HTTP_NOT_ALLOWED;
     }
 
-    if (r->uri.data[r->uri.len - 1] == '/') {
+    if (r->uri.data[r->uri.len - 1] == '/') {       /*检查uri结尾字符，如果结尾是‘/’，那么表明这请求的是一个目录，那么我这个handler是拒绝处理的。*/
         return NGX_DECLINED;
     }
 
@@ -73,7 +73,7 @@ ngx_http_static_handler(ngx_http_request_t *r)
      * ngx_http_map_uri_to_path() allocates memory for terminating '\0'
      * so we do not need to reserve memory for '/' for possible redirect
      */
-
+     /*该函数的作用是把请求的http协议的路径转化成一个文件系统的路径*/
     last = ngx_http_map_uri_to_path(r, &path, &root, 0);   /*解析uri*/
     if (last == NULL) {
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
@@ -84,7 +84,7 @@ ngx_http_static_handler(ngx_http_request_t *r)
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, log, 0,
                    "http filename: \"%s\"", path.data);
 
-    clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
+    clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);   /*获取当前配置结构体*/
 
     ngx_memzero(&of, sizeof(ngx_open_file_info_t));
 
@@ -94,12 +94,12 @@ ngx_http_static_handler(ngx_http_request_t *r)
     of.min_uses = clcf->open_file_cache_min_uses;
     of.errors = clcf->open_file_cache_errors;
     of.events = clcf->open_file_cache_events;
-
-    if (ngx_http_set_disable_symlinks(r, clcf, &path, &of) != NGX_OK) {
+    /*如果请求的文件是个symbol link，根据配置，是否允许符号链接，不允许返回错误。*/
+    if (ngx_http_set_disable_symlinks(r, clcf, &path, &of) != NGX_OK) { 
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
-    if (ngx_open_cached_file(clcf->open_file_cache, &path, &of, r->pool)
+    if (ngx_open_cached_file(clcf->open_file_cache, &path, &of, r->pool)    /*todo*/
         != NGX_OK)
     {
         switch (of.err) {
@@ -144,7 +144,7 @@ ngx_http_static_handler(ngx_http_request_t *r)
 
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, log, 0, "http static fd: %d", of.fd);
 
-    if (of.is_dir) {
+    if (of.is_dir) {    /*如果请求的是一个名称，是一个目录的名字，也返回错误。*/
 
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, log, 0, "http dir");
 
@@ -195,7 +195,7 @@ ngx_http_static_handler(ngx_http_request_t *r)
 
 #if !(NGX_WIN32) /* the not regular files are probably Unix specific */
 
-    if (!of.is_file) {
+    if (!of.is_file) {  /*请求的不是一个文件*/
         ngx_log_error(NGX_LOG_CRIT, log, 0,
                       "\"%s\" is not a regular file", path.data);
 
@@ -204,7 +204,7 @@ ngx_http_static_handler(ngx_http_request_t *r)
 
 #endif
 
-    if (r->method & NGX_HTTP_POST) {
+    if (r->method & NGX_HTTP_POST) {    /*POST请求，拒绝？*/
         return NGX_HTTP_NOT_ALLOWED;
     }
 
@@ -236,12 +236,12 @@ ngx_http_static_handler(ngx_http_request_t *r)
 
     /* we need to allocate all before the header would be sent */
 
-    b = ngx_pcalloc(r->pool, sizeof(ngx_buf_t));
+    b = ngx_pcalloc(r->pool, sizeof(ngx_buf_t));    /*？？我们需要分配内存，在相应头发送之前*/
     if (b == NULL) {
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
-    b->file = ngx_pcalloc(r->pool, sizeof(ngx_file_t));
+    b->file = ngx_pcalloc(r->pool, sizeof(ngx_file_t)); /*？？我们需要分配内存，在相应头发送之前*/
     if (b->file == NULL) {
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
@@ -267,12 +267,12 @@ ngx_http_static_handler(ngx_http_request_t *r)
     out.buf = b;
     out.next = NULL;
 
-    return ngx_http_output_filter(r, &out);
+    return ngx_http_output_filter(r, &out);     /*把产生的内容传递给后续的filter去处理*/
 }
 
 
 static ngx_int_t
-ngx_http_static_init(ngx_conf_t *cf)
+ngx_http_static_init(ngx_conf_t *cf)        /*该模块初始化函数*/
 {
     ngx_http_handler_pt        *h;
     ngx_http_core_main_conf_t  *cmcf;
@@ -284,7 +284,7 @@ ngx_http_static_init(ngx_conf_t *cf)
         return NGX_ERROR;
     }
 
-    *h = ngx_http_static_handler;
+    *h = ngx_http_static_handler; /*将ngx_http_static_handler挂载到NGX_HTTP_CONTENT_PHASE阶段*/
 
     return NGX_OK;
 }

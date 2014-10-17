@@ -61,7 +61,7 @@ HANDLE         ngx_cache_manager_event;
 
 
 void
-ngx_master_process_cycle(ngx_cycle_t *cycle)
+ngx_master_process_cycle(ngx_cycle_t *cycle)    /*开启主进程，也就是控制进程*/
 {
     u_long      nev, ev, timeout;
     ngx_err_t   err;
@@ -125,7 +125,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
     timer = 0;
     timeout = INFINITE;
 
-    for ( ;; ) {
+    for ( ;; ) {    /*主进程的循环主结构， master process*/
 
         nev = 4;
         for (n = 0; n < ngx_last_process; n++) {
@@ -212,7 +212,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
 
             ngx_close_listening_sockets(cycle);
 
-            if (ngx_start_worker_processes(cycle, NGX_PROCESS_JUST_RESPAWN)) {
+            if (ngx_start_worker_processes(cycle, NGX_PROCESS_JUST_RESPAWN)) {  /*work process 工作进程*/
                 ngx_quit_worker_processes(cycle, 1);
             }
 

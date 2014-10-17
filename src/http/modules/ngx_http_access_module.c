@@ -130,9 +130,9 @@ ngx_http_access_handler(ngx_http_request_t *r)
     struct sockaddr_in6         *sin6;
 #endif
 
-    alcf = ngx_http_get_module_loc_conf(r, ngx_http_access_module);
+    alcf = ngx_http_get_module_loc_conf(r, ngx_http_access_module);     /*？？？*/
 
-    switch (r->connection->sockaddr->sa_family) {
+    switch (r->connection->sockaddr->sa_family) {   /*根据客户端地址来选择ipv4或者ipv6的处理函数 或者unix的处理函数？*/
 
     case AF_INET:
         if (alcf->rules) {
@@ -456,14 +456,14 @@ ngx_http_access_init(ngx_conf_t *cf)
     ngx_http_handler_pt        *h;
     ngx_http_core_main_conf_t  *cmcf;
 
-    cmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_core_module);
+    cmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_core_module);    /*？？？todo，这里是在获取配置结构吗？*/
 
-    h = ngx_array_push(&cmcf->phases[NGX_HTTP_ACCESS_PHASE].handlers);
+    h = ngx_array_push(&cmcf->phases[NGX_HTTP_ACCESS_PHASE].handlers);  /*获取内存地址*/
     if (h == NULL) {
         return NGX_ERROR;
     }
 
-    *h = ngx_http_access_handler;
+    *h = ngx_http_access_handler;   /*挂载到 NGX_HTTP_ACCESS_PHASE 阶段*/
 
     return NGX_OK;
 }

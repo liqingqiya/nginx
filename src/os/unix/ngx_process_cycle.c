@@ -728,7 +728,7 @@ ngx_master_process_exit(ngx_cycle_t *cycle)
 
 
 static void
-ngx_worker_process_cycle(ngx_cycle_t *cycle, void *data)
+ngx_worker_process_cycle(ngx_cycle_t *cycle, void *data)    /*work process 工作进程主体函数*/
 {
     ngx_int_t worker = (intptr_t) data;
 
@@ -737,9 +737,9 @@ ngx_worker_process_cycle(ngx_cycle_t *cycle, void *data)
 
     ngx_process = NGX_PROCESS_WORKER;
 
-    ngx_worker_process_init(cycle, worker);
+    ngx_worker_process_init(cycle, worker); /*init 初始化*/
 
-    ngx_setproctitle("worker process");
+    ngx_setproctitle("worker process");     /*设置标题*/
 
 #if (NGX_THREADS)
     {
