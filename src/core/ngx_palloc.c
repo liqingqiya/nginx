@@ -23,15 +23,15 @@ ngx_create_pool(size_t size, ngx_log_t *log)
         return NULL;
     }
 
-    p->d.last = (u_char *) p + sizeof(ngx_pool_t);
-    p->d.end = (u_char *) p + size;
-    p->d.next = NULL;
+    p->d.last = (u_char *) p + sizeof(ngx_pool_t);  /*该内存池所占的最后地址*/
+    p->d.end = (u_char *) p + size;         /*分配的内存块的最后地址*/
+    p->d.next = NULL;   /*指向下一个节点*/
     p->d.failed = 0;
 
     size = size - sizeof(ngx_pool_t);
     p->max = (size < NGX_MAX_ALLOC_FROM_POOL) ? size : NGX_MAX_ALLOC_FROM_POOL; /*todo*/
 
-    p->current = p;
+    p->current = p;     /*当前内存池的地址*/
     p->chain = NULL;
     p->large = NULL;
     p->cleanup = NULL;
@@ -122,7 +122,7 @@ ngx_palloc(ngx_pool_t *pool, size_t size)   /*尝试从pool内存池里分配siz
     u_char      *m;
     ngx_pool_t  *p;
 
-    if (size <= pool->max) {
+    if (size <= pool->max) {    /*size在内存池设定的可分配的最大值的范围内*/
 
         p = pool->current;
 
@@ -132,17 +132,17 @@ ngx_palloc(ngx_pool_t *pool, size_t size)   /*尝试从pool内存池里分配siz
             if ((size_t) (p->d.end - m) >= size) {
                 p->d.last = m + size;
 
-                return m;
+                return m;   /*返回可用内存地址*/
             }
 
-            p = p->d.next;
+            p = p->d.next;  /*当前节点不够分配，那么移到下一个内存节点*/
 
         } while (p);
 
-        return ngx_palloc_block(pool, size);
+        return ngx_palloc_block(pool, size);    /*都不够分配，那么重新开辟一个内存节点节点, 并返回地址*/
     }
 
-    return ngx_palloc_large(pool, size);
+    return ngx_palloc_large(pool, size);    /*size太大，那么就开辟一个大内存节点结构 ngx_pool_large_t,并返回地址*/
 }
 
 
@@ -169,50 +169,50 @@ ngx_pnalloc(ngx_pool_t *pool, size_t size)
 
         } while (p);
 
-        return ngx_palloc_block(pool, size);
+        return ngx_palloc_block(pool, size);    /*新建一个内存池，组成内存池链表*/
     }
 
-    return ngx_palloc_large(pool, size);
+    return ngx_palloc_large(pool, size);    /*开辟一个大存储块*/
 }
 
 
 static void *
-ngx_palloc_block(ngx_pool_t *pool, size_t size)
+ngx_palloc_block(ngx_pool_t *pool, size_t size) /*新建一个内存池，并与先前的内存池组成一个内存池链表*/
 {
     u_char      *m;
     size_t       psize;
     ngx_pool_t  *p, *new, *current;
 
-    psize = (size_t) (pool->d.end - (u_char *) pool);
+    psize = (size_t) (pool->d.end - (u_char *) pool);   /*当前内存池的大小*/
 
-    m = ngx_memalign(NGX_POOL_ALIGNMENT, psize, pool->log);
+    m = ngx_memalign(NGX_POOL_ALIGNMENT, psize, pool->log); /*对齐分配psize大小的内存*/
     if (m == NULL) {
         return NULL;
     }
 
-    new = (ngx_pool_t *) m;
+    new = (ngx_pool_t *) m; /*强制转化指针*/
 
-    new->d.end = m + psize;
-    new->d.next = NULL;
-    new->d.failed = 0;
+    new->d.end = m + psize; /*指向新开辟的内存池的结尾*/
+    new->d.next = NULL;     /*下一个内存池*/
+    new->d.failed = 0;      /*内存分配失败的次数*/
 
-    m += sizeof(ngx_pool_data_t);
+    m += sizeof(ngx_pool_data_t);   
     m = ngx_align_ptr(m, NGX_ALIGNMENT);
-    new->d.last = m + size;
+    new->d.last = m + size; /*指向数据区域的结尾*/
 
-    current = pool->current;
-
+    current = pool->current;    /*指向当前的内存池*/
+    /*遍历到内存池链表的末尾*/
     for (p = current; p->d.next; p = p->d.next) {
-        if (p->d.failed++ > 4) {
-            current = p->d.next;
+        if (p->d.failed++ > 4) {    /*4是一个经验值*/
+            current = p->d.next;    /*如果当前的内存池内存分配失败次数 >4, 那么使用下一个内存池，并且failed++*/
         }
     }
 
-    p->d.next = new;
+    p->d.next = new;    /*内存池末尾指向新开辟的内存池节点*/
 
-    pool->current = current ? current : new;
+    pool->current = current ? current : new;        /*current指向当前可用的内存池*/
 
-    return m;
+    return m;       /*返回新的内存池的地址*/
 }
 
 
@@ -236,12 +236,12 @@ ngx_palloc_large(ngx_pool_t *pool, size_t size)
             return p;
         }
 
-        if (n++ > 3) {
+        if (n++ > 3) {  /*大存储块不超过3个*/
             break;
         }
     }
 
-    large = ngx_palloc(pool, sizeof(ngx_pool_large_t));
+    large = ngx_palloc(pool, sizeof(ngx_pool_large_t)); /*重新开辟一个大存储块*/
     if (large == NULL) {
         ngx_free(p);
         return NULL;

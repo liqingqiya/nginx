@@ -59,7 +59,7 @@ struct ngx_buf_s {
 struct ngx_chain_s {
     ngx_buf_t    *buf;
     ngx_chain_t  *next;
-};
+};  /*链表结构*/
 
 
 typedef struct {

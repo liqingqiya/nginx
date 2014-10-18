@@ -43,26 +43,26 @@ typedef struct ngx_pool_large_s  ngx_pool_large_t;
 struct ngx_pool_large_s {
     ngx_pool_large_t     *next;
     void                 *alloc;
-};
+};      /*大内存节点, 当一个申请的内存空间大小比内存池的大小还要大的时候，malloc一块大的空间，再内存池用保留这个地址的指针*/
 
 
 typedef struct {
-    u_char               *last;
-    u_char               *end;
-    ngx_pool_t           *next;
-    ngx_uint_t            failed;
-} ngx_pool_data_t;
+    u_char               *last;     /*数据区域的结束地址*/
+    u_char               *end;      /*内存池的结束地址*/
+    ngx_pool_t           *next;     /*指向下一个内存池节点*/
+    ngx_uint_t            failed;   /*标志申请内存的时候失败的次数*/
+} ngx_pool_data_t;      /*内存数据区域*/
 
 
 struct ngx_pool_s {
-    ngx_pool_data_t       d;
-    size_t                max;
-    ngx_pool_t           *current;
-    ngx_chain_t          *chain;
-    ngx_pool_large_t     *large;
+    ngx_pool_data_t       d;    /*内存池数据结构*/
+    size_t                max;  /*最大数据区大小*/
+    ngx_pool_t           *current;  /*指向当前的内存池结构*/
+    ngx_chain_t          *chain;    /*todo*/
+    ngx_pool_large_t     *large;    /*携带的大存储块，不超过3个*/
     ngx_pool_cleanup_t   *cleanup;
     ngx_log_t            *log;
-};
+}; /*内存池管理结构*/
 
 
 typedef struct {
