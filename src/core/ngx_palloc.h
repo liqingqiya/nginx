@@ -32,9 +32,9 @@ typedef void (*ngx_pool_cleanup_pt)(void *data);
 typedef struct ngx_pool_cleanup_s  ngx_pool_cleanup_t;
 
 struct ngx_pool_cleanup_s {
-    ngx_pool_cleanup_pt   handler;
-    void                 *data;
-    ngx_pool_cleanup_t   *next;
+    ngx_pool_cleanup_pt   handler;  /*回调函数指针*/
+    void                 *data;     /*回调函数所需要的参数*/
+    ngx_pool_cleanup_t   *next;     /*指向下一个回调函数节点*/
 };
 
 

@@ -47,7 +47,7 @@ ngx_destroy_pool(ngx_pool_t *pool)
     ngx_pool_t          *p, *n;
     ngx_pool_large_t    *l;
     ngx_pool_cleanup_t  *c;
-
+    /*调用设定好的回调函数*/
     for (c = pool->cleanup; c; c = c->next) {
         if (c->handler) {
             ngx_log_debug1(NGX_LOG_DEBUG_ALLOC, pool->log, 0,
@@ -55,7 +55,7 @@ ngx_destroy_pool(ngx_pool_t *pool)
             c->handler(c->data);
         }
     }
-
+    /*销毁大块内存块*/
     for (l = pool->large; l; l = l->next) {
 
         ngx_log_debug1(NGX_LOG_DEBUG_ALLOC, pool->log, 0, "free: %p", l->alloc);
@@ -82,7 +82,7 @@ ngx_destroy_pool(ngx_pool_t *pool)
     }
 
 #endif
-
+    /*小块的内存块销毁，内存池的数据区域，真正的内存池的核心结构*/
     for (p = pool, n = pool->d.next; /* void */; p = n, n = n->d.next) {
         ngx_free(p);
 
@@ -98,13 +98,13 @@ ngx_reset_pool(ngx_pool_t *pool)
 {
     ngx_pool_t        *p;
     ngx_pool_large_t  *l;
-
+    /*释放大块存储区域*/
     for (l = pool->large; l; l = l->next) {
         if (l->alloc) {
             ngx_free(l->alloc);
         }
     }
-
+    /*内存池链中的每一个内存池节点都清零failed，并且last也复位，这个时候就没有数据区域了*/
     for (p = pool; p; p = p->d.next) {
         p->d.last = (u_char *) p + sizeof(ngx_pool_t);
         p->d.failed = 0;
