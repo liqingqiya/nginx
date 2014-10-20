@@ -84,7 +84,7 @@ ngx_time_update(void)
         return;
     }
 
-    ngx_gettimeofday(&tv);
+    ngx_gettimeofday(&tv);  /*系统调用*/
 
     sec = tv.tv_sec;
     msec = tv.tv_usec / 1000;
@@ -105,12 +105,12 @@ ngx_time_update(void)
         slot++;
     }
 
-    tp = &cached_time[slot];
+    tp = &cached_time[slot];    /*cached_time为时间缓存数组*/
 
     tp->sec = sec;
     tp->msec = msec;
 
-    ngx_gmtime(sec, &gmt);
+    ngx_gmtime(sec, &gmt);  /*转换为可读的时间表示结构*/
 
 
     p0 = &cached_http_time[slot][0];

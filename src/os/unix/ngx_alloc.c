@@ -54,7 +54,7 @@ ngx_memalign(size_t alignment, size_t size, ngx_log_t *log)
     void  *p;
     int    err;
 
-    err = posix_memalign(&p, alignment, size);
+    err = posix_memalign(&p, alignment, size);  /*posix_memalign为系统调用，对齐分配内存*/
 
     if (err) {
         ngx_log_error(NGX_LOG_EMERG, log, err,

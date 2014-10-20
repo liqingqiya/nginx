@@ -58,7 +58,7 @@ void ngx_strlow(u_char *dst, u_char *src, size_t n);
 
 
 #define ngx_strstr(s1, s2)  strstr((const char *) s1, (const char *) s2)
-#define ngx_strlen(s)       strlen((const char *) s)
+#define ngx_strlen(s)       strlen((const char *) s)   /*计算字符串长度*/
 
 #define ngx_strchr(s1, c)   strchr((const char *) s1, (int) c)
 

@@ -17,8 +17,12 @@ ngx_pool_t *
 ngx_create_pool(size_t size, ngx_log_t *log)
 {
     ngx_pool_t  *p;
-
-    p = ngx_memalign(NGX_POOL_ALIGNMENT, size, log);    /*进行16个字节的内存对齐分配，对其处理一般是为了从性能上考虑？？todo*/
+    /*
+    进行16个字节的内存对齐分配，对其处理一般是为了从性能上考虑,
+    这里的ngx_memalign本质上是调用了系统调用posix_memalign()，nginx这里进行了一点封装，主要是为了日志打印的功能记录.
+    这里操作是进行16字节的内存分配，也就是说，开辟size大小的内存，返回的内存地址是NGX_POOL_ALIGNMENT的倍数.
+    */
+    p = ngx_memalign(NGX_POOL_ALIGNMENT, size, log);    
     if (p == NULL) {
         return NULL;
     }

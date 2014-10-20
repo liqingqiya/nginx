@@ -53,7 +53,7 @@ typedef struct {
 #define NGX_PROCESS_DETACHED      -5
 
 
-#define ngx_getpid   getpid
+#define ngx_getpid   getpid     /*系统调用，获取进程id号*/
 
 #ifndef ngx_log_pid
 #define ngx_log_pid  ngx_pid

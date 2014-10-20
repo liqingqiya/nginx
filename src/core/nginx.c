@@ -189,10 +189,10 @@ ngx_uint_t          ngx_max_module;
 static ngx_uint_t   ngx_show_help;
 static ngx_uint_t   ngx_show_version;
 static ngx_uint_t   ngx_show_configure;
-static u_char      *ngx_prefix;         //服务器程序安装路径
-static u_char      *ngx_conf_file;
-static u_char      *ngx_conf_params;
-static char        *ngx_signal;
+static u_char      *ngx_prefix;         /*服务器程序安装路径*/
+static u_char      *ngx_conf_file;      /*我们的使用的配置文件路径*/
+static u_char      *ngx_conf_params;    /**/
+static char        *ngx_signal;          /**/
 
 
 static char **ngx_os_environ;
@@ -275,7 +275,7 @@ main(int argc, char *const *argv)
     ngx_regex_init();     /*完成支持正则表达式的准备工作*/
 #endif
 
-    ngx_pid = ngx_getpid();   /*获取当前nginx进程的进程号*/
+    ngx_pid = ngx_getpid();   /*获取当前nginx进程的进程号, 这个是宏定义的系统调用*/
 
     log = ngx_log_init(ngx_prefix);   /*初始化日志*/
     if (log == NULL) {
@@ -672,9 +672,9 @@ ngx_get_options(int argc, char *const *argv)
 
     for (i = 1; i < argc; i++) {
 
-        p = (u_char *) argv[i];
+        p = (u_char *) argv[i]; /*为了兼容性，这里先要转化成 u_char*类型 */
 
-        if (*p++ != '-') {
+        if (*p++ != '-') {  /*第一个参数要是 ‘-’ */
             ngx_log_stderr(0, "invalid option: \"%s\"", argv[i]);
             return NGX_ERROR;
         }
@@ -890,8 +890,8 @@ ngx_process_options(ngx_cycle_t *cycle)
     }
 
     if (ngx_conf_file) {
-        cycle->conf_file.len = ngx_strlen(ngx_conf_file);
-        cycle->conf_file.data = ngx_conf_file;
+        cycle->conf_file.len = ngx_strlen(ngx_conf_file);   /*配置文件路径的字符串长度*/
+        cycle->conf_file.data = ngx_conf_file; /*配置文件路径的字符串*/
 
     } else {
         ngx_str_set(&cycle->conf_file, NGX_CONF_PATH);
