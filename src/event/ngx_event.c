@@ -624,11 +624,11 @@ ngx_event_process_init(ngx_cycle_t *cycle)
     }
 #endif
 
-    if (ngx_event_timer_init(cycle->log) == NGX_ERROR) {
+    if (ngx_event_timer_init(cycle->log) == NGX_ERROR) {    /* 初始化用来管理所有定时器的红黑树 */
         return NGX_ERROR;
     }
 
-    for (m = 0; ngx_modules[m]; m++) {
+    for (m = 0; ngx_modules[m]; m++) {  /* 初始化事件模型 */
         if (ngx_modules[m]->type != NGX_EVENT_MODULE) {
             continue;
         }
@@ -756,7 +756,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
 
     /* for each listening socket */
 
-    ls = cycle->listening.elts;
+    ls = cycle->listening.elts; /* 为每个监听套接字分配一个连接结构 */
     for (i = 0; i < cycle->listening.nelts; i++) {
 
         c = ngx_get_connection(ls[i].fd, cycle->log);
@@ -773,7 +773,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
         rev = c->read;
 
         rev->log = c->log;
-        rev->accept = 1;
+        rev->accept = 1; /* 标识此读事件为新请求连接事件 */
 
 #if (NGX_HAVE_DEFERRED_ACCEPT)
         rev->deferred_accept = ls[i].deferred_accept;

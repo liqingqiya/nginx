@@ -127,7 +127,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
     cycle->paths.nalloc = n;
     cycle->paths.pool = pool;
 
-
+    
     if (old_cycle->open_files.part.nelts) {
         n = old_cycle->open_files.part.nelts;
         for (part = old_cycle->open_files.part.next; part; part = part->next) {
@@ -145,7 +145,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         return NULL;
     }
 
-
+    /*nginx根据以往的经验（old_cycle）预测这一次的配置需要分配多少内存。*/
     if (old_cycle->shared_memory.part.nelts) {
         n = old_cycle->shared_memory.part.nelts;
         for (part = old_cycle->shared_memory.part.next; part; part = part->next)
@@ -156,7 +156,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
     } else {
         n = 1;
     }
-
+    /*遍历old_cycle，统计上一次系统中分配了多少块共享内存，接着就按这个数据初始化当前cycle中共享内存的规模。*/
     if (ngx_list_init(&cycle->shared_memory, pool, n, sizeof(ngx_shm_zone_t))
         != NGX_OK)
     {
@@ -254,13 +254,15 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
 #if 0
     log->log_level = NGX_LOG_DEBUG_ALL;
 #endif
-
+    /*解析nginx命令行参数’-g’加入的配置*/
+    /*ngx_conf_param 用来解析命令行传递的配置*/
     if (ngx_conf_param(&conf) != NGX_CONF_OK) {
         environ = senv;
         ngx_destroy_cycle_pools(&conf);
         return NULL;
     }
     /*在这里解析出错了？？？？todo*/
+    /*解析nginx配置文件*/
     if (ngx_conf_parse(&conf, &cycle->conf_file) != NGX_CONF_OK) {
         environ = senv;
         ngx_destroy_cycle_pools(&conf);

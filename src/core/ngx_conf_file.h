@@ -40,7 +40,7 @@
                               |NGX_CONF_TAKE4)
 
 #define NGX_CONF_ARGS_NUMBER 0x000000ff
-#define NGX_CONF_BLOCK       0x00000100
+#define NGX_CONF_BLOCK       0x00000100              /*todo，？为什么要定义这样的宏*/
 #define NGX_CONF_FLAG        0x00000200
 #define NGX_CONF_ANY         0x00000400
 #define NGX_CONF_1MORE       0x00000800
@@ -306,8 +306,8 @@ char *ngx_conf_check_num_bounds(ngx_conf_t *cf, void *post, void *data);
     }
 
 
-char *ngx_conf_param(ngx_conf_t *cf);
-char *ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename);
+char *ngx_conf_param(ngx_conf_t *cf);       /*解析命令行*/
+char *ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename);/*解析配置参数*/
 char *ngx_conf_include(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 
 

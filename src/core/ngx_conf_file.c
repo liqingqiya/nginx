@@ -313,25 +313,25 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last)
             found = 1;
 
             if (ngx_modules[i]->type != NGX_CONF_MODULE
-                && ngx_modules[i]->type != cf->module_type)
+                && ngx_modules[i]->type != cf->module_type) /*只有处理的模块的类型是NGX_CONF_MODULE或者是当前正在处理的模块类型，才可能被执行。*/
             {
                 continue;
             }
 
             /* is the directive's location right ? */
 
-            if (!(cmd->type & cf->cmd_type)) {
+            if (!(cmd->type & cf->cmd_type)) {  /*指令的Context必须当前解析Context相符；*/
                 continue;
             }
-
-            if (!(cmd->type & NGX_CONF_BLOCK) && last != NGX_OK) {
+            
+            if (!(cmd->type & NGX_CONF_BLOCK) && last != NGX_OK) {  /*非块指令必须以“;”结尾；*/
                 ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
                                   "directive \"%s\" is not terminated by \";\"",
                                   name->data);
                 return NGX_ERROR;
             }
 
-            if ((cmd->type & NGX_CONF_BLOCK) && last != NGX_CONF_BLOCK_START) {
+            if ((cmd->type & NGX_CONF_BLOCK) && last != NGX_CONF_BLOCK_START) { /*块指令必须后接“{”；*/
                 ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
                                    "directive \"%s\" has no opening \"{\"",
                                    name->data);
@@ -340,7 +340,7 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last)
 
             /* is the directive's argument count right ? */
 
-            if (!(cmd->type & NGX_CONF_ANY)) {
+            if (!(cmd->type & NGX_CONF_ANY)) {  /*指令参数个数必须正确。注意指令参数有最大值NGX_CONF_MAX_ARGS，目前值为8。*/
 
                 if (cmd->type & NGX_CONF_FLAG) {
 
@@ -373,7 +373,7 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last)
             /* set up the directive's configuration context */
 
             conf = NULL;
-
+            /*取得指令工作的conf指针。*/
             if (cmd->type & NGX_DIRECT_CONF) {
                 conf = ((void **) cf->ctx)[ngx_modules[i]->index];
 
@@ -388,7 +388,7 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last)
                 }
             }
 
-            rv = cmd->set(cf, cmd, conf);
+            rv = cmd->set(cf, cmd, conf);   /*执行指令解析回调函数,cmd是词法分析得到的结果，conf是上一步得到的配置存贮区地址。*/
 
             if (rv == NGX_CONF_OK) {
                 return NGX_OK;
