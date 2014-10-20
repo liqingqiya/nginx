@@ -155,13 +155,13 @@ typedef char *(*ngx_conf_handler_pt)(ngx_conf_t *cf,
 
 
 struct ngx_conf_s {
-    char                 *name;
-    ngx_array_t          *args;
+    char                 *name;     /*存放当前解析到的指令*/
+    ngx_array_t          *args;     /*存放所有的参数*/
 
     ngx_cycle_t          *cycle;
     ngx_pool_t           *pool;
-    ngx_pool_t           *temp_pool;
-    ngx_conf_file_t      *conf_file;
+    ngx_pool_t           *temp_pool;    /*临时的内存池，解析完参数之后即释放*/
+    ngx_conf_file_t      *conf_file;    /*配置文件的结构体信息*/
     ngx_log_t            *log;
 
     void                 *ctx;

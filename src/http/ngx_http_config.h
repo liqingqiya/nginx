@@ -13,12 +13,15 @@
 #include <ngx_core.h>
 #include <ngx_http.h>
 
-
+/*
+该结构描述了http块的配置上下文
+这样http块通过该结构体就存储了自己的配置上下文，然后将其以指针的形式保存在ngx_conf_s的结构中
+*/
 typedef struct {
-    void        **main_conf;
-    void        **srv_conf;
-    void        **loc_conf;
-} ngx_http_conf_ctx_t;
+    void        **main_conf;/*http块本身的配置参数会保存在**main_conf中*/
+    void        **srv_conf; /*http块server块中的配置结构会通过指针以数组的形式保存在**srv_conf中*/
+    void        **loc_conf; /*http块location块中的配置结构会通过指针以数组的形式保存在**loc_conf中*/
+} ngx_http_conf_ctx_t;  
 
 
 typedef struct {
