@@ -131,9 +131,9 @@ typedef struct {
 typedef struct {
     ngx_http_upstream_srv_conf_t    *upstream;
 
-    ngx_msec_t                       connect_timeout;
-    ngx_msec_t                       send_timeout;
-    ngx_msec_t                       read_timeout;
+    ngx_msec_t                       connect_timeout;   /*连接上游服务器的超时时间，单位为毫秒*/
+    ngx_msec_t                       send_timeout;  /*发送TCP包到上游服务器超时时间，单位为毫秒*/
+    ngx_msec_t                       read_timeout;/*接收TCP包到上游服务器超时时间，单位为毫秒*/
     ngx_msec_t                       timeout;
 
     size_t                           send_lowat;
@@ -198,7 +198,7 @@ typedef struct {
 #endif
 
     ngx_str_t                        module;
-} ngx_http_upstream_conf_t;
+} ngx_http_upstream_conf_t; /*用于设置upstream模块处理请求时候的参数*/
 
 
 typedef struct {
@@ -255,14 +255,14 @@ typedef struct {
     in_port_t                        port;
     ngx_uint_t                       no_port; /* unsigned no_port:1 */
 
-    ngx_uint_t                       naddrs;
-    ngx_addr_t                      *addrs;
+    ngx_uint_t                       naddrs;/*地址个数*/
+    ngx_addr_t                      *addrs;/*？？？*/
 
-    struct sockaddr                 *sockaddr;
+    struct sockaddr                 *sockaddr;/*上游服务器的地址*/
     socklen_t                        socklen;
 
     ngx_resolver_ctx_t              *ctx;
-} ngx_http_upstream_resolved_t;
+} ngx_http_upstream_resolved_t; /*设置上游服务器的地址结构*/
 
 
 typedef void (*ngx_http_upstream_handler_pt)(ngx_http_request_t *r,
@@ -277,20 +277,20 @@ struct ngx_http_upstream_s {
 
     ngx_event_pipe_t                *pipe;
 
-    ngx_chain_t                     *request_bufs;
+    ngx_chain_t                     *request_bufs;  /*request_bufs决定发送什么样的请求给上有服务器，在实现create_request方法时需要设置它*/
 
     ngx_output_chain_ctx_t           output;
     ngx_chain_writer_ctx_t           writer;
 
-    ngx_http_upstream_conf_t        *conf;
+    ngx_http_upstream_conf_t        *conf;  /*upstream访问的时的所有限制性参数*/
 
     ngx_http_upstream_headers_in_t   headers_in;
 
-    ngx_http_upstream_resolved_t    *resolved;
+    ngx_http_upstream_resolved_t    *resolved;/*通过resolved可以直接指定上游服务器地址*/
 
     ngx_buf_t                        from_client;
 
-    ngx_buf_t                        buffer;
+    ngx_buf_t                        buffer;    /*存储接受自上游服务器发来的相应内容*/
     off_t                            length;
 
     ngx_chain_t                     *out_bufs;
@@ -304,12 +304,12 @@ struct ngx_http_upstream_s {
 #if (NGX_HTTP_CACHE)
     ngx_int_t                      (*create_key)(ngx_http_request_t *r);
 #endif
-    ngx_int_t                      (*create_request)(ngx_http_request_t *r);
+    ngx_int_t                      (*create_request)(ngx_http_request_t *r);/*构造发往上游服务器的请求内容*/
     ngx_int_t                      (*reinit_request)(ngx_http_request_t *r);/*某服务器出错，nginx会尝试另一服务器。选定新服务器后，会先调用此函数，以重新初始化 upstream模块的工作状态，然后再次进行upstream连接。*/
     ngx_int_t                      (*process_header)(ngx_http_request_t *r);
     void                           (*abort_request)(ngx_http_request_t *r);
     void                           (*finalize_request)(ngx_http_request_t *r,
-                                         ngx_int_t rc);
+                                         ngx_int_t rc); /*销毁upstream请求时候调用*/
     ngx_int_t                      (*rewrite_redirect)(ngx_http_request_t *r,
                                          ngx_table_elt_t *h, size_t prefix);
     ngx_int_t                      (*rewrite_cookie)(ngx_http_request_t *r,
