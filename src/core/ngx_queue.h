@@ -20,7 +20,7 @@ struct ngx_queue_s {
     ngx_queue_t  *next;
 };
 
-
+/*宏定义，就是一个队列，主要用在可重用网络连接*/
 #define ngx_queue_init(q)                                                     \
     (q)->prev = q;                                                            \
     (q)->next = q

@@ -326,7 +326,7 @@ main(int argc, char *const *argv)
     }
 
     ngx_max_module = 0;
-    for (i = 0; ngx_modules[i]; i++) {    /*遍历所有的模块，简历模块索引*/
+    for (i = 0; ngx_modules[i]; i++) {    /*遍历所有的模块，建立模块索引*/
         ngx_modules[i]->index = ngx_max_module++;
     }
 
@@ -417,7 +417,7 @@ ngx_add_inherited_sockets(ngx_cycle_t *cycle)
     u_char           *p, *v, *inherited;
     ngx_int_t         s;
     ngx_listening_t  *ls;
-
+    /*第一次启动nginx的时候，NGINX_VAR为空，到此就结束函数，返回NGX_OK*/
     inherited = (u_char *) getenv(NGINX_VAR);   /*设置nginx的环境变量*/
 
     if (inherited == NULL) {
@@ -434,8 +434,8 @@ ngx_add_inherited_sockets(ngx_cycle_t *cycle)
         return NGX_ERROR;
     }
 
-    for (p = inherited, v = p; *p; p++) {
-        if (*p == ':' || *p == ';') {
+    for (p = inherited, v = p; *p; p++) { 
+        if (*p == ':' || *p == ';') {    /*通过冒号或者分号取出列表的socket*/
             s = ngx_atoi(v, p - v);
             if (s == NGX_ERROR) {
                 ngx_log_error(NGX_LOG_EMERG, cycle->log, 0,
@@ -447,20 +447,20 @@ ngx_add_inherited_sockets(ngx_cycle_t *cycle)
 
             v = p + 1;
 
-            ls = ngx_array_push(&cycle->listening); /*解析出socket，构造listening数组*/
+            ls = ngx_array_push(&cycle->listening); /*解析出socket，构造listening数组 ,并保存解析出来的socket,在此就只是预留空间，并没有赋值。*/
             if (ls == NULL) {
                 return NGX_ERROR;
             }
 
             ngx_memzero(ls, sizeof(ngx_listening_t));
 
-            ls->fd = (ngx_socket_t) s;
+            ls->fd = (ngx_socket_t) s;  /*真实赋值*/  /*s是socket号？？todo*/
         }
     }
 
     ngx_inherited = 1;      /*继承完毕，标志结束*/
 
-    return ngx_set_inherited_sockets(cycle);
+    return ngx_set_inherited_sockets(cycle); /*完成继承工作,从listening数组逐一取出每一个元素，初始化每一个元素*/
 }
 
 
@@ -930,7 +930,7 @@ ngx_core_module_create_conf(ngx_cycle_t *cycle)
 {
     ngx_core_conf_t  *ccf;
 
-    ccf = ngx_pcalloc(cycle->pool, sizeof(ngx_core_conf_t));
+    ccf = ngx_pcalloc(cycle->pool, sizeof(ngx_core_conf_t));  /*分配内存*/
     if (ccf == NULL) {
         return NULL;
     }
@@ -959,7 +959,7 @@ ngx_core_module_create_conf(ngx_cycle_t *cycle)
     ccf->user = (ngx_uid_t) NGX_CONF_UNSET_UINT;
     ccf->group = (ngx_gid_t) NGX_CONF_UNSET_UINT;
 
-#if (NGX_THREADS)
+#if (NGX_THREADS)  /*多线程运行nginx（实际没有使用多线程）*/
     ccf->worker_threads = NGX_CONF_UNSET;
     ccf->thread_stack_size = NGX_CONF_UNSET_SIZE;
 #endif
@@ -1035,25 +1035,25 @@ ngx_core_module_init_conf(ngx_cycle_t *cycle, void *conf)
         struct passwd  *pwd;
 
         ngx_set_errno(0);
-        pwd = getpwnam(NGX_USER);
+        pwd = getpwnam(NGX_USER);  /*获取运行nginx的用户的相关信息*/
         if (pwd == NULL) {
             ngx_log_error(NGX_LOG_EMERG, cycle->log, ngx_errno,
                           "getpwnam(\"" NGX_USER "\") failed");
             return NGX_CONF_ERROR;
         }
 
-        ccf->username = NGX_USER;
+        ccf->username = NGX_USER;  /*保存nginx运行用户的相关信息*/
         ccf->user = pwd->pw_uid;
 
         ngx_set_errno(0);
-        grp = getgrnam(NGX_GROUP);
+        grp = getgrnam(NGX_GROUP);  /*获取nginx运行用户组的相关信息*/
         if (grp == NULL) {
             ngx_log_error(NGX_LOG_EMERG, cycle->log, ngx_errno,
                           "getgrnam(\"" NGX_GROUP "\") failed");
             return NGX_CONF_ERROR;
         }
 
-        ccf->group = grp->gr_gid;
+        ccf->group = grp->gr_gid;  /*保存nginx运行用户组的id*/
     }
 
 
@@ -1067,7 +1067,7 @@ ngx_core_module_init_conf(ngx_cycle_t *cycle, void *conf)
 
     {
     ngx_str_t  lock_file;
-
+    /*以下代码用于获取nginx.lock文件，并将其信息保存到cycle->lock_file成员中*/
     lock_file = cycle->old_cycle->lock_file;
 
     if (lock_file.len) {

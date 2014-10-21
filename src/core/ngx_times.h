@@ -33,8 +33,8 @@ time_t ngx_next_time(time_t when);
 
 extern volatile ngx_time_t  *ngx_cached_time;
 
-#define ngx_time()           ngx_cached_time->sec
-#define ngx_timeofday()      (ngx_time_t *) ngx_cached_time
+#define ngx_time()           ngx_cached_time->sec  /*获取时间 todo*/
+#define ngx_timeofday()      (ngx_time_t *) ngx_cached_time  /*宏定义，获取系统缓存时间, ngx_cached_time指向缓存时间的最新缓存*/
 
 extern volatile ngx_str_t    ngx_cached_err_log_time;
 extern volatile ngx_str_t    ngx_cached_http_time;

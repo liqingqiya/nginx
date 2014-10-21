@@ -320,23 +320,23 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
 
     /* TODO: configurable try number */
 
-    for (tries = 5; tries; tries--) {
+    for (tries = 5; tries; tries--) {  /*尝试多次socket连接，默认尝试次数为5 , 每次尝试间隔500ms */
         failed = 0;
 
         /* for each listening socket */
 
         ls = cycle->listening.elts;
-        for (i = 0; i < cycle->listening.nelts; i++) {
+        for (i = 0; i < cycle->listening.nelts; i++) { /*循环遍历cycle->listening中的socket，调用bind（）和listening打开并绑定监听地址.*/
 
-            if (ls[i].ignore) {
+            if (ls[i].ignore) { /*ignore标志*/
                 continue;
             }
 
-            if (ls[i].fd != (ngx_socket_t) -1) {
+            if (ls[i].fd != (ngx_socket_t) -1) { /*todo? fd*/
                 continue;
             }
 
-            if (ls[i].inherited) {
+            if (ls[i].inherited) { /*是否继承？？todo*/
 
                 /* TODO: close on exit */
                 /* TODO: nonblocking */
@@ -345,7 +345,7 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
                 continue;
             }
 
-            s = ngx_socket(ls[i].sockaddr->sa_family, ls[i].type, 0);
+            s = ngx_socket(ls[i].sockaddr->sa_family, ls[i].type, 0); /*创建套接字,ngx_socket为nginx自主分装的一个创建socket的函数，为了跨平台*/
 
             if (s == (ngx_socket_t) -1) {
                 ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
@@ -355,7 +355,7 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
 
             if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR,
                            (const void *) &reuseaddr, sizeof(int))
-                == -1)
+                == -1)  /*配置socket, setsockopt是系统函数*/
             {
                 ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
                               "setsockopt(SO_REUSEADDR) %V failed",
@@ -408,7 +408,7 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
             ngx_log_debug2(NGX_LOG_DEBUG_CORE, log, 0,
                            "bind() %V #%d ", &ls[i].addr_text, s);
 
-            if (bind(s, ls[i].sockaddr, ls[i].socklen) == -1) {
+            if (bind(s, ls[i].sockaddr, ls[i].socklen) == -1) { /*绑定监听地址*/
                 err = ngx_socket_errno;
 
                 if (err == NGX_EADDRINUSE && ngx_test_config) {
@@ -456,7 +456,7 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
             }
 #endif
 
-            if (listen(s, ls[i].backlog) == -1) {
+            if (listen(s, ls[i].backlog) == -1) { /*开始监听*/
                 ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
                               "listen() to %V, backlog %d failed",
                               &ls[i].addr_text, ls[i].backlog);
@@ -475,7 +475,7 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
             ls[i].fd = s;
         }
 
-        if (!failed) {
+        if (!failed) { /*如果成功就直接退出*/
             break;
         }
 
@@ -484,7 +484,7 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
         ngx_log_error(NGX_LOG_NOTICE, log, 0,
                       "try again to bind() after 500ms");
 
-        ngx_msleep(500);
+        ngx_msleep(500);   /*每次尝试间隔为500ms*/
     }
 
     if (failed) {

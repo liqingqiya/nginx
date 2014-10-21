@@ -55,41 +55,41 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
     ngx_core_module_t   *module;
     char                 hostname[NGX_MAXHOSTNAMELEN];
 
-    ngx_timezone_update();
+    ngx_timezone_update();  /*初始化时区*/
 
     /* force localtime update with a new timezone */
 
-    tp = ngx_timeofday();
+    tp = ngx_timeofday();  /*获取时间缓存的时间,tp指向类似于{sec = 1413887501, msec = 331, gmtoff = 480}*/
     tp->sec = 0;
 
-    ngx_time_update();
+    ngx_time_update();  /*更新缓存时间*/
 
 
     log = old_cycle->log;
 
-    pool = ngx_create_pool(NGX_CYCLE_POOL_SIZE, log);
+    pool = ngx_create_pool(NGX_CYCLE_POOL_SIZE, log);  /*建立了新的内存池,该内存池将为nginx服务器程序运行的整个生命周期提供内存分配和管理*/
     if (pool == NULL) {
         return NULL;
     }
     pool->log = log;
 
-    cycle = ngx_pcalloc(pool, sizeof(ngx_cycle_t));
+    cycle = ngx_pcalloc(pool, sizeof(ngx_cycle_t));  /*为内存池分配 sizeof(ngx_cycle_t) 大小的空间*/
     if (cycle == NULL) {
         ngx_destroy_pool(pool);
         return NULL;
     }
 
-    cycle->pool = pool;
-    cycle->log = log;
-    cycle->old_cycle = old_cycle;
-
+    cycle->pool = pool; /*内存池，整个nginx生命周期内提供内存分配和管理*/
+    cycle->log = log;   /*日志管理，整个nginx生命周期*/
+    cycle->old_cycle = old_cycle; /*old cycle*/
+    /*cycle->conf_prefix存储配置文件的路径*/
     cycle->conf_prefix.len = old_cycle->conf_prefix.len;
     cycle->conf_prefix.data = ngx_pstrdup(pool, &old_cycle->conf_prefix);
     if (cycle->conf_prefix.data == NULL) {
         ngx_destroy_pool(pool);
         return NULL;
     }
-
+    /*cycle->prefix存储安装路径*/
     cycle->prefix.len = old_cycle->prefix.len;
     cycle->prefix.data = ngx_pstrdup(pool, &old_cycle->prefix);
     if (cycle->prefix.data == NULL) {
@@ -114,7 +114,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
     }
 
 
-    n = old_cycle->paths.nelts ? old_cycle->paths.nelts : 10;
+    n = old_cycle->paths.nelts ? old_cycle->paths.nelts : 10;  /*元素容量*/
 
     cycle->paths.elts = ngx_pcalloc(pool, n * sizeof(ngx_path_t *));
     if (cycle->paths.elts == NULL) {
@@ -122,10 +122,10 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         return NULL;
     }
 
-    cycle->paths.nelts = 0;
-    cycle->paths.size = sizeof(ngx_path_t *);
-    cycle->paths.nalloc = n;
-    cycle->paths.pool = pool;
+    cycle->paths.nelts = 0;  /*元素个数*/
+    cycle->paths.size = sizeof(ngx_path_t *);  /*节点尺寸*/
+    cycle->paths.nalloc = n; /*default 容量为10*/
+    cycle->paths.pool = pool; /*所在内存池*/
 
     
     if (old_cycle->open_files.part.nelts) {
@@ -166,7 +166,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
 
     n = old_cycle->listening.nelts ? old_cycle->listening.nelts : 10;
 
-    cycle->listening.elts = ngx_pcalloc(pool, n * sizeof(ngx_listening_t));
+    cycle->listening.elts = ngx_pcalloc(pool, n * sizeof(ngx_listening_t)); /*为监听结构分配内存，容量为n==10*/
     if (cycle->listening.elts == NULL) {
         ngx_destroy_pool(pool);
         return NULL;
@@ -178,17 +178,17 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
     cycle->listening.pool = pool;
 
 
-    ngx_queue_init(&cycle->reusable_connections_queue);
+    ngx_queue_init(&cycle->reusable_connections_queue); /*初始化可重用网络连接队列*/
 
 
-    cycle->conf_ctx = ngx_pcalloc(pool, ngx_max_module * sizeof(void *));
+    cycle->conf_ctx = ngx_pcalloc(pool, ngx_max_module * sizeof(void *)); /*分配空间，因为conf_ctx都是void*指针回调函数*/
     if (cycle->conf_ctx == NULL) {
         ngx_destroy_pool(pool);
         return NULL;
     }
 
 
-    if (gethostname(hostname, NGX_MAXHOSTNAMELEN) == -1) {
+    if (gethostname(hostname, NGX_MAXHOSTNAMELEN) == -1) {  /*获得主机名字, gethostname为系统调用*/
         ngx_log_error(NGX_LOG_EMERG, log, ngx_errno, "gethostname() failed");
         ngx_destroy_pool(pool);
         return NULL;
@@ -205,7 +205,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         return NULL;
     }
 
-    ngx_strlow(cycle->hostname.data, (u_char *) hostname, cycle->hostname.len);
+    ngx_strlow(cycle->hostname.data, (u_char *) hostname, cycle->hostname.len); /*规范化hostname*/
 
 
     for (i = 0; ngx_modules[i]; i++) {
@@ -216,7 +216,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         module = ngx_modules[i]->ctx;
 
         if (module->create_conf) {
-            rv = module->create_conf(cycle);        /*建立cycle上下文结构*/
+            rv = module->create_conf(cycle);        /*建立cycle上下文结构,rv指向结构体 ngx_core_conf_t*/
             if (rv == NULL) {
                 ngx_destroy_pool(pool);
                 return NULL;
@@ -275,14 +275,14 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
     }
 
     for (i = 0; ngx_modules[i]; i++) {
-        if (ngx_modules[i]->type != NGX_CORE_MODULE) {
+        if (ngx_modules[i]->type != NGX_CORE_MODULE) {  /*遍历模块，选出core模块*/
             continue;
         }
 
         module = ngx_modules[i]->ctx;
 
         if (module->init_conf) {
-            if (module->init_conf(cycle, cycle->conf_ctx[ngx_modules[i]->index])
+            if (module->init_conf(cycle, cycle->conf_ctx[ngx_modules[i]->index]) /*init模块*/
                 == NGX_CONF_ERROR)
             {
                 environ = senv;
@@ -291,8 +291,8 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
             }
         }
     }
-
-    if (ngx_process == NGX_PROCESS_SIGNALLER) {
+    /*至此，core模块上下文的初始化就全部完成了。*/
+    if (ngx_process == NGX_PROCESS_SIGNALLER) { /**/
         return cycle;
     }
 
@@ -300,7 +300,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
 
     if (ngx_test_config) {
 
-        if (ngx_create_pidfile(&ccf->pid, log) != NGX_OK) {
+        if (ngx_create_pidfile(&ccf->pid, log) != NGX_OK) {  /*创建新pid文件*/
             goto failed;
         }
 
@@ -318,11 +318,11 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         {
             /* new pid file name */
 
-            if (ngx_create_pidfile(&ccf->pid, log) != NGX_OK) {
+            if (ngx_create_pidfile(&ccf->pid, log) != NGX_OK) { /*创建新pid文件*/
                 goto failed;
             }
 
-            ngx_delete_pidfile(old_cycle);
+            ngx_delete_pidfile(old_cycle);  /*删除旧的pid文件*/
         }
     }
 
@@ -481,10 +481,10 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
 
     /* handle the listening sockets */
 
-    if (old_cycle->listening.nelts) {
+    if (old_cycle->listening.nelts) {  /*旧的监听socket正在使用*/
         ls = old_cycle->listening.elts;
-        for (i = 0; i < old_cycle->listening.nelts; i++) {
-            ls[i].remain = 0;
+        for (i = 0; i < old_cycle->listening.nelts; i++) { /*设置原有监听socket的标志*/
+            ls[i].remain = 0;  /*先将所有的socket的remain标志位初始化为0，在根据具体情况进行设置*/
         }
 
         nls = cycle->listening.elts;
@@ -496,7 +496,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
                 }
 
                 if (ngx_cmp_sockaddr(nls[n].sockaddr, nls[n].socklen,
-                                     ls[i].sockaddr, ls[i].socklen, 1)
+                                     ls[i].sockaddr, ls[i].socklen, 1)  /*复制原来监听socket的标志信息*/
                     == NGX_OK)
                 {
                     nls[n].fd = ls[i].fd;
@@ -546,8 +546,8 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
                 }
             }
 
-            if (nls[n].fd == (ngx_socket_t) -1) {
-                nls[n].open = 1;
+            if (nls[n].fd == (ngx_socket_t) -1) {  /*socket未打开，需要打开*/
+                nls[n].open = 1;  /*如果原来的init_cycle->listening中继承过来的socket为空，就直接将cycle->listening中所有的socket的open标志置为1*/
 #if (NGX_HAVE_DEFERRED_ACCEPT && defined SO_ACCEPTFILTER)
                 if (nls[n].accept_filter) {
                     nls[n].add_deferred = 1;
@@ -578,7 +578,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         }
     }
 
-    if (ngx_open_listening_sockets(cycle) != NGX_OK) {
+    if (ngx_open_listening_sockets(cycle) != NGX_OK) {  /*todo 打开open标志为1的监听socket,创建实际的监听端口*/
         goto failed;
     }
 

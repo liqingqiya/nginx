@@ -47,12 +47,12 @@ struct ngx_cycle_s {
     ngx_connection_t         *free_connections;
     ngx_uint_t                free_connection_n;    /*可用连接池中的总数*/
 
-    ngx_queue_t               reusable_connections_queue;
+    ngx_queue_t               reusable_connections_queue; /*可重用网络连接队列*/
 
-    ngx_array_t               listening;        /*监听的端口数组, 存储着ngx_listening_t结构体*/
-    ngx_array_t               paths;
-    ngx_list_t                open_files;       /*单链表容器，元素类型是ngx_open_file_t结构体，表示nginx已经打开的所有文件*/
-    ngx_list_t                shared_memory;    /*单链表容器，元素类型是ngx_shm_zone_t结构体，每个元素代表一块共享内存*/
+    ngx_array_t               listening;        /*监听的端口数组, 存储着ngx_listening_t结构体,一个socket对应一个listening结构*/
+    ngx_array_t               paths;            /*存放缓存在磁盘上的路径的数组*/
+    ngx_list_t                open_files;       /*存放所有打开的文件描述符的列表*/
+    ngx_list_t                shared_memory;    /*共享内存列表*/
 
     ngx_uint_t                connection_n; /*当前进程中所有链接对象的总数，与下面的connections配合使用*/
     ngx_uint_t                files_n;      

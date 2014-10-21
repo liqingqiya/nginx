@@ -24,7 +24,7 @@
 #if (NGX_HAVE_FIONBIO)
 
 int
-ngx_nonblocking(ngx_socket_t s)
+ngx_nonblocking(ngx_socket_t s) /*套接字是否阻塞*/
 {
     int  nb;
 

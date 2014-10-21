@@ -16,7 +16,7 @@
 
 typedef int  ngx_socket_t;
 
-#define ngx_socket          socket
+#define ngx_socket          socket  /*unix平台socket套接字接口，定义在 <sys/socket.h> */
 #define ngx_socket_n        "socket()"
 
 
