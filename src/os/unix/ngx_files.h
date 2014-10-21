@@ -46,8 +46,8 @@ typedef struct {
 } ngx_glob_t;
 
 
-#define NGX_INVALID_FILE         -1
-#define NGX_FILE_ERROR           -1
+#define NGX_INVALID_FILE         -1    /*打开文件时候，无效*/
+#define NGX_FILE_ERROR           -1     /*打开文件时候，发生错误*/
 
 
 
@@ -58,7 +58,7 @@ typedef struct {
 #endif
 
 #define ngx_open_file(name, mode, create, access)                            \
-    open((const char *) name, mode|create|O_BINARY, access)
+    open((const char *) name, mode|create|O_BINARY, access)   /*打开文件*/
 
 #else
 
