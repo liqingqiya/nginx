@@ -57,7 +57,7 @@ ngx_strerror_init(void)
 
     len = NGX_SYS_NERR * sizeof(ngx_str_t);
 
-    ngx_sys_errlist = malloc(len);
+    ngx_sys_errlist = malloc(len);  /*分配内存*/
     if (ngx_sys_errlist == NULL) {
         goto failed;
     }

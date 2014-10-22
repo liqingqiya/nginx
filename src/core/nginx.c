@@ -185,17 +185,17 @@ ngx_module_t  ngx_core_module = {
 
 
 ngx_uint_t          ngx_max_module;
-
-static ngx_uint_t   ngx_show_help;
-static ngx_uint_t   ngx_show_version;
-static ngx_uint_t   ngx_show_configure;
+/*下面的几个文件域的静态变量存储解析命令行参数时候的值*/
+static ngx_uint_t   ngx_show_help;      /**/
+static ngx_uint_t   ngx_show_version;   /**/
+static ngx_uint_t   ngx_show_configure; /**/
 static u_char      *ngx_prefix;         /*服务器程序安装路径*/
 static u_char      *ngx_conf_file;      /*我们的使用的配置文件路径*/
 static u_char      *ngx_conf_params;    /**/
-static char        *ngx_signal;          /**/
+static char        *ngx_signal;          /*信号*/
 
 
-static char **ngx_os_environ;
+static char **ngx_os_environ;   /*系统环境变量*/
 
 
 int ngx_cdecl
@@ -262,7 +262,7 @@ main(int argc, char *const *argv)
                 "configure arguments:" NGX_CONFIGURE NGX_LINEFEED);
         }
 
-        if (!ngx_test_config) {
+        if (!ngx_test_config) { /*全局变量 ngx_test_config 的赋值决定是否对nginx配置文件进行语法检查*/
             return 0;
         }
     }
@@ -305,11 +305,11 @@ main(int argc, char *const *argv)
         return 1;
     }
 
-    if (ngx_process_options(&init_cycle) != NGX_OK) {     /*存储传入的参数到 init_cycle 结构*/
+    if (ngx_process_options(&init_cycle) != NGX_OK) {     /*存储传入的参数到 init_cycle 结构的成员变量中*/
         return 1;
     }
 
-    if (ngx_os_init(log) != NGX_OK) {
+    if (ngx_os_init(log) != NGX_OK) {   /*获取运行环境中的一些相关参数*/
         return 1;
     }
 
@@ -317,7 +317,7 @@ main(int argc, char *const *argv)
      * ngx_crc32_table_init() requires ngx_cacheline_size set in ngx_os_init()
      */
 
-    if (ngx_crc32_table_init() != NGX_OK) {
+    if (ngx_crc32_table_init() != NGX_OK) {  /*建立循环冗余检验表*/
         return 1;
     }
 
@@ -686,11 +686,11 @@ ngx_get_options(int argc, char *const *argv)
             case '?':
             case 'h':
                 ngx_show_version = 1;
-                ngx_show_help = 1;
+                ngx_show_help = 1;    /*help标记*/
                 break;
 
             case 'v':
-                ngx_show_version = 1;
+                ngx_show_version = 1; /*version展示标记*/
                 break;
 
             case 'V':
@@ -703,12 +703,12 @@ ngx_get_options(int argc, char *const *argv)
                 break;
 
             case 'q':
-                ngx_quiet_mode = 1;
+                ngx_quiet_mode = 1; 
                 break;
 
-            case 'p':
+            case 'p':  /*设置安装路径*/
                 if (*p) {
-                    ngx_prefix = p;
+                    ngx_prefix = p;  /*-p后面跟的参数是安装路径，这里存入ngx_prefix*/
                     goto next;
                 }
 
@@ -722,7 +722,7 @@ ngx_get_options(int argc, char *const *argv)
 
             case 'c':
                 if (*p) {
-                    ngx_conf_file = p;
+                    ngx_conf_file = p; /*-c后面跟的参数是配置文件路径，这里存入ngx_conf_file*/
                     goto next;
                 }
 
@@ -736,7 +736,7 @@ ngx_get_options(int argc, char *const *argv)
 
             case 'g':
                 if (*p) {
-                    ngx_conf_params = p;
+                    ngx_conf_params = p;/*-g ??? todo*/
                     goto next;
                 }
 
@@ -750,7 +750,7 @@ ngx_get_options(int argc, char *const *argv)
 
             case 's':
                 if (*p) {
-                    ngx_signal = (char *) p;
+                    ngx_signal = (char *) p; /*-s ??? todo*/
 
                 } else if (argv[++i]) {
                     ngx_signal = argv[i];
@@ -794,7 +794,7 @@ ngx_save_argv(ngx_cycle_t *cycle, int argc, char *const *argv)  /*存储命令�
 
     ngx_os_argv = (char **) argv;
     ngx_argc = argc;
-    ngx_argv = (char **) argv;
+    ngx_argv = (char **) argv;  
 
 #else
     size_t     len;
@@ -803,7 +803,7 @@ ngx_save_argv(ngx_cycle_t *cycle, int argc, char *const *argv)  /*存储命令�
     ngx_os_argv = (char **) argv;
     ngx_argc = argc;
 
-    ngx_argv = ngx_alloc((argc + 1) * sizeof(char *), cycle->log);
+    ngx_argv = ngx_alloc((argc + 1) * sizeof(char *), cycle->log);  /*ngx_argv是全局变量，是一个数组*/
     if (ngx_argv == NULL) {
         return NGX_ERROR;
     }
@@ -823,7 +823,7 @@ ngx_save_argv(ngx_cycle_t *cycle, int argc, char *const *argv)  /*存储命令�
 
 #endif
 
-    ngx_os_environ = environ;
+    ngx_os_environ = environ;  /*全局变量*/
 
     return NGX_OK;
 }

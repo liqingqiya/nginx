@@ -23,7 +23,7 @@ ngx_array_t            ngx_old_cycles;
 static ngx_pool_t     *ngx_temp_pool;
 static ngx_event_t     ngx_cleaner_event;
 
-ngx_uint_t             ngx_test_config;
+ngx_uint_t             ngx_test_config;  /*全局变量 ngx_test_config 的赋值决定是否对nginx配置文件进行语法检查*/
 ngx_uint_t             ngx_quiet_mode;
 
 #if (NGX_THREADS)
