@@ -49,29 +49,29 @@ ngx_queue_middle(ngx_queue_t *queue)
 
 void
 ngx_queue_sort(ngx_queue_t *queue,
-    ngx_int_t (*cmp)(const ngx_queue_t *, const ngx_queue_t *))
+    ngx_int_t (*cmp)(const ngx_queue_t *, const ngx_queue_t *)) /*双端链表的插入排序*/
 {
     ngx_queue_t  *q, *prev, *next;
 
-    q = ngx_queue_head(queue);
+    q = ngx_queue_head(queue);  /*记录头*/
 
-    if (q == ngx_queue_last(queue)) {
+    if (q == ngx_queue_last(queue)) { /*为空，则退出*/
         return;
     }
-
+    /*ngx_queue_next(q)得到下一个元素节点*/
     for (q = ngx_queue_next(q); q != ngx_queue_sentinel(queue); q = next) {
 
-        prev = ngx_queue_prev(q);
-        next = ngx_queue_next(q);
+        prev = ngx_queue_prev(q); /*取q的上一个节点*/
+        next = ngx_queue_next(q); /*取q的下一个节点*/
 
-        ngx_queue_remove(q);
-
+        ngx_queue_remove(q);  /*先将q节点从链表中移除出来*/
+        /*该do-while循环找到节点插入的位置，用prev记录，然后把q插入到这个节点的后面.*/
         do {
-            if (cmp(prev, q) <= 0) {
+            if (cmp(prev, q) <= 0) { /*小于, 排序结果是递增*/
                 break;
             }
 
-            prev = ngx_queue_prev(prev);
+            prev = ngx_queue_prev(prev);  /*prev其一个元素*/
 
         } while (prev != ngx_queue_sentinel(queue));
 
