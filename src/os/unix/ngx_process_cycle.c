@@ -291,7 +291,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
 
 
 void
-ngx_single_process_cycle(ngx_cycle_t *cycle)
+ngx_single_process_cycle(ngx_cycle_t *cycle) /*单进程循环模式*/
 {
     ngx_uint_t  i;
 
@@ -312,7 +312,7 @@ ngx_single_process_cycle(ngx_cycle_t *cycle)
     for ( ;; ) {
         ngx_log_debug0(NGX_LOG_DEBUG_EVENT, cycle->log, 0, "worker cycle");
 
-        ngx_process_events_and_timers(cycle);
+        ngx_process_events_and_timers(cycle);  /*阻塞调用, 但进程启动之后，就阻塞在这里, 由信号驱动*/
 
         if (ngx_terminate || ngx_quit) {
 

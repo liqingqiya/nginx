@@ -15,8 +15,8 @@ typedef struct {
     int     signo;
     char   *signame;
     char   *name;
-    void  (*handler)(int signo);
-} ngx_signal_t;
+    void  (*handler)(int signo);  /*处理函数*/
+} ngx_signal_t;  /*信号结构体*/
 
 
 
@@ -36,7 +36,7 @@ ngx_int_t        ngx_last_process;
 ngx_process_t    ngx_processes[NGX_MAX_PROCESSES];
 
 
-ngx_signal_t  signals[] = {
+ngx_signal_t  signals[] = {  /*全局信号变量数组*/
     { ngx_signal_value(NGX_RECONFIGURE_SIGNAL),
       "SIG" ngx_value(NGX_RECONFIGURE_SIGNAL),
       "reload",
@@ -281,16 +281,16 @@ ngx_execute_proc(ngx_cycle_t *cycle, void *data)
 
 
 ngx_int_t
-ngx_init_signals(ngx_log_t *log)
+ngx_init_signals(ngx_log_t *log)  /*信号初始化*/
 {
     ngx_signal_t      *sig;
     struct sigaction   sa;
 
     for (sig = signals; sig->signo != 0; sig++) {
         ngx_memzero(&sa, sizeof(struct sigaction));
-        sa.sa_handler = sig->handler;
+        sa.sa_handler = sig->handler;   /*信号处理函数*/
         sigemptyset(&sa.sa_mask);
-        if (sigaction(sig->signo, &sa, NULL) == -1) {
+        if (sigaction(sig->signo, &sa, NULL) == -1) { /*设置信号处理方式*/
 #if (NGX_VALGRIND)
             ngx_log_error(NGX_LOG_ALERT, log, ngx_errno,
                           "sigaction(%s) failed, ignored", sig->signame);
@@ -307,7 +307,7 @@ ngx_init_signals(ngx_log_t *log)
 
 
 void
-ngx_signal_handler(int signo)
+ngx_signal_handler(int signo) /*信号处理回调函数*/
 {
     char            *action;
     ngx_int_t        ignore;
@@ -318,17 +318,17 @@ ngx_signal_handler(int signo)
 
     err = ngx_errno;
 
-    for (sig = signals; sig->signo != 0; sig++) {
+    for (sig = signals; sig->signo != 0; sig++) {  /*遍历信号数组，根据signo获取信号结构体*/
         if (sig->signo == signo) {
             break;
         }
     }
 
-    ngx_time_sigsafe_update();
+    ngx_time_sigsafe_update();   /*更新缓存时间*/
 
     action = "";
 
-    switch (ngx_process) {
+    switch (ngx_process) {  /*ngx_process是一个全局静态变量*/
 
     case NGX_PROCESS_MASTER:
     case NGX_PROCESS_SINGLE:

@@ -51,8 +51,8 @@
 
 #if !(NGX_WIN32)
 
-#define ngx_signal_helper(n)     SIG##n
-#define ngx_signal_value(n)      ngx_signal_helper(n)
+#define ngx_signal_helper(n)     SIG##n  /*SIG##n ???todo???*/
+#define ngx_signal_value(n)      ngx_signal_helper(n)  
 
 #define ngx_random               random
 
