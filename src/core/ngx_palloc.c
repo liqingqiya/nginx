@@ -27,7 +27,7 @@ ngx_create_pool(size_t size, ngx_log_t *log)
         return NULL;
     }
 
-    p->d.last = (u_char *) p + sizeof(ngx_pool_t);  /*该内存池所占的最后地址*/
+    p->d.last = (u_char *) p + sizeof(ngx_pool_t);  /*该内存池数据区域的最后地址*/
     p->d.end = (u_char *) p + size;         /*分配的内存块的最后地址*/
     p->d.next = NULL;   /*指向下一个节点*/
     p->d.failed = 0;

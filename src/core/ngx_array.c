@@ -59,7 +59,7 @@ ngx_array_push(ngx_array_t *a)
 
         p = a->pool;        /*内存池*/
 
-        if ((u_char *) a->elts + size == p->d.last  /*如果内存池的last指针指向了数组的最后一个元素*/
+        if ((u_char *) a->elts + size == p->d.last  /*如果内存池的last指针指向了数组的最后一个元素，并且内存池足够分配整个数组*/
             && p->d.last + a->size <= p->d.end)         
         {
             /*
