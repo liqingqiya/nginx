@@ -138,7 +138,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         n = 20;
     }
 
-    if (ngx_list_init(&cycle->open_files, pool, n, sizeof(ngx_open_file_t))
+    if (ngx_list_init(&cycle->open_files, pool, n, sizeof(ngx_open_file_t)) /*todo*/
         != NGX_OK)
     {
         ngx_destroy_pool(pool);
@@ -228,7 +228,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
 
     senv = environ;
 
-    // 继续初始化core模块的上下文结构
+    /*继续初始化core模块的上下文结构??todo??ngx_conf_t是做什么的？ngx_core_conf_t呢？*/
     ngx_memzero(&conf, sizeof(ngx_conf_t));
     /* STUB: init array ? */
     conf.args = ngx_array_create(pool, 10, sizeof(ngx_str_t));

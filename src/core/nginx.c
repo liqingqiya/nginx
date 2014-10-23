@@ -930,7 +930,7 @@ ngx_core_module_create_conf(ngx_cycle_t *cycle)
 {
     ngx_core_conf_t  *ccf;
 
-    ccf = ngx_pcalloc(cycle->pool, sizeof(ngx_core_conf_t));  /*分配内存*/
+    ccf = ngx_pcalloc(cycle->pool, sizeof(ngx_core_conf_t));  /*内存池分配内存*/
     if (ccf == NULL) {
         return NULL;
     }
