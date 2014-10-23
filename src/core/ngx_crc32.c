@@ -101,9 +101,9 @@ uint32_t  ngx_crc32_table256[] = {
 
 uint32_t *ngx_crc32_table_short = ngx_crc32_table16;
 
-
+/*初始化用于循环冗余的检验表，方便以后用到循环冗余检验的时候，能够直接查表，这样会高效一些*/
 ngx_int_t
-ngx_crc32_table_init(void)
+ngx_crc32_table_init(void)  /*建立循环冗余检验表*/
 {
     void  *p;
 

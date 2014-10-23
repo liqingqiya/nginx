@@ -30,7 +30,7 @@ ngx_os_io_t ngx_os_io = {
 
 
 ngx_int_t
-ngx_os_init(ngx_log_t *log)
+ngx_os_init(ngx_log_t *log) /*获取系统相关的一些变量*/
 {
     ngx_uint_t  n;
 
@@ -40,10 +40,10 @@ ngx_os_init(ngx_log_t *log)
     }
 #endif
 
-    ngx_init_setproctitle(log);
+    ngx_init_setproctitle(log); /*设置进程名称*/
 
-    ngx_pagesize = getpagesize();
-    ngx_cacheline_size = NGX_CPU_CACHE_LINE;
+    ngx_pagesize = getpagesize(); /*获取内存页大小*/
+    ngx_cacheline_size = NGX_CPU_CACHE_LINE; 
 
     for (n = ngx_pagesize; n >>= 1; ngx_pagesize_shift++) { /* void */ }
 
@@ -57,23 +57,23 @@ ngx_os_init(ngx_log_t *log)
         ngx_ncpu = 1;
     }
 
-    ngx_cpuinfo();
-
-    if (getrlimit(RLIMIT_NOFILE, &rlmt) == -1) {
+    ngx_cpuinfo(); /*cpu的相关信息???todo*/
+    /*获得每个进程能够创建的各种系统资源的限制使用量*/
+    if (getrlimit(RLIMIT_NOFILE, &rlmt) == -1) { /*#include <sys/resource.h> getrlimit为系统调用*/
         ngx_log_error(NGX_LOG_ALERT, log, errno,
                       "getrlimit(RLIMIT_NOFILE) failed)");
         return NGX_ERROR;
     }
 
-    ngx_max_sockets = (ngx_int_t) rlmt.rlim_cur;
+    ngx_max_sockets = (ngx_int_t) rlmt.rlim_cur; /*最大套接字，也就是能够打开的文件数*/
 
 #if (NGX_HAVE_INHERITED_NONBLOCK || NGX_HAVE_ACCEPT4)
-    ngx_inherited_nonblocking = 1;
+    ngx_inherited_nonblocking = 1; /*linux设置非阻塞标记*/
 #else
     ngx_inherited_nonblocking = 0;
 #endif
 
-    srandom(ngx_time());
+    srandom(ngx_time()); /*初始化随机种子*/
 
     return NGX_OK;
 }
