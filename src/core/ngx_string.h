@@ -54,7 +54,7 @@ void ngx_strlow(u_char *dst, u_char *src, size_t n);
 
 
 /* msvc and icc7 compile strcmp() to inline loop */
-#define ngx_strcmp(s1, s2)  strcmp((const char *) s1, (const char *) s2)
+#define ngx_strcmp(s1, s2)  strcmp((const char *) s1, (const char *) s2) /*字符串比较*/
 
 
 #define ngx_strstr(s1, s2)  strstr((const char *) s1, (const char *) s2)

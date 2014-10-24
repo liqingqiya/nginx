@@ -14,22 +14,22 @@
 
 
 struct ngx_file_s {
-    ngx_fd_t                   fd;
-    ngx_str_t                  name;
-    ngx_file_info_t            info;
+    ngx_fd_t                   fd; /*文件描述符*/
+    ngx_str_t                  name; /*文件名字*/
+    ngx_file_info_t            info; /*todo*/
 
-    off_t                      offset;
-    off_t                      sys_offset;
+    off_t                      offset; /*todo*/
+    off_t                      sys_offset; /*todo*/
 
-    ngx_log_t                 *log;
+    ngx_log_t                 *log; /*todo*/
 
 #if (NGX_HAVE_FILE_AIO)
-    ngx_event_aio_t           *aio;
+    ngx_event_aio_t           *aio; /*todo*/
 #endif
 
-    unsigned                   valid_info:1;
-    unsigned                   directio:1;
-};
+    unsigned                   valid_info:1; /*todo*/
+    unsigned                   directio:1; /*todo*/
+};  /*文件的结构体*/
 
 
 #define NGX_MAX_PATH_LEVEL  3
@@ -50,7 +50,7 @@ typedef struct {
 
     u_char                    *conf_file;
     ngx_uint_t                 line;
-} ngx_path_t;
+} ngx_path_t;  
 
 
 typedef struct {

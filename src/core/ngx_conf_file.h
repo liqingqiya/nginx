@@ -144,10 +144,10 @@ typedef struct {
 
 
 typedef struct {
-    ngx_file_t            file;
-    ngx_buf_t            *buffer;
+    ngx_file_t            file;  /*文件结构体*/
+    ngx_buf_t            *buffer;  /*buf ??? todo*/
     ngx_uint_t            line;
-} ngx_conf_file_t;          /**/
+} ngx_conf_file_t;          /*配置文件的结构体*/
 
 
 typedef char *(*ngx_conf_handler_pt)(ngx_conf_t *cf,

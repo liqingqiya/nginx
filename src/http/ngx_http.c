@@ -116,7 +116,7 @@ ngx_module_t  ngx_http_module = {
 
 
 static char *
-ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) /*解析配置文件的时候调用，当找到对应指令的时候调用*/
 {
     char                        *rv;
     ngx_uint_t                   mi, m, s;
@@ -141,11 +141,11 @@ ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     ngx_http_max_module = 0;
     for (m = 0; ngx_modules[m]; m++) {
-        if (ngx_modules[m]->type != NGX_HTTP_MODULE) {
+        if (ngx_modules[m]->type != NGX_HTTP_MODULE) { /*筛选出http模块*/
             continue;
         }
 
-        ngx_modules[m]->ctx_index = ngx_http_max_module++;
+        ngx_modules[m]->ctx_index = ngx_http_max_module++; /*http同类模块的索引*/
     }
 
 

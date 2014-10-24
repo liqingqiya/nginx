@@ -106,9 +106,9 @@ ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename)
     ngx_buf_t         buf;
     ngx_conf_file_t  *prev, conf_file;
     enum {
-        parse_file = 0,
-        parse_block,
-        parse_param
+        parse_file = 0, /*解析配置文件*/
+        parse_block,  /*解析复杂项*/
+        parse_param  /*解析命令行*/
     } type;
 
 #if (NGX_SUPPRESS_WARN)
@@ -116,11 +116,11 @@ ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename)
     prev = NULL;
 #endif
 
-    if (filename) {
+    if (filename) {  /*判断当前解析状态*/
 
         /* open configuration file */
 
-        fd = ngx_open_file(filename->data, NGX_FILE_RDONLY, NGX_FILE_OPEN, 0);
+        fd = ngx_open_file(filename->data, NGX_FILE_RDONLY, NGX_FILE_OPEN, 0); /*打开配置文件，获得文件句柄*/
         if (fd == NGX_INVALID_FILE) {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, ngx_errno,
                                ngx_open_file_n " \"%s\" failed",
@@ -158,17 +158,17 @@ ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename)
 
         type = parse_file;
 
-    } else if (cf->conf_file->file.fd != NGX_INVALID_FILE) {
+    } else if (cf->conf_file->file.fd != NGX_INVALID_FILE) {  /**/
 
-        type = parse_block;
+        type = parse_block;  /*文件已经打开了，处于解析复杂配置项的状态，间接递归调用*/
 
-    } else {
-        type = parse_param;
+    } else {  /**/
+        type = parse_param;  /*将要解析命令行参数配置项*/
     }
 
 
     for ( ;; ) {
-        rc = ngx_conf_read_token(cf);
+        rc = ngx_conf_read_token(cf);  /*解析出token对应的值*/
 
         /*
          * ngx_conf_read_token() may return
@@ -184,7 +184,7 @@ ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename)
             goto done;
         }
 
-        if (rc == NGX_CONF_BLOCK_DONE) {
+        if (rc == NGX_CONF_BLOCK_DONE) {  /*复杂项解析完成*/
 
             if (type != parse_block) {
                 ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "unexpected \"}\"");
@@ -194,7 +194,7 @@ ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename)
             goto done;
         }
 
-        if (rc == NGX_CONF_FILE_DONE) {
+        if (rc == NGX_CONF_FILE_DONE) { /*配置文件解析完成*/
 
             if (type == parse_block) {
                 ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
@@ -205,7 +205,7 @@ ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename)
             goto done;
         }
 
-        if (rc == NGX_CONF_BLOCK_START) {
+        if (rc == NGX_CONF_BLOCK_START) { /*开始解析负载项*/
 
             if (type == parse_param) {
                 ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
@@ -244,7 +244,7 @@ ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename)
         }
 
 
-        rc = ngx_conf_handler(cf, rc);
+        rc = ngx_conf_handler(cf, rc);  /*处理函数*/
 
         if (rc == NGX_ERROR) {
             goto failed;
@@ -293,9 +293,9 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last)
 
     found = 0;
 
-    for (i = 0; ngx_modules[i]; i++) {
+    for (i = 0; ngx_modules[i]; i++) { /*遍历模块*/
 
-        cmd = ngx_modules[i]->commands;
+        cmd = ngx_modules[i]->commands; /*指令数组*/
         if (cmd == NULL) {
             continue;
         }
@@ -306,14 +306,14 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last)
                 continue;
             }
 
-            if (ngx_strcmp(name->data, cmd->name.data) != 0) {
+            if (ngx_strcmp(name->data, cmd->name.data) != 0) { /*比较指令名称*/
                 continue;
             }
 
             found = 1;
-
+            /*只有处理的模块的类型是NGX_CONF_MODULE或者是当前正在处理的模块类型，才可能被执行。*/
             if (ngx_modules[i]->type != NGX_CONF_MODULE
-                && ngx_modules[i]->type != cf->module_type) /*只有处理的模块的类型是NGX_CONF_MODULE或者是当前正在处理的模块类型，才可能被执行。*/
+                && ngx_modules[i]->type != cf->module_type) 
             {
                 continue;
             }
@@ -339,8 +339,8 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last)
             }
 
             /* is the directive's argument count right ? */
-
-            if (!(cmd->type & NGX_CONF_ANY)) {  /*指令参数个数必须正确。注意指令参数有最大值NGX_CONF_MAX_ARGS，目前值为8。*/
+            /*指令参数个数必须正确。注意指令参数有最大值NGX_CONF_MAX_ARGS，目前值为8。*/
+            if (!(cmd->type & NGX_CONF_ANY)) {  
 
                 if (cmd->type & NGX_CONF_FLAG) {
 
@@ -387,10 +387,10 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last)
                     conf = confp[ngx_modules[i]->ctx_index];
                 }
             }
-
+            /*nginx找到配置指令所对应的ngx_command_s变量cmd,调用回调函数处理*/
             rv = cmd->set(cf, cmd, conf);   /*执行指令解析回调函数,cmd是词法分析得到的结果，conf是上一步得到的配置存贮区地址。*/
 
-            if (rv == NGX_CONF_OK) {
+            if (rv == NGX_CONF_OK) { /**/
                 return NGX_OK;
             }
 
@@ -428,7 +428,7 @@ invalid:
 
 
 static ngx_int_t
-ngx_conf_read_token(ngx_conf_t *cf)
+ngx_conf_read_token(ngx_conf_t *cf)  /*读取配置文件中的token的值*/
 {
     u_char      *start, ch, *src, *dst;
     off_t        file_size;
@@ -535,7 +535,7 @@ ngx_conf_read_token(ngx_conf_t *cf)
 
         ch = *b->pos++;
 
-        if (ch == LF) {
+        if (ch == LF) { /*是否换行 '\n'*/
             cf->conf_file->line++;
 
             if (sharp_comment) {
@@ -583,8 +583,8 @@ ngx_conf_read_token(ngx_conf_t *cf)
                 continue;
             }
 
-            start = b->pos - 1;
-            start_line = cf->conf_file->line;
+            start = b->pos - 1; /*解析开始地址*/
+            start_line = cf->conf_file->line; /**/
 
             switch (ch) {
 
@@ -611,7 +611,7 @@ ngx_conf_read_token(ngx_conf_t *cf)
 
                 return NGX_CONF_BLOCK_DONE;
 
-            case '#':
+            case '#': /*comment*/
                 sharp_comment = 1;
                 continue;
 
