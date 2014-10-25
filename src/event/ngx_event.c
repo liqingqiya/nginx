@@ -582,7 +582,7 @@ ngx_timer_signal_handler(int signo)
 
 #endif
 
-
+/*将所有监听的地址挂到事件驱动模块上*/
 static ngx_int_t
 ngx_event_process_init(ngx_cycle_t *cycle)
 {
@@ -684,7 +684,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
         }
 
         cycle->files_n = (ngx_uint_t) rlmt.rlim_cur;
-
+        /*以fd为下标的connection数组*/
         cycle->files = ngx_calloc(sizeof(ngx_connection_t *) * cycle->files_n,
                                   cycle->log);
         if (cycle->files == NULL) {
@@ -693,7 +693,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
     }
 
 #endif
-
+    /*数组大小取决于配置文件worker_connections参数*/
     cycle->connections =
         ngx_alloc(sizeof(ngx_connection_t) * cycle->connection_n, cycle->log);
     if (cycle->connections == NULL) {
@@ -707,7 +707,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
     if (cycle->read_events == NULL) {
         return NGX_ERROR;
     }
-
+    /*初始化read events*/
     rev = cycle->read_events;
     for (i = 0; i < cycle->connection_n; i++) {
         rev[i].closed = 1;
@@ -723,7 +723,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
     if (cycle->write_events == NULL) {
         return NGX_ERROR;
     }
-
+    /*初始化write events*/
     wev = cycle->write_events;
     for (i = 0; i < cycle->connection_n; i++) {
         wev[i].closed = 1;
@@ -735,7 +735,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
 
     i = cycle->connection_n;
     next = NULL;
-
+    /*初始化connections，为每个connection分配一个read event和一个write event,并且建立起connection的单向链表*/
     do {
         i--;
 
@@ -750,15 +750,15 @@ ngx_event_process_init(ngx_cycle_t *cycle)
         c[i].lock = 0;
 #endif
     } while (i);
-
-    cycle->free_connections = next;
-    cycle->free_connection_n = cycle->connection_n;
+    /*初始化free connection，以后每次ngx_get_connection, 都从这个链表中获得connection*/
+    cycle->free_connections = next; /*可用连接结构*/
+    cycle->free_connection_n = cycle->connection_n; /*可用连接数*/
 
     /* for each listening socket */
 
     ls = cycle->listening.elts; /* 为每个监听套接字分配一个连接结构 */
     for (i = 0; i < cycle->listening.nelts; i++) {
-
+        /*为每个监听的fd分配一个connection结构体*/
         c = ngx_get_connection(ls[i].fd, cycle->log);
 
         if (c == NULL) {
@@ -778,7 +778,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
 #if (NGX_HAVE_DEFERRED_ACCEPT)
         rev->deferred_accept = ls[i].deferred_accept;
 #endif
-
+        /*将新生成的fd添加到events中*/
         if (!(ngx_event_flags & NGX_USE_IOCP_EVENT)) {
             if (ls[i].previous) {
 

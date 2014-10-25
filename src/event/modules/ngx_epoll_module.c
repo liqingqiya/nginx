@@ -559,7 +559,7 @@ ngx_epoll_del_connection(ngx_connection_t *c, ngx_uint_t flags)
     return NGX_OK;
 }
 
-
+/*nginx事件机制的核心*/
 static ngx_int_t
 ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
 {
@@ -576,7 +576,7 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
     ngx_log_debug1(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
                    "epoll timer: %M", timer);
 
-    events = epoll_wait(ep, event_list, (int) nevents, timer);
+    events = epoll_wait(ep, event_list, (int) nevents, timer); /*等待内核通知进程,获得激活的描述符*/
 
     err = (events == -1) ? ngx_errno : 0;
 
@@ -614,7 +614,7 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
 
     ngx_mutex_lock(ngx_posted_events_mutex);
 
-    for (i = 0; i < events; i++) {
+    for (i = 0; i < events; i++) { /*轮询处理活动的描述符*/
         c = event_list[i].data.ptr;
 
         instance = (uintptr_t) c & 1;
@@ -688,7 +688,7 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
                 ngx_locked_post_event(rev, queue);
 
             } else {
-                rev->handler(rev);
+                rev->handler(rev); /*读事件的回调函数*/
             }
         }
 
@@ -719,7 +719,7 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
                 ngx_locked_post_event(wev, &ngx_posted_events);
 
             } else {
-                wev->handler(wev);
+                wev->handler(wev); /*写事件的回调函数*/
             }
         }
     }

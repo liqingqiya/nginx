@@ -38,12 +38,12 @@ typedef struct {
 struct ngx_event_s {
     void            *data;
 
-    unsigned         write:1;
+    unsigned         write:1;/*是否可写*/
 
-    unsigned         accept:1;
+    unsigned         accept:1;/*是否是accept产生的事件*/
 
     /* used to detect the stale events in kqueue, rtsig, and epoll */
-    unsigned         instance:1;
+    unsigned         instance:1;/*???todo*/
 
     /*
      * the event was passed or would be passed to a kernel;
@@ -64,8 +64,8 @@ struct ngx_event_s {
     unsigned         eof:1;
     unsigned         error:1;
 
-    unsigned         timedout:1;
-    unsigned         timer_set:1;
+    unsigned         timedout:1;/*是否超时*/
+    unsigned         timer_set:1;/*是否置为定时器，加入超时定时器红黑树时就置为１*/
 
     unsigned         delayed:1;
 
@@ -110,7 +110,7 @@ struct ngx_event_s {
     unsigned         available:1;
 #endif
 
-    ngx_event_handler_pt  handler;
+    ngx_event_handler_pt  handler; /*事件处理函数*/
 
 
 #if (NGX_HAVE_AIO)
@@ -127,7 +127,7 @@ struct ngx_event_s {
 
     ngx_log_t       *log;
 
-    ngx_rbtree_node_t   timer;
+    ngx_rbtree_node_t   timer; /*加入红黑树时需要的辅助节点*/
 
     unsigned         closed:1;
 
@@ -218,21 +218,21 @@ struct ngx_event_aio_s {
 
 
 typedef struct {
-    ngx_int_t  (*add)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);
-    ngx_int_t  (*del)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);
+    ngx_int_t  (*add)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);  /*将某描述符的事件添加到事件驱动列表中*/
+    ngx_int_t  (*del)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);/*将某描述符的事件从事件驱动列表中删除*/
 
-    ngx_int_t  (*enable)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);
-    ngx_int_t  (*disable)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);
+    ngx_int_t  (*enable)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);/*启动对某个事件的监控*/
+    ngx_int_t  (*disable)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);/*禁止对某个事件的监控*/
 
-    ngx_int_t  (*add_conn)(ngx_connection_t *c);
-    ngx_int_t  (*del_conn)(ngx_connection_t *c, ngx_uint_t flags);
+    ngx_int_t  (*add_conn)(ngx_connection_t *c);/*将指定的连接关联的描述符添加到多路io复用的监控里*/
+    ngx_int_t  (*del_conn)(ngx_connection_t *c, ngx_uint_t flags);/*将指定的连接关联的描述符从多路复用的监控里删除*/
 
     ngx_int_t  (*process_changes)(ngx_cycle_t *cycle, ngx_uint_t nowait);
     ngx_int_t  (*process_events)(ngx_cycle_t *cycle, ngx_msec_t timer,
-                   ngx_uint_t flags);
+                   ngx_uint_t flags);/*阻塞等待事件发生,对发生的事件进行逐个处理*/
 
-    ngx_int_t  (*init)(ngx_cycle_t *cycle, ngx_msec_t timer);
-    void       (*done)(ngx_cycle_t *cycle);
+    ngx_int_t  (*init)(ngx_cycle_t *cycle, ngx_msec_t timer);/*初始化*/
+    void       (*done)(ngx_cycle_t *cycle);/*释放资源*/
 } ngx_event_actions_t;
 
 
