@@ -113,7 +113,7 @@ ngx_time_update(void)
     ngx_gmtime(sec, &gmt);  /*转换为可读的时间表示结构*/
 
 
-    p0 = &cached_http_time[slot][0];
+    p0 = &cached_http_time[slot][0]; /*用于记录http请求的时间*/
 
     (void) ngx_sprintf(p0, "%s, %02d %s %4d %02d:%02d:%02d GMT",
                        week[gmt.ngx_tm_wday], gmt.ngx_tm_mday,
@@ -140,7 +140,7 @@ ngx_time_update(void)
 #endif
 
 
-    p1 = &cached_err_log_time[slot][0];
+    p1 = &cached_err_log_time[slot][0];  /*用于记录错误日志的时间*/
 
     (void) ngx_sprintf(p1, "%4d/%02d/%02d %02d:%02d:%02d",
                        tm.ngx_tm_year, tm.ngx_tm_mon,
@@ -148,7 +148,7 @@ ngx_time_update(void)
                        tm.ngx_tm_min, tm.ngx_tm_sec);
 
 
-    p2 = &cached_http_log_time[slot][0];
+    p2 = &cached_http_log_time[slot][0];  /*用于记录http请求日志的时间*/
 
     (void) ngx_sprintf(p2, "%02d/%s/%d:%02d:%02d:%02d %c%02d%02d",
                        tm.ngx_tm_mday, months[tm.ngx_tm_mon - 1],
@@ -157,7 +157,7 @@ ngx_time_update(void)
                        tp->gmtoff < 0 ? '-' : '+',
                        ngx_abs(tp->gmtoff / 60), ngx_abs(tp->gmtoff % 60));
 
-    p3 = &cached_http_log_iso8601[slot][0];
+    p3 = &cached_http_log_iso8601[slot][0];  /*符合iso8601标准格式的时间*/
 
     (void) ngx_sprintf(p3, "%4d-%02d-%02dT%02d:%02d:%02d%c%02d:%02d",
                        tm.ngx_tm_year, tm.ngx_tm_mon,
