@@ -221,8 +221,8 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle)
 #endif
     }
 
-    if (ngx_use_accept_mutex) {
-        if (ngx_accept_disabled > 0) {
+    if (ngx_use_accept_mutex) { /*开启均衡负载之后*/
+        if (ngx_accept_disabled > 0) { /*通过检验ngx_accept_disabled是否大于0来判断当前进程是否过载*/
             ngx_accept_disabled--;
 
         } else {

@@ -139,7 +139,7 @@ ngx_event_accept(ngx_event_t *ev)
 #endif
 
         ngx_accept_disabled = ngx_cycle->connection_n / 8
-                              - ngx_cycle->free_connection_n;
+                              - ngx_cycle->free_connection_n;  /*用于判断当前进程是否过载的一个量*/
 
         c = ngx_get_connection(s, ev->log);
 

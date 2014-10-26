@@ -64,8 +64,8 @@ struct ngx_event_s {
     unsigned         eof:1;
     unsigned         error:1;
 
-    unsigned         timedout:1;/*是否超时*/
-    unsigned         timer_set:1;/*是否置为定时器，加入超时定时器红黑树时就置为１*/
+    unsigned         timedout:1;/*是否超时,0表示没超时*/
+    unsigned         timer_set:1;/*是否置为定时器，0表示没哟加入，加入超时定时器红黑树时就置为１*/
 
     unsigned         delayed:1;
 
@@ -127,7 +127,7 @@ struct ngx_event_s {
 
     ngx_log_t       *log;
 
-    ngx_rbtree_node_t   timer; /*加入红黑树时需要的辅助节点*/
+    ngx_rbtree_node_t   timer; /*加入红黑树时需要的辅助节点，红黑树就是通过该字段来组织所有的超时事件对象*/
 
     unsigned         closed:1;
 
@@ -233,7 +233,7 @@ typedef struct {
 
     ngx_int_t  (*init)(ngx_cycle_t *cycle, ngx_msec_t timer);/*初始化*/
     void       (*done)(ngx_cycle_t *cycle);/*释放资源*/
-} ngx_event_actions_t;
+} ngx_event_actions_t; /*I/O多路复用模型统一接口*/
 
 
 extern ngx_event_actions_t   ngx_event_actions;
@@ -444,8 +444,8 @@ extern ngx_event_actions_t   ngx_event_actions;
 #define ngx_process_events   ngx_event_actions.process_events
 #define ngx_done_events      ngx_event_actions.done
 
-#define ngx_add_event        ngx_event_actions.add
-#define ngx_del_event        ngx_event_actions.del
+#define ngx_add_event        ngx_event_actions.add /*添加事件*/
+#define ngx_del_event        ngx_event_actions.del  /*删除事件*/
 #define ngx_add_conn         ngx_event_actions.add_conn
 #define ngx_del_conn         ngx_event_actions.del_conn
 
