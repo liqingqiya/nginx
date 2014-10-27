@@ -915,7 +915,7 @@ ngx_http_process_request_line(ngx_event_t *rev)
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, rev->log, 0,
                    "http process request line");
 
-    if (rev->timedout) {
+    if (rev->timedout) { /*读事件超时*/
         ngx_log_error(NGX_LOG_INFO, c->log, NGX_ETIMEDOUT, "client timed out");
         c->timedout = 1;
         ngx_http_close_request(r, NGX_HTTP_REQUEST_TIME_OUT);
@@ -934,7 +934,7 @@ ngx_http_process_request_line(ngx_event_t *rev)
             }
         }
 
-        rc = ngx_http_parse_request_line(r, r->header_in);
+        rc = ngx_http_parse_request_line(r, r->header_in); /*将数据读到了缓存区r->header_in内,并解析*/
 
         if (rc == NGX_OK) {
 
@@ -1009,7 +1009,7 @@ ngx_http_process_request_line(ngx_event_t *rev)
             c->log->action = "reading client request headers";
 
             rev->handler = ngx_http_process_request_headers;
-            ngx_http_process_request_headers(rev);
+            ngx_http_process_request_headers(rev); /*解析首部行, 这是下一步的请求处理衔接。*/
 
             return;
         }
@@ -1251,7 +1251,7 @@ ngx_http_process_request_headers(ngx_event_t *rev)
         cscf = ngx_http_get_module_srv_conf(r, ngx_http_core_module);
 
         rc = ngx_http_parse_header_line(r, r->header_in,
-                                        cscf->underscores_in_headers);
+                                        cscf->underscores_in_headers); /*解析首部行,结果存入r->headers_in.headers*/
 
         if (rc == NGX_OK) {
 
@@ -1313,8 +1313,8 @@ ngx_http_process_request_headers(ngx_event_t *rev)
             continue;
         }
 
-        if (rc == NGX_HTTP_PARSE_HEADER_DONE) {
-
+        if (rc == NGX_HTTP_PARSE_HEADER_DONE) { /*表示所有首部行已经全部解析完成*/
+                                                    /*nginx下一步进入内部处理，开始执行各种模块的handler*/
             /* a whole header has been parsed successfully */
 
             ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
@@ -1324,13 +1324,13 @@ ngx_http_process_request_headers(ngx_event_t *rev)
 
             r->http_state = NGX_HTTP_PROCESS_REQUEST_STATE;
 
-            rc = ngx_http_process_request_header(r);
+            rc = ngx_http_process_request_header(r); /*对我们解析出来的首部行做一个简单的检查*/
 
             if (rc != NGX_OK) {
                 return;
             }
 
-            ngx_http_process_request(r);
+            ngx_http_process_request(r); /*开始正式的处理我们的请求，调用 handler 处理链*/
 
             return;
         }

@@ -286,7 +286,7 @@ ngx_handle_read_event(ngx_event_t *rev, ngx_uint_t flags)
         /* kqueue, epoll */
 
         if (!rev->active && !rev->ready) {
-            if (ngx_add_event(rev, NGX_READ_EVENT, NGX_CLEAR_EVENT)
+            if (ngx_add_event(rev, NGX_READ_EVENT, NGX_CLEAR_EVENT) /*将read事件添加到事件监控机制中*/
                 == NGX_ERROR)
             {
                 return NGX_ERROR;
@@ -300,7 +300,7 @@ ngx_handle_read_event(ngx_event_t *rev, ngx_uint_t flags)
         /* select, poll, /dev/poll */
 
         if (!rev->active && !rev->ready) {
-            if (ngx_add_event(rev, NGX_READ_EVENT, NGX_LEVEL_EVENT)
+            if (ngx_add_event(rev, NGX_READ_EVENT, NGX_LEVEL_EVENT) /*将read事件添加到事件监控机制中*/
                 == NGX_ERROR)
             {
                 return NGX_ERROR;
@@ -324,7 +324,7 @@ ngx_handle_read_event(ngx_event_t *rev, ngx_uint_t flags)
         /* event ports */
 
         if (!rev->active && !rev->ready) {
-            if (ngx_add_event(rev, NGX_READ_EVENT, 0) == NGX_ERROR) {
+            if (ngx_add_event(rev, NGX_READ_EVENT, 0) == NGX_ERROR) { /*将read事件添加到事件监控机制中*/
                 return NGX_ERROR;
             }
 
@@ -365,7 +365,7 @@ ngx_handle_write_event(ngx_event_t *wev, size_t lowat)
 
         if (!wev->active && !wev->ready) {
             if (ngx_add_event(wev, NGX_WRITE_EVENT,
-                              NGX_CLEAR_EVENT | (lowat ? NGX_LOWAT_EVENT : 0))
+                              NGX_CLEAR_EVENT | (lowat ? NGX_LOWAT_EVENT : 0)) /*将read事件添加到事件监控机制中*/
                 == NGX_ERROR)
             {
                 return NGX_ERROR;
@@ -379,7 +379,7 @@ ngx_handle_write_event(ngx_event_t *wev, size_t lowat)
         /* select, poll, /dev/poll */
 
         if (!wev->active && !wev->ready) {
-            if (ngx_add_event(wev, NGX_WRITE_EVENT, NGX_LEVEL_EVENT)
+            if (ngx_add_event(wev, NGX_WRITE_EVENT, NGX_LEVEL_EVENT) /*将read事件添加到事件监控机制中*/
                 == NGX_ERROR)
             {
                 return NGX_ERROR;
@@ -403,7 +403,7 @@ ngx_handle_write_event(ngx_event_t *wev, size_t lowat)
         /* event ports */
 
         if (!wev->active && !wev->ready) {
-            if (ngx_add_event(wev, NGX_WRITE_EVENT, 0) == NGX_ERROR) {
+            if (ngx_add_event(wev, NGX_WRITE_EVENT, 0) == NGX_ERROR) { /*将read事件添加到事件监控机制中*/
                 return NGX_ERROR;
             }
 
@@ -810,7 +810,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
                 continue;
             }
 
-            if (ngx_add_event(rev, 0, NGX_IOCP_ACCEPT) == NGX_ERROR) {
+            if (ngx_add_event(rev, 0, NGX_IOCP_ACCEPT) == NGX_ERROR) { /*将read事件添加到事件监控机制中*/
                 return NGX_ERROR;
             }
 
@@ -824,20 +824,20 @@ ngx_event_process_init(ngx_cycle_t *cycle)
             }
 
         } else {
-            rev->handler = ngx_event_accept;
+            rev->handler = ngx_event_accept; /*read事件的回调函数是ngx_event_accept()*/
 
             if (ngx_use_accept_mutex) {
                 continue;
             }
 
-            if (ngx_add_event(rev, NGX_READ_EVENT, 0) == NGX_ERROR) {
+            if (ngx_add_event(rev, NGX_READ_EVENT, 0) == NGX_ERROR) { /*将read事件添加到事件监控机制中*/
                 return NGX_ERROR;
             }
         }
 
 #else
 
-        rev->handler = ngx_event_accept;
+        rev->handler = ngx_event_accept; /*read事件的回调函数是ngx_event_accept()*/
 
         if (ngx_use_accept_mutex) {
             continue;
@@ -849,7 +849,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
             }
 
         } else {
-            if (ngx_add_event(rev, NGX_READ_EVENT, 0) == NGX_ERROR) {
+            if (ngx_add_event(rev, NGX_READ_EVENT, 0) == NGX_ERROR) { /*将read事件添加到事件监控机制中*/
                 return NGX_ERROR;
             }
         }

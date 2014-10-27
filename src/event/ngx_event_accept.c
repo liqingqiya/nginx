@@ -56,18 +56,18 @@ ngx_event_accept(ngx_event_t *ev)
     ngx_log_debug2(NGX_LOG_DEBUG_EVENT, ev->log, 0,
                    "accept on %V, ready: %d", &ls->addr_text, ev->available);
 
-    do {
+    do { /*配置了multi_accpet on;该循环执行到accept()接受不到客户端请求为止，没有配置则执行一次*/
         socklen = NGX_SOCKADDRLEN;
 
 #if (NGX_HAVE_ACCEPT4)
         if (use_accept4) {
             s = accept4(lc->fd, (struct sockaddr *) sa, &socklen,
-                        SOCK_NONBLOCK);
+                        SOCK_NONBLOCK);  /*请求连接，创建连接套接字*/
         } else {
-            s = accept(lc->fd, (struct sockaddr *) sa, &socklen);
+            s = accept(lc->fd, (struct sockaddr *) sa, &socklen); /*请求连接，创建连接套接字*/
         }
 #else
-        s = accept(lc->fd, (struct sockaddr *) sa, &socklen);
+        s = accept(lc->fd, (struct sockaddr *) sa, &socklen); /*请求连接，创建连接套接字*/
 #endif
 
         if (s == (ngx_socket_t) -1) {
@@ -234,7 +234,7 @@ ngx_event_accept(ngx_event_t *ev)
 
         if (ngx_event_flags & (NGX_USE_AIO_EVENT|NGX_USE_RTSIG_EVENT)) {
             /* rtsig, aio, iocp */
-            rev->ready = 1;
+            rev->ready = 1;  /*设置为1,表示数据准备就绪*/
         }
 
         if (ev->deferred_accept) {
@@ -356,13 +356,13 @@ ngx_event_accept(ngx_event_t *ev)
         log->data = NULL;
         log->handler = NULL;
 
-        ls->handler(c);
+        ls->handler(c); /*回调函数：ngx_http_init_connection()*/
 
         if (ngx_event_flags & NGX_USE_KQUEUE_EVENT) {
             ev->available--;
         }
 
-    } while (ev->available);
+    } while (ev->available); /*配置了 multi_accept on;的时候，对应解析值 ecf->multi_accept为1,从而ev->available为1*/
 }
 
 
