@@ -56,7 +56,7 @@ typedef struct {
 
 
 #define ngx_http_get_module_main_conf(r, module)                             \
-    (r)->main_conf[module.ctx_index]
+    (r)->main_conf[module.ctx_index]   /*todo,获得对应模块的配置结构体吗？*/
 #define ngx_http_get_module_srv_conf(r, module)  (r)->srv_conf[module.ctx_index]
 #define ngx_http_get_module_loc_conf(r, module)  (r)->loc_conf[module.ctx_index]    /*loc_conf取的是哪个值？？？todo*/
 

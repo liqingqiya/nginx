@@ -1335,7 +1335,7 @@ ngx_http_process_request_headers(ngx_event_t *rev)
             return;
         }
 
-        if (rc == NGX_AGAIN) {
+        if (rc == NGX_AGAIN) { /*还没哟解析完我们的http协议头部*/
 
             /* a header line parsing is still not complete */
 
@@ -1348,7 +1348,7 @@ ngx_http_process_request_headers(ngx_event_t *rev)
                       "client sent invalid header line: \"%*s\\r...\"",
                       r->header_end - r->header_name_start,
                       r->header_name_start);
-        ngx_http_finalize_request(r, NGX_HTTP_BAD_REQUEST);
+        ngx_http_finalize_request(r, NGX_HTTP_BAD_REQUEST); /*清理工作*/
         return;
     }
 }
@@ -1824,11 +1824,11 @@ ngx_http_process_request_header(ngx_http_request_t *r)
 
 
 void
-ngx_http_process_request(ngx_http_request_t *r)
+ngx_http_process_request(ngx_http_request_t *r) /*进入请求链的处理过程*/
 {
     ngx_connection_t  *c;
 
-    c = r->connection;
+    c = r->connection; /*当前请求对应的连接结构体*/
 
 #if (NGX_HTTP_SSL)
 
@@ -1884,8 +1884,8 @@ ngx_http_process_request(ngx_http_request_t *r)
 
 #endif
 
-    if (c->read->timer_set) {
-        ngx_del_timer(c->read);
+    if (c->read->timer_set) { /*定时器的设置吗？？todo*/
+        ngx_del_timer(c->read); /*如果设置了定时器时间就删除？todo*/
     }
 
 #if (NGX_STAT_STUB)
@@ -1895,13 +1895,13 @@ ngx_http_process_request(ngx_http_request_t *r)
     r->stat_writing = 1;
 #endif
 
-    c->read->handler = ngx_http_request_handler;
-    c->write->handler = ngx_http_request_handler;
-    r->read_event_handler = ngx_http_block_reading;
+    c->read->handler = ngx_http_request_handler; /*读事件的回调函数*/
+    c->write->handler = ngx_http_request_handler; /*写事件的回调函数*/
+    r->read_event_handler = ngx_http_block_reading; /*??todo*/
 
-    ngx_http_handler(r);
+    ngx_http_handler(r); /*执行请求处理链模块*/
 
-    ngx_http_run_posted_requests(c);
+    ngx_http_run_posted_requests(c); /*todo*/
 }
 
 

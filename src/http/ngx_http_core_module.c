@@ -828,25 +828,25 @@ ngx_str_t  ngx_http_core_get_method = { 3, (u_char *) "GET " };
 
 
 void
-ngx_http_handler(ngx_http_request_t *r)
+ngx_http_handler(ngx_http_request_t *r) /*该函数执行什么功能？*/
 {
-    ngx_http_core_main_conf_t  *cmcf;
+    ngx_http_core_main_conf_t  *cmcf; /*上下文结构*/
 
     r->connection->log->action = NULL;
 
     r->connection->unexpected_eof = 0;
 
-    if (!r->internal) {
-        switch (r->headers_in.connection_type) {
+    if (!r->internal) { /*r->internal字段？？todo*/
+        switch (r->headers_in.connection_type) { /*此次请求的连接类型*/
         case 0:
-            r->keepalive = (r->http_version > NGX_HTTP_VERSION_10);
+            r->keepalive = (r->http_version > NGX_HTTP_VERSION_10); /*http1.1默认为长连接*/
             break;
 
-        case NGX_HTTP_CONNECTION_CLOSE:
+        case NGX_HTTP_CONNECTION_CLOSE: /*close*/
             r->keepalive = 0;
             break;
 
-        case NGX_HTTP_CONNECTION_KEEP_ALIVE:
+        case NGX_HTTP_CONNECTION_KEEP_ALIVE: /*keep alive*/
             r->keepalive = 1;
             break;
         }
@@ -860,14 +860,14 @@ ngx_http_handler(ngx_http_request_t *r)
         r->phase_handler = cmcf->phase_engine.server_rewrite_index;
     }
 
-    r->valid_location = 1;
+    r->valid_location = 1; /*该请求连接有效，设置对应位域的值*/
 #if (NGX_HTTP_GZIP)
     r->gzip_tested = 0;
     r->gzip_ok = 0;
     r->gzip_vary = 0;
 #endif
 
-    r->write_event_handler = ngx_http_core_run_phases;
+    r->write_event_handler = ngx_http_core_run_phases; /*写事件回调函数*/
     ngx_http_core_run_phases(r);
 }
 
@@ -879,15 +879,15 @@ ngx_http_core_run_phases(ngx_http_request_t *r)
     ngx_http_phase_handler_t   *ph;
     ngx_http_core_main_conf_t  *cmcf;
 
-    cmcf = ngx_http_get_module_main_conf(r, ngx_http_core_module);
+    cmcf = ngx_http_get_module_main_conf(r, ngx_http_core_module); /*??todo??*/
 
-    ph = cmcf->phase_engine.handlers;
-
-    while (ph[r->phase_handler].checker) {
+    ph = cmcf->phase_engine.handlers; /**/
+    /*最后一条处理链是NULL，作为哨兵，作为我们简化思想，简化编程的常用技巧*/
+    while (ph[r->phase_handler].checker) { /*这里是实际的处理链吗？？todo*/
 
         rc = ph[r->phase_handler].checker(r, &ph[r->phase_handler]);
 
-        if (rc == NGX_OK) {
+        if (rc == NGX_OK) { /*处理完成，返回*/
             return;
         }
     }

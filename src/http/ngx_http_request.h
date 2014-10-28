@@ -361,10 +361,10 @@ struct ngx_http_request_s { /*表示一个客户端请求*/
 
     ngx_connection_t                 *connection;
 
-    void                            **ctx;
-    void                            **main_conf;
-    void                            **srv_conf;
-    void                            **loc_conf;
+    void                            **ctx; /*todo，上下文结构*/
+    void                            **main_conf; /*主结构环境下的配置结构体?todo*/
+    void                            **srv_conf; /*server的配置?todo*/
+    void                            **loc_conf; /*location的配置？todo*/
 
     ngx_http_event_handler_pt         read_event_handler; /*读事件回调函数*/
     ngx_http_event_handler_pt         write_event_handler; /*写事件回调函数*/
@@ -509,7 +509,7 @@ struct ngx_http_request_s { /*表示一个客户端请求*/
     unsigned                          keepalive:1;
     unsigned                          lingering_close:1;
     unsigned                          discard_body:1;
-    unsigned                          internal:1;
+    unsigned                          internal:1; /*todo???*/
     unsigned                          error_page:1;
     unsigned                          ignore_content_encoding:1;
     unsigned                          filter_finalize:1;
