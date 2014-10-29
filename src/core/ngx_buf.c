@@ -10,7 +10,7 @@
 
 
 ngx_buf_t *
-ngx_create_temp_buf(ngx_pool_t *pool, size_t size)
+ngx_create_temp_buf(ngx_pool_t *pool, size_t size) /*标志位temporary为1时候，使用该函数进行创建*/
 {
     ngx_buf_t *b;
 
@@ -49,13 +49,13 @@ ngx_alloc_chain_link(ngx_pool_t *pool)
 {
     ngx_chain_t  *cl;
 
-    cl = pool->chain;
+    cl = pool->chain;/*chain所在内存池的chain字段*/
 
     if (cl) {
-        pool->chain = cl->next;
+        pool->chain = cl->next;/*pool->chain已经链接了一个单链表*/
         return cl;
     }
-
+    /*如果没有,则开辟一个ngx_chain_t结构内存，返回地址*/
     cl = ngx_palloc(pool, sizeof(ngx_chain_t));
     if (cl == NULL) {
         return NULL;
@@ -71,18 +71,18 @@ ngx_create_chain_of_bufs(ngx_pool_t *pool, ngx_bufs_t *bufs)
     u_char       *p;
     ngx_int_t     i;
     ngx_buf_t    *b;
-    ngx_chain_t  *chain, *cl, **ll;
+    ngx_chain_t  *chain, *cl, **ll; /*堆栈变量*/
 
-    p = ngx_palloc(pool, bufs->num * bufs->size);
+    p = ngx_palloc(pool, bufs->num * bufs->size); /*分配所有节点的数据区域内存*/
     if (p == NULL) {
         return NULL;
     }
 
-    ll = &chain;
+    ll = &chain; /*chain地址*/
 
-    for (i = 0; i < bufs->num; i++) {
+    for (i = 0; i < bufs->num; i++) { /*遍历每一个节点*/
 
-        b = ngx_calloc_buf(pool);
+        b = ngx_calloc_buf(pool); /* 开辟一个buf节点内存 */
         if (b == NULL) {
             return NULL;
         }
@@ -101,23 +101,23 @@ ngx_create_chain_of_bufs(ngx_pool_t *pool, ngx_bufs_t *bufs)
 
         b->pos = p;
         b->last = p;
-        b->temporary = 1;
+        b->temporary = 1; /*设置内存标志*/
 
         b->start = p;
         p += bufs->size;
         b->end = p;
 
-        cl = ngx_alloc_chain_link(pool);
+        cl = ngx_alloc_chain_link(pool); /*获得poll->chain字段的chain管理节点*/
         if (cl == NULL) {
             return NULL;
         }
 
-        cl->buf = b;
-        *ll = cl;
+        cl->buf = b; /*指向buf区域*/
+        *ll = cl; /*cl指向chain*/
         ll = &cl->next;
     }
 
-    *ll = NULL;
+    *ll = NULL; /*设置哨兵*/
 
     return chain;
 }
@@ -164,7 +164,7 @@ ngx_chain_get_free_buf(ngx_pool_t *p, ngx_chain_t **free)
         return cl;
     }
 
-    cl = ngx_alloc_chain_link(p);
+    cl = ngx_alloc_chain_link(p); /*最后一个节点*/
     if (cl == NULL) {
         return NULL;
     }

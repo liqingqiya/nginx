@@ -58,7 +58,7 @@ struct ngx_pool_s {
     ngx_pool_data_t       d;    /*内存池数据结构*/
     size_t                max;  /*最大数据区大小*/
     ngx_pool_t           *current;  /*指向当前的内存池结构*/
-    ngx_chain_t          *chain;    /*todo*/
+    ngx_chain_t          *chain;    /*链接一个单链表*/
     ngx_pool_large_t     *large;    /*携带的大存储块，不超过3个*/
     ngx_pool_cleanup_t   *cleanup;
     ngx_log_t            *log;
