@@ -1171,11 +1171,11 @@ ngx_http_gzip_merge_conf(ngx_conf_t *cf, void *parent, void *child)
 static ngx_int_t
 ngx_http_gzip_filter_init(ngx_conf_t *cf)
 {
-    ngx_http_next_header_filter = ngx_http_top_header_filter;
-    ngx_http_top_header_filter = ngx_http_gzip_header_filter;
+    ngx_http_next_header_filter = ngx_http_top_header_filter; /*指向链接头指向的模块,作为next*/
+    ngx_http_top_header_filter = ngx_http_gzip_header_filter;/*链接头指向自身*/
 
-    ngx_http_next_body_filter = ngx_http_top_body_filter;
-    ngx_http_top_body_filter = ngx_http_gzip_body_filter;
+    ngx_http_next_body_filter = ngx_http_top_body_filter;/*指向链接头指向的模块,作为next*/
+    ngx_http_top_body_filter = ngx_http_gzip_body_filter;/*链接头指向自身*/
 
     return NGX_OK;
 }

@@ -474,10 +474,10 @@ ngx_http_headers_merge_conf(ngx_conf_t *cf, void *parent, void *child)
 
 
 static ngx_int_t
-ngx_http_headers_filter_init(ngx_conf_t *cf)
+ngx_http_headers_filter_init(ngx_conf_t *cf) /*模块初始化函数*/
 {
-    ngx_http_next_header_filter = ngx_http_top_header_filter;
-    ngx_http_top_header_filter = ngx_http_headers_filter;
+    ngx_http_next_header_filter = ngx_http_top_header_filter; /*指向链接头指向的模块,作为next*/
+    ngx_http_top_header_filter = ngx_http_headers_filter; /*链接头指向自身, 形成过滤链*/
 
     return NGX_OK;
 }

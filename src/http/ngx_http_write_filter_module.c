@@ -13,7 +13,7 @@
 static ngx_int_t ngx_http_write_filter_init(ngx_conf_t *cf);
 
 
-static ngx_http_module_t  ngx_http_write_filter_module_ctx = {
+static ngx_http_module_t  ngx_http_write_filter_module_ctx = {  /*http类型模块的一个通用接口*/
     NULL,                                  /* preconfiguration */
     ngx_http_write_filter_init,            /* postconfiguration */
 
@@ -28,7 +28,7 @@ static ngx_http_module_t  ngx_http_write_filter_module_ctx = {
 };
 
 
-ngx_module_t  ngx_http_write_filter_module = {
+ngx_module_t  ngx_http_write_filter_module = { /*每一个模块必须遵守的通用接口*/
     NGX_MODULE_V1,
     &ngx_http_write_filter_module_ctx,     /* module context */
     NULL,                                  /* module directives */
@@ -310,7 +310,7 @@ ngx_http_write_filter(ngx_http_request_t *r, ngx_chain_t *in)
 
 
 static ngx_int_t
-ngx_http_write_filter_init(ngx_conf_t *cf)
+ngx_http_write_filter_init(ngx_conf_t *cf) /*模块初始化，这个模块是模块处理链的最后一站,响应头已经发了，只有body的处理*/
 {
     ngx_http_top_body_filter = ngx_http_write_filter;
 

@@ -1555,7 +1555,7 @@ ngx_http_core_find_location(ngx_http_request_t *r)
 
     pclcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
 
-    rc = ngx_http_core_find_static_location(r, pclcf->static_locations);
+    rc = ngx_http_core_find_static_location(r, pclcf->static_locations); /*静态匹配（绝对匹配和前缀匹配）,静态匹配以树的形式挂载到 pclcf->static_locations */
 
     if (rc == NGX_AGAIN) {
 
@@ -1619,7 +1619,7 @@ ngx_http_core_find_location(ngx_http_request_t *r)
 
 static ngx_int_t
 ngx_http_core_find_static_location(ngx_http_request_t *r,
-    ngx_http_location_tree_node_t *node)
+    ngx_http_location_tree_node_t *node) /*静态匹配以树的形式挂载到 pclcf->static_locations */
 {
     u_char     *uri;
     size_t      len, n;
@@ -1933,7 +1933,7 @@ ngx_http_send_response(ngx_http_request_t *r, ngx_uint_t status,
 
 
 ngx_int_t
-ngx_http_send_header(ngx_http_request_t *r)
+ngx_http_send_header(ngx_http_request_t *r) /*通过这个函数，经过nginx的过滤链，以此调用下去*/
 {
     if (r->header_sent) {
         ngx_log_error(NGX_LOG_ALERT, r->connection->log, 0,
@@ -1946,7 +1946,7 @@ ngx_http_send_header(ngx_http_request_t *r)
         r->headers_out.status_line.len = 0;
     }
 
-    return ngx_http_top_header_filter(r);
+    return ngx_http_top_header_filter(r); /*调用过滤链step:1*/ 
 }
 
 
