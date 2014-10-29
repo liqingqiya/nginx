@@ -68,7 +68,7 @@ static ngx_int_t ngx_http_add_addrs6(ngx_conf_t *cf, ngx_http_port_t *hport,
 
 ngx_uint_t   ngx_http_max_module;
 
-/*整个文件可见, filter的两条过滤链*/
+/*整个文件可见, filter的两条过滤链, 每一个过滤链模块都会将自己挂载到这个链接头上面*/
 ngx_int_t  (*ngx_http_top_header_filter) (ngx_http_request_t *r);
 ngx_int_t  (*ngx_http_top_body_filter) (ngx_http_request_t *r, ngx_chain_t *ch);
 

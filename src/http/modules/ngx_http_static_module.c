@@ -46,7 +46,7 @@ ngx_module_t  ngx_http_static_module = {
 
 
 static ngx_int_t
-ngx_http_static_handler(ngx_http_request_t *r)
+ngx_http_static_handler(ngx_http_request_t *r) /*处理函数*/
 {
     u_char                    *last, *location;
     size_t                     root, len;
