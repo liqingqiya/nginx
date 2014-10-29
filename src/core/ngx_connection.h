@@ -20,12 +20,12 @@ struct ngx_listening_s {
 
     struct sockaddr    *sockaddr;   /*套接字地址*/
     socklen_t           socklen;    /* size of sockaddr */
-    size_t              addr_text_max_len;
+    size_t              addr_text_max_len;/*存储IP地址的字符串addr_text最大长度，即它指定了addr_text所分配的内存大小*/
     ngx_str_t           addr_text;  /*以字符串类型存储ip地址*/
 
     int                 type;       /*套接字类型，比如SOCK_STREAM代表TCP*/
 
-    int                 backlog;
+    int                 backlog;/*TCP实现监听时的backlog队列，表示允许正在通过三次握手建立TCP连接，但还没有任何进程开始处理的连接的最大个数*/
     int                 rcvbuf;     /*内核中对于这个套接字的接收缓冲区的大小*/
     int                 sndbuf;     /*内核中对于这个套接字的发送缓冲区的大小*/
 #if (NGX_HAVE_KEEPALIVE_TUNABLE)
@@ -46,19 +46,19 @@ struct ngx_listening_s {
     /* should be here because of the AcceptEx() preread */
     size_t              post_accept_buffer_size;
     /* should be here because of the deferred accept */
-    ngx_msec_t          post_accept_timeout;
+    ngx_msec_t          post_accept_timeout;/*如果post_accept_timeout秒后，仍然没有收到用户的数据，则内核直接丢弃连接*/
 
-    ngx_listening_t    *previous;
-    ngx_connection_t   *connection; /*当前监听句柄对应着的ngx_connection_t结构体*/
+    ngx_listening_t    *previous;/*多个ngx_listenging_t结构体之间由previous指针组成单链表*/
+    ngx_connection_t   *connection; /*当前监听句柄对应着的 ngx_connection_t 结构体*/
 
-    unsigned            open:1; /*标志位，1表示当前监听有效*/
-    unsigned            remain:1;
-    unsigned            ignore:1;
+    unsigned            open:1; /*标志位，1表示当前监听有效,且执行ngx_init_cycle时，不关闭监听端口，为0时则正常关闭*/
+    unsigned            remain:1;/*标志位，1表示使用已有的ngx_cycle_t来初始化新的ngx_cycle_t结构体时，不关闭原先打开的监听端口，这个对运行时升级有效，remain为0时，表示正常关闭曾经打开的监听端口。*/
+    unsigned            ignore:1;/*标志位，1表示跳过设置当前ngx_listening_t结构体的套接字，为0时，正常初始化套接字*/
 
     unsigned            bound:1;       /* already bound */
     unsigned            inherited:1;   /* inherited from previous process */
     unsigned            nonblocking_accept:1;
-    unsigned            listen:1;
+    unsigned            listen:1;/*为1表示当前套接字已经监听*/
     unsigned            nonblocking:1;
     unsigned            shared:1;    /* shared between threads or processes */
     unsigned            addr_ntop:1;

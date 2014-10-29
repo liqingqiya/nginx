@@ -137,9 +137,9 @@ struct ngx_module_s {
 
 
 typedef struct {
-    ngx_str_t             name;
-    void               *(*create_conf)(ngx_cycle_t *cycle);
-    char               *(*init_conf)(ngx_cycle_t *cycle, void *conf);
+    ngx_str_t             name;  /*核心模块的名字*/
+    void               *(*create_conf)(ngx_cycle_t *cycle); /*解析配置项前，nginx框架会调用create_conf方法*/
+    char               *(*init_conf)(ngx_cycle_t *cycle, void *conf);/*解析配置后，nginx框架会调用init_conf方法*/
 } ngx_core_module_t;        /*core模块的上下文结构*/
 
 

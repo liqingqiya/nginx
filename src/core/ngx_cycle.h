@@ -43,19 +43,19 @@ struct ngx_cycle_s {
 
     ngx_uint_t                log_use_stderr;  /* unsigned  log_use_stderr:1; */
 
-    ngx_connection_t        **files;
-    ngx_connection_t         *free_connections;
+    ngx_connection_t        **files;/*对于poll，rtsig这样的事件模块，会以有效文件句柄数来预先建立这些ngx_connection_t结构体，加速事件的收集，分发。这个时候files保存所有的ngx_connection_t的指针组成的数组*/
+    ngx_connection_t         *free_connections;/*可用连接池*/
     ngx_uint_t                free_connection_n;    /*可用连接池中的总数*/
 
     ngx_queue_t               reusable_connections_queue; /*可重用网络连接队列*/
 
-    ngx_array_t               listening;        /*监听的端口数组, 存储着ngx_listening_t结构体,一个socket对应一个listening结构*/
-    ngx_array_t               paths;            /*存放缓存在磁盘上的路径的数组*/
-    ngx_list_t                open_files;       /*存放所有打开的文件描述符的列表*/
-    ngx_list_t                shared_memory;    /*共享内存列表*/
+    ngx_array_t               listening;        /*监听的端口数组, 存储着ngx_listening_t结构体,一个监听socket对应一个listening结构*/
+    ngx_array_t               paths;            /*保存nginx所要操作的目录。如果有目录不存在，那么就会创建，如果失败，那么nginx启动也会失败*/
+    ngx_list_t                open_files;       /*单链表，元素类型为ngx_open_file_t，表示nginx已经打开的文件。nginx框架并不会向open_file链表中添加文件，只是由对此感兴趣的模块向其中添加文件路径名，nginx框架会在ngx_init_cycle方法中打开这些文件*/
+    ngx_list_t                shared_memory;    /*元素类型为ngx_shm_zone_t结构体，每一个元素代表一块共享内存*/
 
-    ngx_uint_t                connection_n; /*当前进程中所有链接对象的总数，与下面的connections配合使用*/
-    ngx_uint_t                files_n;      
+    ngx_uint_t                connection_n; /*当前进程中所有连接对象的总数，与下面的connections配合使用*/
+    ngx_uint_t                files_n;      /*连接池容量，与files配合使用*/
 
     ngx_connection_t         *connections;  /*指向当前进程中所有的连接对象，与connection_n配合使用*/
     ngx_event_t              *read_events;  /*指向当前进程中所有的读事件对象，connection_n同时表示所有的读事件总数*/
@@ -63,9 +63,9 @@ struct ngx_cycle_s {
 
     ngx_cycle_t              *old_cycle;    /*旧的cycle对象，用于引用上一个ngx_cycle_t对象中的成员。*/
 
-    ngx_str_t                 conf_file;    /*配置文件相对与安装路径的名称*/
+    ngx_str_t                 conf_file;    /*配置文件 相对与 安装路径的名称*/
     ngx_str_t                 conf_param;   /*nginx处理配置文件时候需要特殊处理的命令行携带的参数，一般是-g选项携带的参数*/
-    ngx_str_t                 conf_prefix;  /*nginx配置文件所在的目录路径*/
+    ngx_str_t                 conf_prefix;  /*nginx配置文件 所在 的目录路径*/
     ngx_str_t                 prefix;       /*nginx安装目录路径*/
     ngx_str_t                 lock_file;    /*用于进程间同步的文件锁名称*/
     ngx_str_t                 hostname;     /*使用gethostname系统调用得到的主机名称*/
