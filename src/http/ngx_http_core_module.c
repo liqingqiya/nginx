@@ -1931,7 +1931,7 @@ ngx_http_send_response(ngx_http_request_t *r, ngx_uint_t status,
     return ngx_http_output_filter(r, &out);
 }
 
-
+/*header 过滤链的入口*/
 ngx_int_t
 ngx_http_send_header(ngx_http_request_t *r) /*通过这个函数，经过nginx的过滤链，以此调用下去*/
 {
@@ -1945,13 +1945,13 @@ ngx_http_send_header(ngx_http_request_t *r) /*通过这个函数，经过nginx�
         r->headers_out.status = r->err_status;
         r->headers_out.status_line.len = 0;
     }
-
+    /*ngx_http_top_header_filter是头部过滤链的头指针*/
     return ngx_http_top_header_filter(r); /*调用过滤链step:1*/ 
 }
 
-
+/*body 过滤链的入口*/
 ngx_int_t
-ngx_http_output_filter(ngx_http_request_t *r, ngx_chain_t *in)
+ngx_http_output_filter(ngx_http_request_t *r, ngx_chain_t *in)/*通过这个函数，经过nginx的过滤链，以此调用下去*/
 {
     ngx_int_t          rc;
     ngx_connection_t  *c;
@@ -1960,7 +1960,7 @@ ngx_http_output_filter(ngx_http_request_t *r, ngx_chain_t *in)
 
     ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0,
                    "http output filter \"%V?%V\"", &r->uri, &r->args);
-
+    /*ngx_http_top_body_filter是body过滤链的头指针*/
     rc = ngx_http_top_body_filter(r, in);
 
     if (rc == NGX_ERROR) {
