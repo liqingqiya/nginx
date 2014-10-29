@@ -10,7 +10,7 @@
 
 
 void *
-ngx_hash_find(ngx_hash_t *hash, ngx_uint_t key, u_char *name, size_t len)
+ngx_hash_find(ngx_hash_t *hash, ngx_uint_t key, u_char *name, size_t len)/*如果查找成功，则返回指向value的指针，否则返回NULL*/
 {
     ngx_uint_t       i;
     ngx_hash_elt_t  *elt;
@@ -48,7 +48,7 @@ ngx_hash_find(ngx_hash_t *hash, ngx_uint_t key, u_char *name, size_t len)
     return NULL;
 }
 
-
+/*查询包含通配符在前的key的hash表的*/
 void *
 ngx_hash_find_wc_head(ngx_hash_wildcard_t *hwc, u_char *name, size_t len)
 {
@@ -142,7 +142,7 @@ ngx_hash_find_wc_head(ngx_hash_wildcard_t *hwc, u_char *name, size_t len)
     return hwc->value;
 }
 
-
+/*查询包含通配符在后的key的hash表的*/
 void *
 ngx_hash_find_wc_tail(ngx_hash_wildcard_t *hwc, u_char *name, size_t len)
 {
@@ -249,7 +249,7 @@ ngx_hash_find_combined(ngx_hash_combined_t *hash, ngx_uint_t key, u_char *name,
     (sizeof(void *) + ngx_align((name)->key.len + 2, sizeof(void *)))
 
 ngx_int_t
-ngx_hash_init(ngx_hash_init_t *hinit, ngx_hash_key_t *names, ngx_uint_t nelts)
+ngx_hash_init(ngx_hash_init_t *hinit, ngx_hash_key_t *names, ngx_uint_t nelts) /*hash表的初始化*/
 {
     u_char          *elts;
     size_t           len;
@@ -451,7 +451,7 @@ found:
     return NGX_OK;
 }
 
-
+/*ngx_hash_wildcard_t类型变量的构建*/
 ngx_int_t
 ngx_hash_wildcard_init(ngx_hash_init_t *hinit, ngx_hash_key_t *names,
     ngx_uint_t nelts)
@@ -702,7 +702,7 @@ ngx_hash_keys_array_init(ngx_hash_keys_arrays_t *ha, ngx_uint_t type)
 
 ngx_int_t
 ngx_hash_add_key(ngx_hash_keys_arrays_t *ha, ngx_str_t *key, void *value,
-    ngx_uint_t flags)
+    ngx_uint_t flags) /*添加元素*/
 {
     size_t           len;
     u_char          *p;
