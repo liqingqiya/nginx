@@ -85,7 +85,7 @@ ngx_signal_t  signals[] = {  /*全局信号变量数组*/
 
 ngx_pid_t
 ngx_spawn_process(ngx_cycle_t *cycle, ngx_spawn_proc_pt proc, void *data,
-    char *name, ngx_int_t respawn)
+    char *name, ngx_int_t respawn) /*进程的初始化*/
 {
     u_long     on;
     ngx_pid_t  pid;

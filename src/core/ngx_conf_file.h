@@ -279,11 +279,11 @@ char *ngx_conf_check_num_bounds(ngx_conf_t *cf, void *post, void *data);
     }
 
 #define ngx_conf_merge_str_value(conf, prev, default)                        \
-    if (conf.data == NULL) {                                                 \
-        if (prev.data) {                                                     \
-            conf.len = prev.len;                                             \
+    if (conf.data == NULL) {  /*当前配置块是否已经解析到...配置项*/              \
+        if (prev.data) {    /*父配置块中是否已经解析到...配置项*/              \
+            conf.len = prev.len;  /*将父配置块中的...参数值直接覆盖当前配置的...*/   \
             conf.data = prev.data;                                           \
-        } else {                                                             \
+        } else { /*如果父配置块和子配置块都没有解析到..., 以default参数作为默认值传给当前配置块的...*/ \
             conf.len = sizeof(default) - 1;                                  \
             conf.data = (u_char *) default;                                  \
         }                                                                    \

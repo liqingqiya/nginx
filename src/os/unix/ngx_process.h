@@ -20,20 +20,20 @@ typedef pid_t       ngx_pid_t;
 typedef void (*ngx_spawn_proc_pt) (ngx_cycle_t *cycle, void *data);
 
 typedef struct {
-    ngx_pid_t           pid;
-    int                 status;
-    ngx_socket_t        channel[2];
+    ngx_pid_t           pid;            /*进程ID*/
+    int                 status;         /*由waitpid系统调用获取到的进程状态*/
+    ngx_socket_t        channel[2];         /*由socketpair系统调用产生出的用于进程通信的socket句柄,这一对socket句柄可以相互通信，目前用于master父进程和worker子进程的通信*/
 
-    ngx_spawn_proc_pt   proc;
-    void               *data;
-    char               *name;
+    ngx_spawn_proc_pt   proc;           /*子进程的循环执行方法，当父进程调用ngx_spawn_process 生成子进程的时候使用*/
+    void               *data;           /*ngx_spawn_proc_pt的第二个参数, 可选*/
+    char               *name;           /*进程名称，操作系统中显示的进程名称与name相同*/
 
-    unsigned            respawn:1;
-    unsigned            just_spawn:1;
-    unsigned            detached:1;
-    unsigned            exiting:1;
-    unsigned            exited:1;
-} ngx_process_t;
+    unsigned            respawn:1;          /*标志位，为1时，表示在重新生成子进程*/
+    unsigned            just_spawn:1;           /*标志位，为1时，表示正在生成自己成*/
+    unsigned            detached:1;         /*标志位，为1时，表示在进行父，子进程的分离*/
+    unsigned            exiting:1;          /*标志位， 为1时， 表示进程正在退出*/
+    unsigned            exited:1;           /*标志位， 为1时， 表示进程已经退出*/
+} ngx_process_t; /*子进程相关结构体*/
 
 
 typedef struct {
@@ -44,7 +44,7 @@ typedef struct {
 } ngx_exec_ctx_t;
 
 
-#define NGX_MAX_PROCESSES         1024
+#define NGX_MAX_PROCESSES         1024 /*最大进程数*/
 
 #define NGX_PROCESS_NORESPAWN     -1
 #define NGX_PROCESS_JUST_SPAWN    -2
