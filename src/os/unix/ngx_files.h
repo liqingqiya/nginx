@@ -14,7 +14,7 @@
 
 
 typedef int                      ngx_fd_t;
-typedef struct stat              ngx_file_info_t;
+typedef struct stat              ngx_file_info_t; /*文件的资源信息*/
 typedef ino_t                    ngx_file_uniq_t;
 
 

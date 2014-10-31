@@ -371,7 +371,7 @@ ngx_pool_run_cleanup_file(ngx_pool_t *p, ngx_fd_t fd)
 
 
 void
-ngx_pool_cleanup_file(void *data)
+ngx_pool_cleanup_file(void *data) /*关闭文件句柄*/
 {
     ngx_pool_cleanup_file_t  *c = data;
 

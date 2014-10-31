@@ -62,11 +62,11 @@ typedef struct {
 
 
 #define ngx_http_conf_get_module_main_conf(cf, module)                        \
-    ((ngx_http_conf_ctx_t *) cf->ctx)->main_conf[module.ctx_index]
+    ((ngx_http_conf_ctx_t *) cf->ctx)->main_conf[module.ctx_index]/*找到该模块对应的ngx_http_core_main_conf_t结构体*/
 #define ngx_http_conf_get_module_srv_conf(cf, module)                         \
-    ((ngx_http_conf_ctx_t *) cf->ctx)->srv_conf[module.ctx_index]
+    ((ngx_http_conf_ctx_t *) cf->ctx)->srv_conf[module.ctx_index]/*找到该模块对应的ngx_http_core_srv_conf_t结构体*/
 #define ngx_http_conf_get_module_loc_conf(cf, module)                         \
-    ((ngx_http_conf_ctx_t *) cf->ctx)->loc_conf[module.ctx_index]
+    ((ngx_http_conf_ctx_t *) cf->ctx)->loc_conf[module.ctx_index] /*找到该模块对应的ngx_http_core_loc_conf_t结构体*/
 
 #define ngx_http_cycle_get_module_main_conf(cycle, module)                    \
     (cycle->conf_ctx[ngx_http_module.index] ?                                 \

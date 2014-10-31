@@ -170,9 +170,9 @@ typedef struct {
 
 
 typedef struct {
-    ngx_list_t                        headers;
+    ngx_list_t                        headers; /*所有解析过的头部都在这个链表中，元素类型为 ngx_table_elt_t成员*/
 
-    ngx_table_elt_t                  *host;
+    ngx_table_elt_t                  *host; /*以下ngx_table_elt_t成员都是http头部，实际指向header链表中的相应成员, 为null时，表示没有解析到相应的http头部*/
     ngx_table_elt_t                  *connection;
     ngx_table_elt_t                  *if_modified_since;
     ngx_table_elt_t                  *if_unmodified_since;
@@ -227,7 +227,7 @@ typedef struct {
     ngx_str_t                         server;
     off_t                             content_length_n;
     time_t                            keep_alive_n;
-
+    /*以下标志位是http框架根据浏览器传来的useragent头部， 可以用来判断浏览器的类型*/
     unsigned                          connection_type:2;
     unsigned                          chunked:1;
     unsigned                          msie:1;
@@ -237,16 +237,16 @@ typedef struct {
     unsigned                          chrome:1;
     unsigned                          safari:1;
     unsigned                          konqueror:1;
-} ngx_http_headers_in_t;
+} ngx_http_headers_in_t; /*存放解析过的http头部(请求行+首部行)*/
 
 
 typedef struct {
-    ngx_list_t                        headers;
+    ngx_list_t                        headers;/*待发送的http头部链表，与headers_in中的headers成员结构一样*/
 
-    ngx_uint_t                        status;
-    ngx_str_t                         status_line;
+    ngx_uint_t                        status;/*待发送的状态码*/
+    ngx_str_t                         status_line;/*响应的状态行*/
 
-    ngx_table_elt_t                  *server;
+    ngx_table_elt_t                  *server;/*以下成员为心爱供应头部，只想headers中的元素*/
     ngx_table_elt_t                  *date;
     ngx_table_elt_t                  *content_length;
     ngx_table_elt_t                  *content_encoding;
@@ -272,7 +272,7 @@ typedef struct {
     off_t                             content_length_n;
     time_t                            date_time;
     time_t                            last_modified_time;
-} ngx_http_headers_out_t;
+} ngx_http_headers_out_t;  /*响应头部结构*/
 
 
 typedef void (*ngx_http_client_body_handler_pt)(ngx_http_request_t *r);
