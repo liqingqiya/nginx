@@ -29,7 +29,7 @@ struct ngx_listening_s {
     int                 rcvbuf;     /*内核中对于这个套接字的接收缓冲区的大小*/
     int                 sndbuf;     /*内核中对于这个套接字的发送缓冲区的大小*/
 #if (NGX_HAVE_KEEPALIVE_TUNABLE)
-    int                 keepidle;
+    int                 keepidle; /*长连接*/
     int                 keepintvl;
     int                 keepcnt;
 #endif
@@ -69,8 +69,8 @@ struct ngx_listening_s {
     unsigned            keepalive:2;
 
 #if (NGX_HAVE_DEFERRED_ACCEPT)
-    unsigned            deferred_accept:1;
-    unsigned            delete_deferred:1;
+    unsigned            deferred_accept:1; /*todo*/
+    unsigned            delete_deferred:1; /*todo*/
     unsigned            add_deferred:1;
 #ifdef SO_ACCEPTFILTER
     char               *accept_filter;

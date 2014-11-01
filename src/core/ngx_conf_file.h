@@ -214,7 +214,7 @@ char * ngx_conf_deprecated(ngx_conf_t *cf, void *post, void *data);
 char *ngx_conf_check_num_bounds(ngx_conf_t *cf, void *post, void *data);
 
 
-#define ngx_get_conf(conf_ctx, module)  conf_ctx[module.index]
+#define ngx_get_conf(conf_ctx, module)  conf_ctx[module.index]  /*获得上下文 - ngx_core_conf_t */
 
 
 

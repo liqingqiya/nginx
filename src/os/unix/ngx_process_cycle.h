@@ -22,7 +22,7 @@
 
 #define NGX_PROCESS_SINGLE     0
 #define NGX_PROCESS_MASTER     1
-#define NGX_PROCESS_SIGNALLER  2
+#define NGX_PROCESS_SIGNALLER  2 /*todo*/
 #define NGX_PROCESS_WORKER     3
 #define NGX_PROCESS_HELPER     4
 

@@ -66,7 +66,7 @@ ngx_conf_param(ngx_conf_t *cf)
     ngx_buf_t         b;
     ngx_conf_file_t   conf_file;
 
-    param = &cf->cycle->conf_param;
+    param = &cf->cycle->conf_param; /**/
 
     if (param->len == 0) {
         return NGX_CONF_OK;
@@ -137,7 +137,7 @@ ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename)
                           ngx_fd_info_n " \"%s\" failed", filename->data);
         }
 
-        cf->conf_file->buffer = &buf;
+        cf->conf_file->buffer = &buf; /*缓存结构*/
 
         buf.start = ngx_alloc(NGX_CONF_BUFFER, cf->log);
         if (buf.start == NULL) {
@@ -148,7 +148,7 @@ ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename)
         buf.last = buf.start;
         buf.end = buf.last + NGX_CONF_BUFFER;
         buf.temporary = 1;
-
+        /*初始化 conf_file */
         cf->conf_file->file.fd = fd;
         cf->conf_file->file.name.len = filename->len;
         cf->conf_file->file.name.data = filename->data;
@@ -281,7 +281,7 @@ done:
 
 
 static ngx_int_t
-ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last)
+ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last) /*这个时候， cf的args数组中已经存储了一对解析到的配置值，比如：name[0]='master_process', name[1]='off'*/
 {
     char           *rv;
     void           *conf, **confp;
@@ -295,14 +295,14 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last)
 
     for (i = 0; ngx_modules[i]; i++) { /*遍历模块*/
 
-        cmd = ngx_modules[i]->commands; /*指令数组*/
+        cmd = ngx_modules[i]->commands; /*取得当前模块的指令数组*/
         if (cmd == NULL) {
             continue;
         }
 
         for ( /* void */ ; cmd->name.len; cmd++) {
 
-            if (name->len != cmd->name.len) {
+            if (name->len != cmd->name.len) { /*先比较解析配置名的长度和指令名的长度是否一致*/
                 continue;
             }
 
@@ -310,8 +310,8 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last)
                 continue;
             }
 
-            found = 1;
-            /*只有处理的模块的类型是NGX_CONF_MODULE或者是当前正在处理的模块类型，才可能被执行。*/
+            found = 1; /*配置名和指令匹配*/
+            /* 只有处理的模块的类型是 NGX_CONF_MODULE 或者 当前正在处理的模块类型，才可执行下面的逻辑 */
             if (ngx_modules[i]->type != NGX_CONF_MODULE
                 && ngx_modules[i]->type != cf->module_type) 
             {
@@ -320,7 +320,7 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last)
 
             /* is the directive's location right ? */
 
-            if (!(cmd->type & cf->cmd_type)) {  /*指令的Context必须当前解析Context相符；*/
+            if (!(cmd->type & cf->cmd_type)) {  /*指令的 type 和当前解析Context相符；*/
                 continue;
             }
             

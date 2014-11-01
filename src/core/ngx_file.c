@@ -567,10 +567,10 @@ ngx_create_paths(ngx_cycle_t *cycle, ngx_uid_t user)
     ngx_uint_t        i;
     ngx_path_t      **path;
 
-    path = cycle->paths.elts;
+    path = cycle->paths.elts; /*我们需要操作的目录路径*/
     for (i = 0; i < cycle->paths.nelts; i++) {
 
-        if (ngx_create_dir(path[i]->name.data, 0700) == NGX_FILE_ERROR) {
+        if (ngx_create_dir(path[i]->name.data, 0700) == NGX_FILE_ERROR) { /*如果不存在就创建目录*/
             err = ngx_errno;
             if (err != NGX_EEXIST) {
                 ngx_log_error(NGX_LOG_EMERG, cycle->log, err,
@@ -588,7 +588,7 @@ ngx_create_paths(ngx_cycle_t *cycle, ngx_uid_t user)
         {
         ngx_file_info_t   fi;
 
-        if (ngx_file_info((const char *) path[i]->name.data, &fi)
+        if (ngx_file_info((const char *) path[i]->name.data, &fi) /*获取文件的相关信息*/
             == NGX_FILE_ERROR)
         {
             ngx_log_error(NGX_LOG_EMERG, cycle->log, ngx_errno,
@@ -596,7 +596,7 @@ ngx_create_paths(ngx_cycle_t *cycle, ngx_uid_t user)
             return NGX_ERROR;
         }
 
-        if (fi.st_uid != user) {
+        if (fi.st_uid != user) { /*检查文件操作用户*/
             if (chown((const char *) path[i]->name.data, user, -1) == -1) {
                 ngx_log_error(NGX_LOG_EMERG, cycle->log, ngx_errno,
                               "chown(\"%s\", %d) failed",
@@ -606,7 +606,7 @@ ngx_create_paths(ngx_cycle_t *cycle, ngx_uid_t user)
         }
 
         if ((fi.st_mode & (S_IRUSR|S_IWUSR|S_IXUSR))
-                                                  != (S_IRUSR|S_IWUSR|S_IXUSR))
+                                                  != (S_IRUSR|S_IWUSR|S_IXUSR)) /*检查文件操作权限*/
         {
             fi.st_mode |= (S_IRUSR|S_IWUSR|S_IXUSR);
 

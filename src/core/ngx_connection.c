@@ -302,7 +302,7 @@ ngx_set_inherited_sockets(ngx_cycle_t *cycle)
 
 
 ngx_int_t
-ngx_open_listening_sockets(ngx_cycle_t *cycle)
+ngx_open_listening_sockets(ngx_cycle_t *cycle) /*打开监听套接字*/
 {
     int               reuseaddr;
     ngx_uint_t        i, tries, failed;
@@ -332,11 +332,11 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
                 continue;
             }
 
-            if (ls[i].fd != (ngx_socket_t) -1) { /*todo? fd*/
+            if (ls[i].fd != (ngx_socket_t) -1) { /*这里运用了强制转化，判断socket描述符时候有效*/
                 continue;
             }
 
-            if (ls[i].inherited) { /*是否继承？？todo*/
+            if (ls[i].inherited) { /*判断该套接字是否来自继承*/
 
                 /* TODO: close on exit */
                 /* TODO: nonblocking */
@@ -344,10 +344,10 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
 
                 continue;
             }
+            /*创建套接字,ngx_socket为nginx封装的一个创建无名socket的函数，为了跨平台*/
+            s = ngx_socket(ls[i].sockaddr->sa_family, ls[i].type, 0); 
 
-            s = ngx_socket(ls[i].sockaddr->sa_family, ls[i].type, 0); /*创建套接字,ngx_socket为nginx自主分装的一个创建socket的函数，为了跨平台*/
-
-            if (s == (ngx_socket_t) -1) {
+            if (s == (ngx_socket_t) -1) { /*判断是否创建套接字成功*/
                 ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
                               ngx_socket_n " %V failed", &ls[i].addr_text);
                 return NGX_ERROR;
@@ -389,8 +389,8 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
 #endif
             /* TODO: close on exit */
 
-            if (!(ngx_event_flags & NGX_USE_AIO_EVENT)) {
-                if (ngx_nonblocking(s) == -1) {
+            if (!(ngx_event_flags & NGX_USE_AIO_EVENT)) { /*todo*/
+                if (ngx_nonblocking(s) == -1) { /*判断是否是非阻塞的套接字*/
                     ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
                                   ngx_nonblocking_n " %V failed",
                                   &ls[i].addr_text);
@@ -435,7 +435,7 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
 
 #if (NGX_HAVE_UNIX_DOMAIN)
 
-            if (ls[i].sockaddr->sa_family == AF_UNIX) {
+            if (ls[i].sockaddr->sa_family == AF_UNIX) { /*套接字类型, 判断是否是unix网络的套接字*/
                 mode_t   mode;
                 u_char  *name;
 
@@ -455,8 +455,8 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
                 }
             }
 #endif
-
-            if (listen(s, ls[i].backlog) == -1) { /*开始监听*/
+            /*监听套接字开始监听*/
+            if (listen(s, ls[i].backlog) == -1) { 
                 ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
                               "listen() to %V, backlog %d failed",
                               &ls[i].addr_text, ls[i].backlog);

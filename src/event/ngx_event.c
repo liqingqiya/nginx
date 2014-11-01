@@ -199,7 +199,7 @@ ngx_module_t  ngx_event_core_module = {
 
 
 void
-ngx_process_events_and_timers(ngx_cycle_t *cycle)
+ngx_process_events_and_timers(ngx_cycle_t *cycle) /*等待事件发生的函数，核心函数*/
 {
     ngx_uint_t  flags;
     ngx_msec_t  timer, delta;
@@ -245,7 +245,7 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle)
 
     delta = ngx_current_msec;
 
-    (void) ngx_process_events(cycle, timer, flags);
+    (void) ngx_process_events(cycle, timer, flags); /*进程实际阻塞在这里，等待事件的发生*/
 
     delta = ngx_current_msec - delta;
 
@@ -449,7 +449,7 @@ ngx_event_module_init(ngx_cycle_t *cycle)
     ngx_core_conf_t     *ccf;
     ngx_event_conf_t    *ecf;
 
-    cf = ngx_get_conf(cycle->conf_ctx, ngx_events_module);
+    cf = ngx_get_conf(cycle->conf_ctx, ngx_events_module); /*获得core类型模块的配置上下文*/
     ecf = (*cf)[ngx_event_core_module.ctx_index];
 
     if (!ngx_test_config && ngx_process <= NGX_PROCESS_MASTER) {

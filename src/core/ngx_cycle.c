@@ -251,13 +251,13 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         return NULL;
     }
 
-
-    conf.ctx = cycle->conf_ctx;
-    conf.cycle = cycle;
+    /*conf的初始化， 每一个模块都有一个conf吗？ todo */
+    conf.ctx = cycle->conf_ctx; /*双层数组*/
+    conf.cycle = cycle; /*此时的cycle已经赋值了很多的参数，比如路径，日志等等*/
     conf.pool = pool;
     conf.log = log;
-    conf.module_type = NGX_CORE_MODULE;
-    conf.cmd_type = NGX_MAIN_CONF;
+    conf.module_type = NGX_CORE_MODULE; /*核心模块*/
+    conf.cmd_type = NGX_MAIN_CONF;  /*main级别的配置*/
 
 #if 0
     log->log_level = NGX_LOG_DEBUG_ALL;
@@ -269,7 +269,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         ngx_destroy_cycle_pools(&conf);
         return NULL;
     }
-    /*在这里解析出错了？？？？todo*/
+    /*ngx_conf_parse（）函数做了什么？？怎么做的？？ todo*/
     /*解析nginx配置文件*/
     if (ngx_conf_parse(&conf, &cycle->conf_file) != NGX_CONF_OK) {
         environ = senv;
@@ -281,7 +281,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         ngx_log_stderr(0, "the configuration file %s syntax is ok",
                        cycle->conf_file.data);
     }
-
+    /*调用每一个模块的create_conf创建的结构的init回调函数*/
     for (i = 0; ngx_modules[i]; i++) {
         if (ngx_modules[i]->type != NGX_CORE_MODULE) {  /*遍历模块，选出core模块*/
             continue;
@@ -303,8 +303,8 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
     if (ngx_process == NGX_PROCESS_SIGNALLER) { /**/
         return cycle;
     }
-
-    ccf = (ngx_core_conf_t *) ngx_get_conf(cycle->conf_ctx, ngx_core_module);
+    /*获得 ngx_core_module 模块的配置上下文结构*/
+    ccf = (ngx_core_conf_t *) ngx_get_conf(cycle->conf_ctx, ngx_core_module); 
 
     if (ngx_test_config) {
 
@@ -312,7 +312,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
             goto failed;
         }
 
-    } else if (!ngx_is_init_cycle(old_cycle)) {
+    } else if (!ngx_is_init_cycle(old_cycle)) { /*判断是否是第一次cycle*/
 
         /*
          * we do not create the pid file in the first ngx_init_cycle() call
@@ -340,20 +340,20 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
     }
 
 
-    if (ngx_create_paths(cycle, ccf->user) != NGX_OK) {
+    if (ngx_create_paths(cycle, ccf->user) != NGX_OK) { /*为系统要操作的目录做准备*/
         goto failed;
     }
 
 
-    if (ngx_log_open_default(cycle) != NGX_OK) {
+    if (ngx_log_open_default(cycle) != NGX_OK) { /*打开默认日志文件*/
         goto failed;
     }
 
     /* open the new files */
-
+    /*打开文件*/
     part = &cycle->open_files.part;
     file = part->elts;
-
+    /*依次打开cycle->open_files链表上面的文件*/
     for (i = 0; /* void */ ; i++) {
 
         if (i >= part->nelts) {
@@ -368,7 +368,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         if (file[i].name.len == 0) {
             continue;
         }
-
+        /*open the file*/
         file[i].fd = ngx_open_file(file[i].name.data,
                                    NGX_FILE_APPEND,
                                    NGX_FILE_CREATE_OR_OPEN,
@@ -394,18 +394,18 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         }
 #endif
     }
-
+    /*init log*/
     cycle->log = &cycle->new_log;
     pool->log = &cycle->new_log;
 
 
     /* create shared memory */
-
+    /*创建共享内存*/
     part = &cycle->shared_memory.part;
     shm_zone = part->elts;
 
     for (i = 0; /* void */ ; i++) {
-
+        /*第一次启动的时候，这个链表是空的*/
         if (i >= part->nelts) {
             if (part->next == NULL) {
                 break;
@@ -488,8 +488,8 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
 
 
     /* handle the listening sockets */
-
-    if (old_cycle->listening.nelts) {  /*旧的监听socket正在使用*/
+    /*监听套接字的设置*/
+    if (old_cycle->listening.nelts) {  /*旧的监听socket正在使用, 第一次使用的时候，直接跳到else分支*/
         ls = old_cycle->listening.elts;
         for (i = 0; i < old_cycle->listening.nelts; i++) { /*设置原有监听socket的标志*/
             ls[i].remain = 0;  /*先将所有的socket的remain标志位初始化为0，在根据具体情况进行设置*/
@@ -570,8 +570,8 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         }
 
     } else {
-        ls = cycle->listening.elts;
-        for (i = 0; i < cycle->listening.nelts; i++) {
+        ls = cycle->listening.elts; /* cycle->listening.elts是在哪里赋值的？这里设置一个watch点，todo？这里做了一个隐式的转化，void* 转化为 ngx_listening_t */
+        for (i = 0; i < cycle->listening.nelts; i++) { /*遍历所有的套接字，进行一些赋值*/
             ls[i].open = 1;
 #if (NGX_HAVE_DEFERRED_ACCEPT && defined SO_ACCEPTFILTER)
             if (ls[i].accept_filter) {
@@ -591,7 +591,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
     }
 
     if (!ngx_test_config) {
-        ngx_configure_listening_sockets(cycle);
+        ngx_configure_listening_sockets(cycle); /*简单的检查监听套接字*/
     }
 
 
@@ -602,9 +602,9 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
     }
 
     pool->log = cycle->log;
-
+    /*遍历所有的模块，运行所有模块的 init 函数, todo */
     for (i = 0; ngx_modules[i]; i++) {
-        if (ngx_modules[i]->init_module) {
+        if (ngx_modules[i]->init_module) { /*如果设置了 init 回调函数*/
             if (ngx_modules[i]->init_module(cycle) != NGX_OK) {
                 /* fatal */
                 exit(1);
@@ -622,9 +622,9 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
 
     for (i = 0; /* void */ ; i++) {
 
-        if (i >= opart->nelts) {
+        if (i >= opart->nelts) { 
             if (opart->next == NULL) {
-                goto old_shm_zone_done;
+                goto old_shm_zone_done; /*第一次启动， goto old_shm_zone_done*/
             }
             opart = opart->next;
             oshm_zone = opart->elts;
@@ -666,9 +666,9 @@ old_shm_zone_done:
 
 
     /* close the unnecessary listening sockets */
-
+    /*第一次启动，没有不必要的监听端口，所以跳过*/
     ls = old_cycle->listening.elts;
-    for (i = 0; i < old_cycle->listening.nelts; i++) {
+    for (i = 0; i < old_cycle->listening.nelts; i++) { /*第一次启动，跳过*/
 
         if (ls[i].remain || ls[i].fd == (ngx_socket_t) -1) {
             continue;
@@ -701,7 +701,7 @@ old_shm_zone_done:
 
 
     /* close the unnecessary open files */
-
+    /*第一次启动的时候，没有不必要的文件，所以这段for代码跳过*/
     part = &old_cycle->open_files.part;
     file = part->elts;
 
@@ -726,10 +726,10 @@ old_shm_zone_done:
                           file[i].name.data);
         }
     }
-
+    /*销毁临时内存池*/
     ngx_destroy_pool(conf.temp_pool);
 
-    if (ngx_process == NGX_PROCESS_MASTER || ngx_is_init_cycle(old_cycle)) {
+    if (ngx_process == NGX_PROCESS_MASTER || ngx_is_init_cycle(old_cycle)) { /*主进程 或者 第一次启动*/
 
         /*
          * perl_destruct() frees environ, if it is not the same as it was at
@@ -740,12 +740,12 @@ old_shm_zone_done:
         env = environ;
         environ = senv;
 
-        ngx_destroy_pool(old_cycle->pool);
+        ngx_destroy_pool(old_cycle->pool); /*销毁旧的内存池*/
         cycle->old_cycle = NULL;
 
         environ = env;
 
-        return cycle;
+        return cycle; /*第一次启动，启动正常在这里返回*/
     }
 
 
@@ -909,7 +909,7 @@ ngx_init_zone_pool(ngx_cycle_t *cycle, ngx_shm_zone_t *zn)
 
 
 ngx_int_t
-ngx_create_pidfile(ngx_str_t *name, ngx_log_t *log)
+ngx_create_pidfile(ngx_str_t *name, ngx_log_t *log) /*创建pid文件*/
 {
     size_t      len;
     ngx_uint_t  create;

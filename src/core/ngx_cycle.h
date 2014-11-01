@@ -108,7 +108,7 @@ typedef struct {
      size_t                   thread_stack_size;
 #endif
 
-} ngx_core_conf_t;  /*这个结构体是做什么的？？？*/
+} ngx_core_conf_t;  /*核心模块的一个上下文配置结构*/
 
 
 typedef struct {
@@ -116,7 +116,7 @@ typedef struct {
 } ngx_core_tls_t;
 
 
-#define ngx_is_init_cycle(cycle)  (cycle->conf_ctx == NULL)
+#define ngx_is_init_cycle(cycle)  (cycle->conf_ctx == NULL) /*判断是否是第一次的cycle*/
 
 
 ngx_cycle_t *ngx_init_cycle(ngx_cycle_t *old_cycle);

@@ -299,9 +299,9 @@ ngx_single_process_cycle(ngx_cycle_t *cycle) /*单进程循环模式*/
         /* fatal */
         exit(2);
     }
-
+    /*遍历所有的模块*/
     for (i = 0; ngx_modules[i]; i++) {
-        if (ngx_modules[i]->init_process) {
+        if (ngx_modules[i]->init_process) { /*定义了 init_process的，就使用init_process初始化我们有关于进程的设置*/
             if (ngx_modules[i]->init_process(cycle) == NGX_ERROR) {
                 /* fatal */
                 exit(2);
@@ -314,7 +314,7 @@ ngx_single_process_cycle(ngx_cycle_t *cycle) /*单进程循环模式*/
 
         ngx_process_events_and_timers(cycle);  /*阻塞调用, 但进程启动之后，就阻塞在这里, 由信号驱动*/
 
-        if (ngx_terminate || ngx_quit) {
+        if (ngx_terminate || ngx_quit) { /*收到终止nginx的信号*/
 
             for (i = 0; ngx_modules[i]; i++) {
                 if (ngx_modules[i]->exit_process) {
@@ -325,7 +325,7 @@ ngx_single_process_cycle(ngx_cycle_t *cycle) /*单进程循环模式*/
             ngx_master_process_exit(cycle);
         }
 
-        if (ngx_reconfigure) {
+        if (ngx_reconfigure) { /*收到修改config的信号？todo*/
             ngx_reconfigure = 0;
             ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "reconfiguring");
 
@@ -338,7 +338,7 @@ ngx_single_process_cycle(ngx_cycle_t *cycle) /*单进程循环模式*/
             ngx_cycle = cycle;
         }
 
-        if (ngx_reopen) {
+        if (ngx_reopen) { /*重新打开nginx的信号*/
             ngx_reopen = 0;
             ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "reopening logs");
             ngx_reopen_files(cycle, (ngx_uid_t) -1);

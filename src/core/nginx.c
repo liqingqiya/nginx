@@ -340,7 +340,7 @@ main(int argc, char *const *argv)
         return 1;
     }
 
-    if (ngx_test_config) {
+    if (ngx_test_config) { /*todo*/
         if (!ngx_quiet_mode) {
             ngx_log_stderr(0, "configuration file %s test is successful",
                            cycle->conf_file.data);
@@ -349,14 +349,14 @@ main(int argc, char *const *argv)
         return 0;
     }
 
-    if (ngx_signal) {
+    if (ngx_signal) { /*todo*/
         return ngx_signal_process(cycle, ngx_signal);
     }
 
-    ngx_os_status(cycle->log);
+    ngx_os_status(cycle->log); /*关于特殊操作系统平台的设置，主要是关于日志的设置*/
 
     ngx_cycle = cycle;
-
+    /*获取核心模块的配置上下文结构*/
     ccf = (ngx_core_conf_t *) ngx_get_conf(cycle->conf_ctx, ngx_core_module);
 
     if (ccf->master && ngx_process == NGX_PROCESS_SINGLE) {
@@ -365,12 +365,12 @@ main(int argc, char *const *argv)
 
 #if !(NGX_WIN32)
 
-    if (ngx_init_signals(cycle->log) != NGX_OK) {     //初始化信号设置
+    if (ngx_init_signals(cycle->log) != NGX_OK) {     /*初始化信号设置 todo*/
         return 1;
     }
 
     if (!ngx_inherited && ccf->daemon) {
-        if (ngx_daemon(cycle->log) != NGX_OK) {   //启动 master process
+        if (ngx_daemon(cycle->log) != NGX_OK) {   /*启动 master process*/
             return 1;
         }
 
@@ -383,7 +383,7 @@ main(int argc, char *const *argv)
 
 #endif
 
-    if (ngx_create_pidfile(&ccf->pid, cycle->log) != NGX_OK) {    //创建pid文件
+    if (ngx_create_pidfile(&ccf->pid, cycle->log) != NGX_OK) {    /*创建pid文件*/
         return 1;
     }
 
@@ -398,7 +398,7 @@ main(int argc, char *const *argv)
         }
     }
 
-    ngx_use_stderr = 0;
+    ngx_use_stderr = 0; /*todo*/
 
     if (ngx_process == NGX_PROCESS_SINGLE) { /*看是否是单进程模式*/
         ngx_single_process_cycle(cycle);  /*单进程循环模式*/

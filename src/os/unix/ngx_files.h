@@ -14,7 +14,7 @@
 
 
 typedef int                      ngx_fd_t;
-typedef struct stat              ngx_file_info_t; /*文件的资源信息*/
+typedef struct stat              ngx_file_info_t; /*文件信息结构体*/
 typedef ino_t                    ngx_file_uniq_t;
 
 
@@ -170,7 +170,7 @@ ngx_int_t ngx_set_file_time(u_char *name, ngx_fd_t fd, time_t s);
 #define ngx_set_file_time_n      "utimes()"
 
 
-#define ngx_file_info(file, sb)  stat((const char *) file, sb)
+#define ngx_file_info(file, sb)  stat((const char *) file, sb) /*系统调用, 获取linux系统上文件的信息*/
 #define ngx_file_info_n          "stat()"
 
 #define ngx_fd_info(fd, sb)      fstat(fd, sb)
@@ -228,7 +228,7 @@ ngx_int_t ngx_read_dir(ngx_dir_t *dir);
 #define ngx_read_dir_n           "readdir()"
 
 
-#define ngx_create_dir(name, access) mkdir((const char *) name, access)
+#define ngx_create_dir(name, access) mkdir((const char *) name, access) /*创建目录, mkdir为系统调用*/
 #define ngx_create_dir_n         "mkdir()"
 
 

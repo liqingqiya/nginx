@@ -80,7 +80,7 @@ ngx_os_init(ngx_log_t *log) /*获取系统相关的一些变量*/
 
 
 void
-ngx_os_status(ngx_log_t *log)
+ngx_os_status(ngx_log_t *log) /*操作系统的状态, 主要关于日志的设置*/
 {
     ngx_log_error(NGX_LOG_NOTICE, log, 0, NGINX_VER);
 
