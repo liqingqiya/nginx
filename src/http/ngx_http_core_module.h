@@ -179,7 +179,7 @@ typedef struct {
     ngx_uint_t                 try_files;       /* unsigned  try_files:1 */
 
     ngx_http_phase_t           phases[NGX_HTTP_LOG_PHASE + 1];  /*结构体内嵌套数组*/
-} ngx_http_core_main_conf_t;
+} ngx_http_core_main_conf_t; /*http模块中的main级别的配置结构体*/
 
 
 typedef struct {
@@ -209,7 +209,7 @@ typedef struct {
 #endif
 
     ngx_http_core_loc_conf_t  **named_locations;
-} ngx_http_core_srv_conf_t;
+} ngx_http_core_srv_conf_t; /*http模块中的server级别结构体*/
 
 
 /* list of structures to find core_srv_conf quickly at run time */
@@ -314,7 +314,7 @@ typedef struct {
 } ngx_http_try_file_t;
 
 
-struct ngx_http_core_loc_conf_s {
+struct ngx_http_core_loc_conf_s { /*http模块中的location级别结构体*/
     ngx_str_t     name;          /* location name */
 
 #if (NGX_PCRE)
@@ -342,7 +342,7 @@ struct ngx_http_core_loc_conf_s {
 #endif
 
     /* pointer to the modules' loc_conf */
-    void        **loc_conf;
+    void        **loc_conf; /*这个字段应该是指向我们每个模块的独立的配置结构, todo */
 
     uint32_t      limit_except;
     void        **limit_except_loc_conf;

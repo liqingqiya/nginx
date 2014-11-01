@@ -110,7 +110,7 @@ struct ngx_module_s {
 
     ngx_uint_t            version;          /*版本*/
 
-    void                 *ctx;               /*模块上下文结构，对应一个特殊的模块*/
+    void                 *ctx;               /*对应一类模块的统一接口，比如http模块，就是ngx_http_module_t类型的结构*/
     ngx_command_t        *commands;        /*模块支持的指令集合*/
     ngx_uint_t            type;             /*模块的种类*/
                                                             /*以下为回调函数*/
@@ -164,7 +164,7 @@ struct ngx_conf_s {
     ngx_conf_file_t      *conf_file;    /*配置文件的结构体信息*/
     ngx_log_t            *log;
 
-    void                 *ctx;
+    void                 *ctx; /*指向一个上下文结构 ngx_http_conf_ctx_t, 保存http所有模块的main，server，location配置级别的配置结构*/
     ngx_uint_t            module_type;
     ngx_uint_t            cmd_type;
 

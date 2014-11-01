@@ -31,7 +31,7 @@ ngx_http_module_t  ngx_http_static_module_ctx = {
 
 ngx_module_t  ngx_http_static_module = {
     NGX_MODULE_V1,                           /*所有模块中的编号*/
-    &ngx_http_static_module_ctx,           /* module context */     /*特定模块特有的上下文结构*/
+    &ngx_http_static_module_ctx,           /* module context */     /*http模块的统一接口*/
     NULL,                                  /* module directives */
     NGX_HTTP_MODULE,                       /* module type */        /*模块类型，http,event,core,mail,null*/
     NULL,                                  /* init master */
