@@ -361,7 +361,7 @@ struct ngx_http_request_s { /*表示一个客户端请求*/
 
     ngx_connection_t                 *connection;
 
-    void                            **ctx; /*todo，上下文结构*/
+    void                            **ctx; /* 指向 ngx_http_conf_ctx_t ??? todo，上下文结构*/
     void                            **main_conf; /*主结构环境下的配置结构体?todo*/
     void                            **srv_conf; /*server的配置?todo*/
     void                            **loc_conf; /*location的配置？todo*/

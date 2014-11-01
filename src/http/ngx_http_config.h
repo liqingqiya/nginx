@@ -15,7 +15,7 @@
 
 /*
 该结构描述了http块的配置上下文
-这样http块通过该结构体就存储了自己的配置上下文，然后将其以指针的形式保存在ngx_conf_s的结构中
+这样http块通过该结构体就存储了自己的配置上下文，然后将其以指针的形式保存在ngx_conf_s的结构中,也保存在ngx_http_request_t中
 */
 typedef struct {
     void        **main_conf;/*http块本身的配置参数会保存在**main_conf中*/
@@ -36,7 +36,7 @@ typedef struct {
 
     void       *(*create_loc_conf)(ngx_conf_t *cf);
     char       *(*merge_loc_conf)(ngx_conf_t *cf, void *prev, void *conf);
-} ngx_http_module_t;
+} ngx_http_module_t; /*http类型的模块统一接口*/
 
 
 #define NGX_HTTP_MODULE           0x50545448   /* "HTTP" */

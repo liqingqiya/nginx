@@ -158,7 +158,7 @@ struct ngx_conf_s {
     char                 *name;     /*存放当前解析到的指令*/
     ngx_array_t          *args;     /*存放所有的参数*/
 
-    ngx_cycle_t          *cycle;
+    ngx_cycle_t          *cycle; /*本次循环周期, 代表一次nginx运行周期*/
     ngx_pool_t           *pool;
     ngx_pool_t           *temp_pool;    /*临时的内存池，解析完参数之后即释放*/
     ngx_conf_file_t      *conf_file;    /*配置文件的结构体信息*/
@@ -168,7 +168,7 @@ struct ngx_conf_s {
     ngx_uint_t            module_type;
     ngx_uint_t            cmd_type;
 
-    ngx_conf_handler_pt   handler;
+    ngx_conf_handler_pt   handler; /*conf回调函数*/
     char                 *handler_conf;
 };
 
