@@ -184,7 +184,7 @@
 
 
 #ifndef NGX_SYS_NERR
-#define NGX_SYS_NERR  135
+#define NGX_SYS_NERR  135  /*0-134的错误码*/
 #endif
 
 
@@ -334,7 +334,7 @@
 
 
 #ifndef NGX_CONF_PREFIX
-#define NGX_CONF_PREFIX  "conf/"
+#define NGX_CONF_PREFIX  "conf/" /*配置文件目录路径*/
 #endif
 
 
@@ -344,12 +344,12 @@
 
 
 #ifndef NGX_CONF_PATH
-#define NGX_CONF_PATH  "conf/nginx.conf"
+#define NGX_CONF_PATH  "conf/nginx.conf" /*配置文件路径*/
 #endif
 
 
 #ifndef NGX_PID_PATH
-#define NGX_PID_PATH  "logs/nginx.pid"
+#define NGX_PID_PATH  "logs/nginx.pid" /**/
 #endif
 
 

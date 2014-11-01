@@ -87,9 +87,9 @@ struct ngx_command_s {
 #define ngx_null_command  { ngx_null_string, 0, NULL, 0, 0, NULL }  /*初始化一个空指令*/
 
 
-struct ngx_open_file_s {
-    ngx_fd_t              fd;
-    ngx_str_t             name;
+struct ngx_open_file_s { /*指向一个已经打开的文件*/
+    ngx_fd_t              fd; /*文件描述符号*/
+    ngx_str_t             name; /*名称*/
 
     void                (*flush)(ngx_open_file_t *file, ngx_log_t *log);
     void                 *data;

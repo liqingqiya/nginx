@@ -40,7 +40,7 @@ typedef struct {
 #define ngx_string(str)     { sizeof(str) - 1, (u_char *) str }     /*u_char进行转化，提高可移植性*/
 #define ngx_null_string     { 0, NULL }
 #define ngx_str_set(str, text)                                               \
-    (str)->len = sizeof(text) - 1; (str)->data = (u_char *) text
+    (str)->len = sizeof(text) - 1; (str)->data = (u_char *) text /*将text字符串转化成ngx_str_t类型存储*/
 #define ngx_str_null(str)   (str)->len = 0; (str)->data = NULL
 
 

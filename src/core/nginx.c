@@ -161,10 +161,10 @@ static ngx_command_t  ngx_core_commands[] = {
 };
 
 
-static ngx_core_module_t  ngx_core_module_ctx = {
+static ngx_core_module_t  ngx_core_module_ctx = { /*core模块的统一接口*/
     ngx_string("core"),
-    ngx_core_module_create_conf,
-    ngx_core_module_init_conf
+    ngx_core_module_create_conf, /*上下文创建的回调函数*/
+    ngx_core_module_init_conf  /*上下文创建的回调函数*/
 };
 
 
@@ -292,9 +292,9 @@ main(int argc, char *const *argv)
      * ngx_process_options()
      */
 
-    ngx_memzero(&init_cycle, sizeof(ngx_cycle_t));    /*给ngx_cycle_t结构体内存块赋零值，定义在ngx_string.h*/
+    ngx_memzero(&init_cycle, sizeof(ngx_cycle_t));    /*init_cycle是我们暂时在主函数的堆栈上分配的一个结构，这里给这块内存清零*/
     init_cycle.log = log;       /*初始化cycle结构的log*/
-    ngx_cycle = &init_cycle;    
+    ngx_cycle = &init_cycle;    /*ngx_cycle是声明在ngx_cycle.h中的全局变量*/
 
     init_cycle.pool = ngx_create_pool(1024, log);     /*创建内存池，初始化cycle结构的pool*/
     if (init_cycle.pool == NULL) {
@@ -326,7 +326,7 @@ main(int argc, char *const *argv)
     }
 
     ngx_max_module = 0;
-    for (i = 0; ngx_modules[i]; i++) {    /*遍历所有的模块，建立模块索引*/
+    for (i = 0; ngx_modules[i]; i++) {    /*为所有模块建立全局索引*/
         ngx_modules[i]->index = ngx_max_module++;
     }
 
@@ -418,7 +418,7 @@ ngx_add_inherited_sockets(ngx_cycle_t *cycle)
     ngx_int_t         s;
     ngx_listening_t  *ls;
     /*第一次启动nginx的时候，NGINX_VAR为空，到此就结束函数，返回NGX_OK*/
-    inherited = (u_char *) getenv(NGINX_VAR);   /*设置nginx的环境变量*/
+    inherited = (u_char *) getenv(NGINX_VAR);   /*读取环境变量NGINX当前的值，并设置nginx的环境变量*/
 
     if (inherited == NULL) {
         return NGX_OK;
@@ -800,7 +800,7 @@ ngx_save_argv(ngx_cycle_t *cycle, int argc, char *const *argv)  /*存储命令�
     size_t     len;
     ngx_int_t  i;
 
-    ngx_os_argv = (char **) argv;
+    ngx_os_argv = (char **) argv; /*和系统相关的一个命令行参数*/
     ngx_argc = argc;
 
     ngx_argv = ngx_alloc((argc + 1) * sizeof(char *), cycle->log);  /*ngx_argv是全局变量，是一个数组*/
@@ -926,7 +926,7 @@ ngx_process_options(ngx_cycle_t *cycle)
 
 
 static void *
-ngx_core_module_create_conf(ngx_cycle_t *cycle)
+ngx_core_module_create_conf(ngx_cycle_t *cycle) /* module[0]->create_conf调用 */
 {
     ngx_core_conf_t  *ccf;
 

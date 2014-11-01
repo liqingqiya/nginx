@@ -28,7 +28,7 @@ static void ngx_unlock_mutexes(ngx_pid_t pid);
 
 int              ngx_argc;  /*全局变量，命令行参数个数*/
 char           **ngx_argv;  /*全局变量，命令行参数数组, 每一个参数都是字符串*/
-char           **ngx_os_argv; /**/
+char           **ngx_os_argv; /*系统原生的一个保留格式*/
 
 ngx_int_t        ngx_process_slot;
 ngx_socket_t     ngx_channel;

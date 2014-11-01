@@ -108,7 +108,7 @@ typedef struct {
      size_t                   thread_stack_size;
 #endif
 
-} ngx_core_conf_t;
+} ngx_core_conf_t;  /*这个结构体是做什么的？？？*/
 
 
 typedef struct {

@@ -17,7 +17,7 @@ static ngx_int_t ngx_test_lockfile(u_char *file, ngx_log_t *log);
 static void ngx_clean_old_cycles(ngx_event_t *ev);
 
 
-volatile ngx_cycle_t  *ngx_cycle;
+volatile ngx_cycle_t  *ngx_cycle;  /*全局变量*/
 ngx_array_t            ngx_old_cycles;
 
 static ngx_pool_t     *ngx_temp_pool;
@@ -114,14 +114,14 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
     }
 
 
-    n = old_cycle->paths.nelts ? old_cycle->paths.nelts : 10;  /*元素容量*/
+    n = old_cycle->paths.nelts ? old_cycle->paths.nelts : 10;  /*nginx所要操作的目录*/
 
-    cycle->paths.elts = ngx_pcalloc(pool, n * sizeof(ngx_path_t *));
+    cycle->paths.elts = ngx_pcalloc(pool, n * sizeof(ngx_path_t *)); /*分配数组空间，这里paths数组的元素类型为 ngx_path_t */
     if (cycle->paths.elts == NULL) {
         ngx_destroy_pool(pool);
         return NULL;
     }
-
+    /*初始化这个数组结构*/
     cycle->paths.nelts = 0;  /*元素个数*/
     cycle->paths.size = sizeof(ngx_path_t *);  /*节点尺寸*/
     cycle->paths.nalloc = n; /*default 容量为10*/
@@ -145,7 +145,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         return NULL;
     }
 
-    /*nginx根据以往的经验（old_cycle）预测这一次的配置需要分配多少内存。*/
+    /*初始化nginx共享内存, 以一个链表的方式链接*/
     if (old_cycle->shared_memory.part.nelts) {
         n = old_cycle->shared_memory.part.nelts;
         for (part = old_cycle->shared_memory.part.next; part; part = part->next)
@@ -163,7 +163,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         ngx_destroy_pool(pool);
         return NULL;
     }
-
+    /*初始化nginx的监听结构*/
     n = old_cycle->listening.nelts ? old_cycle->listening.nelts : 10;
 
     cycle->listening.elts = ngx_pcalloc(pool, n * sizeof(ngx_listening_t)); /*为监听结构分配内存，容量为n==10*/
@@ -177,18 +177,18 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
     cycle->listening.nalloc = n;
     cycle->listening.pool = pool;
 
+    /*初始化可重用网络连接队列*/
+    ngx_queue_init(&cycle->reusable_connections_queue); 
 
-    ngx_queue_init(&cycle->reusable_connections_queue); /*初始化可重用网络连接队列*/
-
-
-    cycle->conf_ctx = ngx_pcalloc(pool, ngx_max_module * sizeof(void *)); /*分配空间，因为conf_ctx都是void*指针回调函数*/
+    /*分配空间，因为conf_ctx都是void*指针回调函数*/
+    cycle->conf_ctx = ngx_pcalloc(pool, ngx_max_module * sizeof(void *)); 
     if (cycle->conf_ctx == NULL) {
         ngx_destroy_pool(pool);
         return NULL;
     }
 
-
-    if (gethostname(hostname, NGX_MAXHOSTNAMELEN) == -1) {  /*获得主机名字, gethostname为系统调用*/
+    /*获得主机名字, gethostname为系统调用*/
+    if (gethostname(hostname, NGX_MAXHOSTNAMELEN) == -1) {  
         ngx_log_error(NGX_LOG_EMERG, log, ngx_errno, "gethostname() failed");
         ngx_destroy_pool(pool);
         return NULL;
@@ -216,11 +216,19 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         module = ngx_modules[i]->ctx;
 
         if (module->create_conf) {
-            rv = module->create_conf(cycle);        /*建立cycle上下文结构,rv指向结构体 ngx_core_conf_t*/
+            /*
+            module[0]->create_conf实际是调用了nginx.c中的ngx_core_module_create_conf（）函数，
+            构造了一个ngx_core_conf_t结构体
+            */
+            rv = module->create_conf(cycle);     
             if (rv == NULL) {
                 ngx_destroy_pool(pool);
                 return NULL;
             }
+            /*
+            ngx_cycle_t的**conf_ctx数组存储 modules[i]->create_conf得到的 ngx_xxx_conf_t 结构体数组
+            conf_ctx是一个双层数组结构
+            */
             cycle->conf_ctx[ngx_modules[i]->index] = rv;
         }
     }

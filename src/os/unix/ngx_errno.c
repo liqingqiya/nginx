@@ -25,7 +25,7 @@
  */
 
 
-static ngx_str_t  *ngx_sys_errlist;
+static ngx_str_t  *ngx_sys_errlist;  /*定义的一个全局错误码信息列表*/
 static ngx_str_t   ngx_unknown_error = ngx_string("Unknown error");
 
 
@@ -43,7 +43,7 @@ ngx_strerror(ngx_err_t err, u_char *errstr, size_t size)
 
 
 ngx_int_t
-ngx_strerror_init(void)
+ngx_strerror_init(void) /*创建一个错误码列表*/
 {
     char       *msg;
     u_char     *p;
@@ -63,7 +63,7 @@ ngx_strerror_init(void)
     }
 
     for (err = 0; err < NGX_SYS_NERR; err++) {
-        msg = strerror(err);
+        msg = strerror(err); /*err是系统定义的错误码，strerror是系统调用，这里使用strerror翻译err成人类可理解的错误信息*/
         len = ngx_strlen(msg);
 
         p = malloc(len);

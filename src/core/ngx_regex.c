@@ -403,7 +403,7 @@ ngx_regex_module_init(ngx_cycle_t *cycle)
 static void *
 ngx_regex_create_conf(ngx_cycle_t *cycle)
 {
-    ngx_regex_conf_t  *rcf;
+    ngx_regex_conf_t  *rcf; /*正则结构*/
 
     rcf = ngx_pcalloc(cycle->pool, sizeof(ngx_regex_conf_t));
     if (rcf == NULL) {

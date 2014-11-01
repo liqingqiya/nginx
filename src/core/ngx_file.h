@@ -40,7 +40,7 @@ typedef void (*ngx_path_loader_pt) (void *data);
 
 
 typedef struct {
-    ngx_str_t                  name;
+    ngx_str_t                  name; /*name*/
     size_t                     len;
     size_t                     level[3];
 
@@ -50,7 +50,7 @@ typedef struct {
 
     u_char                    *conf_file;
     ngx_uint_t                 line;
-} ngx_path_t;  
+} ngx_path_t;   /*为路径设计的结构体*/
 
 
 typedef struct {

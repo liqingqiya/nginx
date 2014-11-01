@@ -30,7 +30,7 @@ ngx_strlow(u_char *dst, u_char *src, size_t n)
 
 
 u_char *
-ngx_cpystrn(u_char *dst, u_char *src, size_t n)
+ngx_cpystrn(u_char *dst, u_char *src, size_t n) /* 字符串复制*/
 {
     if (n == 0) {
         return dst;
@@ -63,7 +63,7 @@ ngx_pstrdup(ngx_pool_t *pool, ngx_str_t *src)
         return NULL;
     }
 
-    ngx_memcpy(dst, src->data, src->len);
+    ngx_memcpy(dst, src->data, src->len); /*copy*/
 
     return dst;
 }
