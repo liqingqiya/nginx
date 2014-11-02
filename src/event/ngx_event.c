@@ -119,49 +119,49 @@ static ngx_str_t  event_core_name = ngx_string("event_core");
 
 
 static ngx_command_t  ngx_event_core_commands[] = {
-
+    /*连接池大小，也就是每个worker进程中支持的TCP最大的连接数，它与下面的connections配置想意义重复*/
     { ngx_string("worker_connections"),
       NGX_EVENT_CONF|NGX_CONF_TAKE1,
       ngx_event_connections,
       0,
       0,
       NULL },
-
+    /*连接池大小，也就是每个worker进程中支持的TCP最大的连接数，它与上面的worker_connections配置想意义重复*/
     { ngx_string("connections"),
       NGX_EVENT_CONF|NGX_CONF_TAKE1,
       ngx_event_connections,
       0,
       0,
       NULL },
-
+      /*确定选择哪一个事件模块作为事件驱动机制*/
     { ngx_string("use"),
       NGX_EVENT_CONF|NGX_CONF_TAKE1,
       ngx_event_use,
       0,
       0,
       NULL },
-
+      /*意味着希望尽可能多的接收到新的连接*/
     { ngx_string("multi_accept"),
       NGX_EVENT_CONF|NGX_CONF_FLAG,
       ngx_conf_set_flag_slot,
       0,
       offsetof(ngx_event_conf_t, multi_accept),
       NULL },
-
+      /*确定是否使用accept_mutex负载均衡锁，默认为开启*/
     { ngx_string("accept_mutex"),
       NGX_EVENT_CONF|NGX_CONF_FLAG,
       ngx_conf_set_flag_slot,
       0,
       offsetof(ngx_event_conf_t, accept_mutex),
       NULL },
-
+      /*启用accept_mutex负载均衡锁后，延迟accept_mutex_delay毫秒后再试图处理新的连接事件*/
     { ngx_string("accept_mutex_delay"),
       NGX_EVENT_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_msec_slot,
       0,
       offsetof(ngx_event_conf_t, accept_mutex_delay),
       NULL },
-
+      /*需要对来自指定IP的TCP连接打印debug级别的调试日志*/
     { ngx_string("debug_connection"),
       NGX_EVENT_CONF|NGX_CONF_TAKE1,
       ngx_event_debug_connection,
@@ -279,7 +279,7 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle) /*等待事件发生的函数�
 
 
 ngx_int_t
-ngx_handle_read_event(ngx_event_t *rev, ngx_uint_t flags)
+ngx_handle_read_event(ngx_event_t *rev, ngx_uint_t flags) /*将事件添加到事件驱动模块中，一旦出现了可读事件，就会调用对应的handler方法*/
 {
     if (ngx_event_flags & NGX_USE_CLEAR_EVENT) {
 
@@ -309,7 +309,7 @@ ngx_handle_read_event(ngx_event_t *rev, ngx_uint_t flags)
             return NGX_OK;
         }
 
-        if (rev->active && (rev->ready || (flags & NGX_CLOSE_EVENT))) {
+        if (rev->active && (rev->ready || (flags & NGX_CLOSE_EVENT))) { /*如果可读||或者事件已经关闭*/
             if (ngx_del_event(rev, NGX_READ_EVENT, NGX_LEVEL_EVENT | flags)
                 == NGX_ERROR)
             {
@@ -347,7 +347,7 @@ ngx_handle_read_event(ngx_event_t *rev, ngx_uint_t flags)
 
 
 ngx_int_t
-ngx_handle_write_event(ngx_event_t *wev, size_t lowat)
+ngx_handle_write_event(ngx_event_t *wev, size_t lowat) /*将写事件添加到事件驱动模块中去*/
 {
     ngx_connection_t  *c;
 
@@ -911,7 +911,7 @@ ngx_events_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     }
 
     /* count the number of the event modules and set up their indices */
-
+    /*筛选出 event 模块，并赋值 ctx_index */
     ngx_event_max_module = 0;
     for (i = 0; ngx_modules[i]; i++) {
         if (ngx_modules[i]->type != NGX_EVENT_MODULE) {
@@ -932,7 +932,7 @@ ngx_events_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     }
 
     *(void **) conf = ctx;
-
+    /*筛选出event模块，并由每一个event模块创建各自的配置结构体*/
     for (i = 0; ngx_modules[i]; i++) {
         if (ngx_modules[i]->type != NGX_EVENT_MODULE) {
             continue;
@@ -953,13 +953,13 @@ ngx_events_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     cf->module_type = NGX_EVENT_MODULE;
     cf->cmd_type = NGX_EVENT_CONF;
 
-    rv = ngx_conf_parse(cf, NULL);
+    rv = ngx_conf_parse(cf, NULL); /*解析配置文件*/
 
     *cf = pcf;
 
     if (rv != NGX_CONF_OK)
         return rv;
-
+    /*初始化各个event模块的配置结构体*/
     for (i = 0; ngx_modules[i]; i++) {
         if (ngx_modules[i]->type != NGX_EVENT_MODULE) {
             continue;

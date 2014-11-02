@@ -116,28 +116,28 @@ typedef enum {
 
 
 struct ngx_connection_s {
-    void               *data;
-    ngx_event_t        *read;
-    ngx_event_t        *write;
+    void               *data; /*连接未使用时，data成员用于充当连接池中空闲连接表中的next指针。当连接使用时，data意义由使用它的nginx模块而定，如在http框架中，data指向ngx_http_request_t请求*/
+    ngx_event_t        *read; /*对应的读事件*/
+    ngx_event_t        *write; /*对应的写事件*/
 
-    ngx_socket_t        fd;
+    ngx_socket_t        fd; /*套接字句柄*/
 
-    ngx_recv_pt         recv;
-    ngx_send_pt         send;
-    ngx_recv_chain_pt   recv_chain;
-    ngx_send_chain_pt   send_chain;
+    ngx_recv_pt         recv;/*直接接收网络字符流的方法*/
+    ngx_send_pt         send;/*直接发送网络字符流的方法*/
+    ngx_recv_chain_pt   recv_chain;/*以ngx_chain_t链表为参数来接收网络字符流的方法*/
+    ngx_send_chain_pt   send_chain;/*以ngx_chain_t链表为参数来发送网络字符流的方法*/
 
-    ngx_listening_t    *listening;
+    ngx_listening_t    *listening;/*这个连接对应的ngx_listening_t监听对象，此连接由listening监听端口的事件建立*/
 
-    off_t               sent;
+    off_t               sent;/*这个连接上已经发送出去的字节数*/
 
     ngx_log_t          *log;
 
     ngx_pool_t         *pool;
 
-    struct sockaddr    *sockaddr;
-    socklen_t           socklen;
-    ngx_str_t           addr_text;
+    struct sockaddr    *sockaddr; /*连接客户端的sockaddr结构*/
+    socklen_t           socklen;/*sockaddr结构体长度*/
+    ngx_str_t           addr_text; /*字符串形式的IP地址*/
 
     ngx_str_t           proxy_protocol_addr;
 
@@ -148,13 +148,13 @@ struct ngx_connection_s {
     struct sockaddr    *local_sockaddr;
     socklen_t           local_socklen;
 
-    ngx_buf_t          *buffer;
+    ngx_buf_t          *buffer; /*用于接收缓存客户端发来的字符流，每个事件消费模块可以自由决定从连接池中分配多大的空间给buffer这个接收缓存字段。*/
 
-    ngx_queue_t         queue;
+    ngx_queue_t         queue; /*该字段用于将当前以双向链表元素的形式添加到 ngx_cycle_t 核心结构体的 reusable_connections_queue 双向链表中，表示可以重用的连接*/
 
-    ngx_atomic_uint_t   number;
+    ngx_atomic_uint_t   number;/*连接使用次数*/
 
-    ngx_uint_t          requests;
+    ngx_uint_t          requests;/*处理的请求次数*/
 
     unsigned            buffered:8;
 
@@ -165,12 +165,12 @@ struct ngx_connection_s {
     unsigned            error:1;
     unsigned            destroyed:1;
 
-    unsigned            idle:1;
-    unsigned            reusable:1;
-    unsigned            close:1;
+    unsigned            idle:1; /*标志位，为1时表示处于空闲状态*/
+    unsigned            reusable:1;/*标志位，为1时表示连接可重用，与上面的queue字段对应*/
+    unsigned            close:1;/*为1时表示连接关闭*/
 
-    unsigned            sendfile:1;
-    unsigned            sndlowat:1;
+    unsigned            sendfile:1;/*为1时表示正在将文件中的数据发往连接的另一端*/
+    unsigned            sndlowat:1;/*为1时表示只有在连接套接字对应的发送缓冲区必须满足最低设置的大小阀值，事件驱动模型才会分发该事件*/
     unsigned            tcp_nodelay:2;   /* ngx_connection_tcp_nodelay_e */
     unsigned            tcp_nopush:2;    /* ngx_connection_tcp_nopush_e */
 
@@ -181,9 +181,9 @@ struct ngx_connection_s {
 #endif
 
 #if (NGX_HAVE_AIO_SENDFILE)
-    unsigned            aio_sendfile:1;
+    unsigned            aio_sendfile:1; /*为1时表示使用异步I/O的方式将磁盘上文件发送给网络连接的另一端*/
     unsigned            busy_count:2;
-    ngx_buf_t          *busy_sendfile;
+    ngx_buf_t          *busy_sendfile;/*使用异步I/O方式发送的文件，busy_sendfile缓冲区保存待发送文件的信息*/
 #endif
 
 #if (NGX_THREADS)
