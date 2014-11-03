@@ -209,7 +209,7 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle) /*等待事件发生的函数�
         flags = 0;
 
     } else {
-        timer = ngx_event_find_timer();
+        timer = ngx_event_find_timer(); /*得到最近超时time，并将flags设置为 NGX_UPDATE_TIME */
         flags = NGX_UPDATE_TIME;
 
 #if (NGX_THREADS)
@@ -221,23 +221,23 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle) /*等待事件发生的函数�
 #endif
     }
 
-    if (ngx_use_accept_mutex) { /*开启均衡负载之后*/
+    if (ngx_use_accept_mutex) { /*检查accept_mutex锁是否打开*/
         if (ngx_accept_disabled > 0) { /*通过检验ngx_accept_disabled是否大于0来判断当前进程是否过载*/
-            ngx_accept_disabled--;
+            ngx_accept_disabled--; /*当前进程连接数超过阀值*/
 
         } else {
             if (ngx_trylock_accept_mutex(cycle) == NGX_ERROR) {
                 return;
             }
 
-            if (ngx_accept_mutex_held) {
-                flags |= NGX_POST_EVENTS;
+            if (ngx_accept_mutex_held) {/*当前进程获取到了锁*/
+                flags |= NGX_POST_EVENTS;/*flags参数带上NGX_POST_EVENTS*/
 
             } else {
                 if (timer == NGX_TIMER_INFINITE
                     || timer > ngx_accept_mutex_delay)
                 {
-                    timer = ngx_accept_mutex_delay;
+                    timer = ngx_accept_mutex_delay; /*没抢到锁，那么至少等ngx_accept_mutex_delay毫秒再去试图抢锁*/
                 }
             }
         }
@@ -245,9 +245,9 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle) /*等待事件发生的函数�
 
     delta = ngx_current_msec;
 
-    (void) ngx_process_events(cycle, timer, flags); /*进程实际阻塞在这里，等待事件的发生*/
+    (void) ngx_process_events(cycle, timer, flags); /*实际进入ngx_epoll_module模块*/
 
-    delta = ngx_current_msec - delta;
+    delta = ngx_current_msec - delta; /*delta是ngx_process_events执行时候消耗的毫秒数,会影响到下面触发定时器的执行*/
 
     ngx_log_debug1(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
                    "timer delta: %M", delta);

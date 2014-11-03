@@ -49,7 +49,7 @@ ngx_event_timer_init(ngx_log_t *log)
 
 
 ngx_msec_t
-ngx_event_find_timer(void)
+ngx_event_find_timer(void) /*得到最近超时时间*/
 {
     ngx_msec_int_t      timer;
     ngx_rbtree_node_t  *node, *root, *sentinel;

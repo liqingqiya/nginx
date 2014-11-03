@@ -16,7 +16,7 @@ static void ngx_close_accepted_connection(ngx_connection_t *c);
 
 
 void
-ngx_event_accept(ngx_event_t *ev)
+ngx_event_accept(ngx_event_t *ev) /*读事件的回调函数*/
 {
     socklen_t          socklen;
     ngx_err_t          err;
@@ -368,7 +368,7 @@ ngx_event_accept(ngx_event_t *ev)
 
 ngx_int_t
 ngx_trylock_accept_mutex(ngx_cycle_t *cycle)
-{
+{   /*进程间的同步锁，试图获取accept_mutex锁.ngx_shmtx_trylock是非阻塞的，拿到锁就返回1,失败则是0*/
     if (ngx_shmtx_trylock(&ngx_accept_mutex)) {
 
         ngx_log_debug0(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
@@ -376,16 +376,16 @@ ngx_trylock_accept_mutex(ngx_cycle_t *cycle)
 
         if (ngx_accept_mutex_held
             && ngx_accept_events == 0
-            && !(ngx_event_flags & NGX_USE_RTSIG_EVENT))
+            && !(ngx_event_flags & NGX_USE_RTSIG_EVENT)) /*ngx_accept_mutex_held是标志位，为1时，表示当前进程已经拿到锁了*/
         {
             return NGX_OK;
         }
-
+        /*将所有监听连接的读事件添加到当前的epoll等事件驱动模块中*/
         if (ngx_enable_accept_events(cycle) == NGX_ERROR) {
-            ngx_shmtx_unlock(&ngx_accept_mutex);
+            ngx_shmtx_unlock(&ngx_accept_mutex); /*添加失败，那么就必须释放ngx_accept_mutex锁*/
             return NGX_ERROR;
         }
-
+        /*经过ngx_enable_accept_events()调用，当前进程的事件驱动模块已经开始监听所有的端口，这个时候需要吧ngx_accept_mutex_held设置为1,方便其他模块了解它目前已经获取到了锁*/
         ngx_accept_events = 0;
         ngx_accept_mutex_held = 1;
 

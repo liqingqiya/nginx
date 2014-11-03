@@ -206,7 +206,7 @@ ngx_http_init_connection(ngx_connection_t *c)
     ngx_http_in6_addr_t    *addr6;
 #endif
 
-    hc = ngx_pcalloc(c->pool, sizeof(ngx_http_connection_t));
+    hc = ngx_pcalloc(c->pool, sizeof(ngx_http_connection_t)); /**/
     if (hc == NULL) {
         ngx_http_close_connection(c);
         return;
@@ -363,7 +363,7 @@ ngx_http_init_connection(ngx_connection_t *c)
     ngx_add_timer(rev, c->listening->post_accept_timeout);
     ngx_reusable_connection(c, 1);
 
-    if (ngx_handle_read_event(rev, 0) != NGX_OK) {
+    if (ngx_handle_read_event(rev, 0) != NGX_OK) { /**/
         ngx_http_close_connection(c);
         return;
     }
@@ -371,7 +371,7 @@ ngx_http_init_connection(ngx_connection_t *c)
 
 
 static void
-ngx_http_wait_request_handler(ngx_event_t *rev)
+ngx_http_wait_request_handler(ngx_event_t *rev) /*step: 2*/
 {
     u_char                    *p;
     size_t                     size;
@@ -425,7 +425,7 @@ ngx_http_wait_request_handler(ngx_event_t *rev)
         b->end = b->last + size;
     }
 
-    n = c->recv(c, b->last, size);
+    n = c->recv(c, b->last, size); /*???*/
 
     if (n == NGX_AGAIN) {
 
@@ -489,19 +489,19 @@ ngx_http_wait_request_handler(ngx_event_t *rev)
 
     ngx_reusable_connection(c, 0);
 
-    c->data = ngx_http_create_request(c);
+    c->data = ngx_http_create_request(c);  /*创建request结构，c->data字段指向一个ngx_http_request_t结构*/
     if (c->data == NULL) {
         ngx_http_close_connection(c);
         return;
     }
 
     rev->handler = ngx_http_process_request_line;
-    ngx_http_process_request_line(rev);
+    ngx_http_process_request_line(rev); /*进入处理了吗？？todo*/
 }
 
 
 ngx_http_request_t *
-ngx_http_create_request(ngx_connection_t *c)
+ngx_http_create_request(ngx_connection_t *c) /**/
 {
     ngx_pool_t                 *pool;
     ngx_time_t                 *tp;
@@ -927,13 +927,13 @@ ngx_http_process_request_line(ngx_event_t *rev)
     for ( ;; ) {
 
         if (rc == NGX_AGAIN) {
-            n = ngx_http_read_request_header(r);
+            n = ngx_http_read_request_header(r); /*读取http报文的头部*/
 
             if (n == NGX_AGAIN || n == NGX_ERROR) {
                 return;
             }
         }
-
+        /*读取http报文头部*/
         rc = ngx_http_parse_request_line(r, r->header_in); /*将数据读到了缓存区r->header_in内,并解析*/
 
         if (rc == NGX_OK) {
@@ -1240,7 +1240,7 @@ ngx_http_process_request_headers(ngx_event_t *rev)
                 }
             }
 
-            n = ngx_http_read_request_header(r);
+            n = ngx_http_read_request_header(r); /*读取http头部*/
 
             if (n == NGX_AGAIN || n == NGX_ERROR) {
                 return;
