@@ -16,7 +16,7 @@ static void ngx_shmtx_wakeup(ngx_shmtx_t *mtx);
 
 
 ngx_int_t
-ngx_shmtx_create(ngx_shmtx_t *mtx, ngx_shmtx_sh_t *addr, u_char *name)
+ngx_shmtx_create(ngx_shmtx_t *mtx, ngx_shmtx_sh_t *addr, u_char *name) /*创建共享内存互斥锁*/
 {
     mtx->lock = &addr->lock;
 
@@ -44,7 +44,7 @@ ngx_shmtx_create(ngx_shmtx_t *mtx, ngx_shmtx_sh_t *addr, u_char *name)
 
 
 void
-ngx_shmtx_destroy(ngx_shmtx_t *mtx)
+ngx_shmtx_destroy(ngx_shmtx_t *mtx) /*销毁共享内存互斥锁*/
 {
 #if (NGX_HAVE_POSIX_SEM)
 
@@ -60,14 +60,14 @@ ngx_shmtx_destroy(ngx_shmtx_t *mtx)
 
 
 ngx_uint_t
-ngx_shmtx_trylock(ngx_shmtx_t *mtx) /*非阻塞获取进程同步锁*/
+ngx_shmtx_trylock(ngx_shmtx_t *mtx) /*尝试加锁, 非阻塞获取进程同步锁*/
 {
     return (*mtx->lock == 0 && ngx_atomic_cmp_set(mtx->lock, 0, ngx_pid));
 }
 
 
 void
-ngx_shmtx_lock(ngx_shmtx_t *mtx)
+ngx_shmtx_lock(ngx_shmtx_t *mtx) /*加锁， 持续等待，直到加锁成功*/
 {
     ngx_uint_t         i, n;
 
@@ -133,7 +133,7 @@ ngx_shmtx_lock(ngx_shmtx_t *mtx)
 
 
 void
-ngx_shmtx_unlock(ngx_shmtx_t *mtx)
+ngx_shmtx_unlock(ngx_shmtx_t *mtx) /*解锁*/
 {
     if (mtx->spin != (ngx_uint_t) -1) {
         ngx_log_debug0(NGX_LOG_DEBUG_CORE, ngx_cycle->log, 0, "shmtx unlock");
@@ -146,7 +146,7 @@ ngx_shmtx_unlock(ngx_shmtx_t *mtx)
 
 
 ngx_uint_t
-ngx_shmtx_force_unlock(ngx_shmtx_t *mtx, ngx_pid_t pid)
+ngx_shmtx_force_unlock(ngx_shmtx_t *mtx, ngx_pid_t pid) /*强制解锁*/
 {
     ngx_log_debug0(NGX_LOG_DEBUG_CORE, ngx_cycle->log, 0,
                    "shmtx forced unlock");
@@ -161,7 +161,7 @@ ngx_shmtx_force_unlock(ngx_shmtx_t *mtx, ngx_pid_t pid)
 
 
 static void
-ngx_shmtx_wakeup(ngx_shmtx_t *mtx)
+ngx_shmtx_wakeup(ngx_shmtx_t *mtx) /*唤醒等待加锁进程*/
 {
 #if (NGX_HAVE_POSIX_SEM)
     ngx_atomic_uint_t  wait;

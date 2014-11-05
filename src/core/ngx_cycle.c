@@ -469,11 +469,11 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
             break;
         }
 
-        if (ngx_shm_alloc(&shm_zone[i].shm) != NGX_OK) {
+        if (ngx_shm_alloc(&shm_zone[i].shm) != NGX_OK) { /*共享内存的实际分配*/
             goto failed;
         }
-
-        if (ngx_init_zone_pool(cycle, &shm_zone[i]) != NGX_OK) {
+        /*该函数是在共享内存分配好之后，进行的初始化调用*/
+        if (ngx_init_zone_pool(cycle, &shm_zone[i]) != NGX_OK) { /*共享内存管理机制的初始化*/
             goto failed;
         }
 
@@ -860,7 +860,7 @@ ngx_destroy_cycle_pools(ngx_conf_t *conf)
 
 
 static ngx_int_t
-ngx_init_zone_pool(ngx_cycle_t *cycle, ngx_shm_zone_t *zn)
+ngx_init_zone_pool(ngx_cycle_t *cycle, ngx_shm_zone_t *zn) /*该函数是在共享内存分配好之后，进行的初始化调用*/
 {
     u_char           *file;
     ngx_slab_pool_t  *sp;
@@ -898,11 +898,11 @@ ngx_init_zone_pool(ngx_cycle_t *cycle, ngx_shm_zone_t *zn)
 
 #endif
 
-    if (ngx_shmtx_create(&sp->mutex, &sp->lock, file) != NGX_OK) {
+    if (ngx_shmtx_create(&sp->mutex, &sp->lock, file) != NGX_OK) { /*创建锁*/
         return NGX_ERROR;
     }
 
-    ngx_slab_init(sp);
+    ngx_slab_init(sp); /*todo*/
 
     return NGX_OK;
 }

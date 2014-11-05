@@ -9,9 +9,9 @@
 #include <ngx_core.h>
 
 
-ngx_uint_t  ngx_pagesize;
-ngx_uint_t  ngx_pagesize_shift;
-ngx_uint_t  ngx_cacheline_size;
+ngx_uint_t  ngx_pagesize; /*系统内存页面大小，linux一般为4KB*/
+ngx_uint_t  ngx_pagesize_shift; /*对应ngx_pagesizee (4096) , 即是 4096 = 1<<12;*/
+ngx_uint_t  ngx_cacheline_size; /*todo*/
 
 
 void *

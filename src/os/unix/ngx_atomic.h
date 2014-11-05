@@ -31,7 +31,7 @@ typedef volatile ngx_atomic_uint_t  ngx_atomic_t;
 #endif
 
 #define ngx_atomic_cmp_set(lock, old, new)                                    \
-    AO_compare_and_swap(lock, old, new)
+    AO_compare_and_swap(lock, old, new)   /*todo*/
 #define ngx_atomic_fetch_add(value, add)                                      \
     AO_fetch_and_add(value, add)
 #define ngx_memory_barrier()        AO_nop()

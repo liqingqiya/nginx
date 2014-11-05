@@ -64,9 +64,9 @@ static void ngx_slab_error(ngx_slab_pool_t *pool, ngx_uint_t level,
     char *text);
 
 
-static ngx_uint_t  ngx_slab_max_size;
-static ngx_uint_t  ngx_slab_exact_size;
-static ngx_uint_t  ngx_slab_exact_shift;
+static ngx_uint_t  ngx_slab_max_size; /*slots分配和pages分配的分割点， 大于等于该值则需从pages里分配*/
+static ngx_uint_t  ngx_slab_exact_size; /*(128) 正好能用一个uintptr_t类型的位图变量表示的页划分*/
+static ngx_uint_t  ngx_slab_exact_shift; /*对应 ngx_slab_exact_size 128 = 1<<7;*/
 
 
 void
