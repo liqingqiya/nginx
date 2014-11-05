@@ -79,7 +79,7 @@ ngx_signal_t  signals[] = {  /*全局信号变量数组*/
 
     { SIGPIPE, "SIGPIPE, SIG_IGN", "", SIG_IGN },
 
-    { 0, NULL, "", NULL }
+    { 0, NULL, "", NULL } /*末尾哨兵， 不定数组的惯用手法，方便以后遍历*/
 };
 
 
@@ -286,11 +286,11 @@ ngx_init_signals(ngx_log_t *log)  /*信号初始化*/
     ngx_signal_t      *sig;
     struct sigaction   sa;
 
-    for (sig = signals; sig->signo != 0; sig++) {
+    for (sig = signals; sig->signo != 0; sig++) { /*遍历全局信号数组*/
         ngx_memzero(&sa, sizeof(struct sigaction));
-        sa.sa_handler = sig->handler;   /*信号处理函数*/
+        sa.sa_handler = sig->handler;   /*设置信号处理函数*/
         sigemptyset(&sa.sa_mask);
-        if (sigaction(sig->signo, &sa, NULL) == -1) { /*设置信号处理方式*/
+        if (sigaction(sig->signo, &sa, NULL) == -1) { /*注册信号处理*/
 #if (NGX_VALGRIND)
             ngx_log_error(NGX_LOG_ALERT, log, ngx_errno,
                           "sigaction(%s) failed, ignored", sig->signame);

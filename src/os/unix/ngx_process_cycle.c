@@ -271,7 +271,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle) /*主进程*/
             ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "reopening logs");
             ngx_reopen_files(cycle, ccf->user);
             ngx_signal_worker_processes(cycle,
-                                        ngx_signal_value(NGX_REOPEN_SIGNAL));
+                                        ngx_signal_value(NGX_REOPEN_SIGNAL)); /*把信号值发送给子进程, 利用的是socketpair产生的未命名socket套接字*/
         }
 
         if (ngx_change_binary) { /*改变二进制文件*/
