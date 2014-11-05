@@ -368,7 +368,7 @@ ngx_start_worker_processes(ngx_cycle_t *cycle, ngx_int_t n, ngx_int_t type)
         ch.slot = ngx_process_slot;
         ch.fd = ngx_processes[ngx_process_slot].channel[0];
 
-        ngx_pass_open_channel(cycle, &ch);
+        ngx_pass_open_channel(cycle, &ch); /*将fork出来的子进程的信息主动告知前面已经生成的子进程*/
     }
 }
 
@@ -434,7 +434,7 @@ ngx_pass_open_channel(ngx_cycle_t *cycle, ngx_channel_t *ch)
 {
     ngx_int_t  i;
 
-    for (i = 0; i < ngx_last_process; i++) {
+    for (i = 0; i < ngx_last_process; i++) { /*遍历其他的子进程*/
 
         if (i == ngx_process_slot
             || ngx_processes[i].pid == -1
@@ -452,7 +452,7 @@ ngx_pass_open_channel(ngx_cycle_t *cycle, ngx_channel_t *ch)
         /* TODO: NGX_AGAIN */
 
         ngx_write_channel(ngx_processes[i].channel[0],
-                          ch, sizeof(ngx_channel_t), cycle->log);
+                          ch, sizeof(ngx_channel_t), cycle->log); /*主动告知pid，进程信息等*/
     }
 }
 
@@ -1083,9 +1083,9 @@ ngx_worker_process_exit(ngx_cycle_t *cycle)
     exit(0);
 }
 
-
+/*将收到的新子进程的相关信息存储在全局变量ngx_processes内*/
 static void
-ngx_channel_handler(ngx_event_t *ev)
+ngx_channel_handler(ngx_event_t *ev) /*回调函数*/
 {
     ngx_int_t          n;
     ngx_channel_t      ch;
@@ -1149,7 +1149,7 @@ ngx_channel_handler(ngx_event_t *ev)
                            "get channel s:%i pid:%P fd:%d",
                            ch.slot, ch.pid, ch.fd);
 
-            ngx_processes[ch.slot].pid = ch.pid;
+            ngx_processes[ch.slot].pid = ch.pid; /*将收到的新子进程的相关信息存储在全局变量ngx_processes内*/
             ngx_processes[ch.slot].channel[0] = ch.fd;
             break;
 
