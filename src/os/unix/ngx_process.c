@@ -183,22 +183,22 @@ ngx_spawn_process(ngx_cycle_t *cycle, ngx_spawn_proc_pt proc, void *data,
     ngx_process_slot = s;
 
 
-    pid = fork();
+    pid = fork(); /*创建新的进程映像*/
 
     switch (pid) {
 
-    case -1:
+    case -1: /*创建失败*/
         ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
                       "fork() failed while spawning \"%s\"", name);
         ngx_close_channel(ngx_processes[s].channel, cycle->log);
         return NGX_INVALID_PID;
 
-    case 0:
+    case 0: /*子进程*/
         ngx_pid = ngx_getpid();
-        proc(cycle, data);
+        proc(cycle, data); /*子进程进入自己的事件循环*/
         break;
 
-    default:
+    default: /*父进程*/
         break;
     }
 

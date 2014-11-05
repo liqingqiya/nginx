@@ -57,7 +57,7 @@
 #define ngx_random               random
 
 /* TODO: #ifndef */
-#define NGX_SHUTDOWN_SIGNAL      QUIT
+#define NGX_SHUTDOWN_SIGNAL      QUIT /*nginx自己封装的信号*/
 #define NGX_TERMINATE_SIGNAL     TERM
 #define NGX_NOACCEPT_SIGNAL      WINCH
 #define NGX_RECONFIGURE_SIGNAL   HUP

@@ -80,7 +80,7 @@ static ngx_open_file_t  ngx_exit_log_file;
 
 
 void
-ngx_master_process_cycle(ngx_cycle_t *cycle)
+ngx_master_process_cycle(ngx_cycle_t *cycle) /*主进程*/
 {
     char              *title;
     u_char            *p;
@@ -99,7 +99,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
     sigaddset(&set, SIGALRM);
     sigaddset(&set, SIGIO);
     sigaddset(&set, SIGINT);
-    sigaddset(&set, ngx_signal_value(NGX_RECONFIGURE_SIGNAL));
+    sigaddset(&set, ngx_signal_value(NGX_RECONFIGURE_SIGNAL)); /*添加信号*/
     sigaddset(&set, ngx_signal_value(NGX_REOPEN_SIGNAL));
     sigaddset(&set, ngx_signal_value(NGX_NOACCEPT_SIGNAL));
     sigaddset(&set, ngx_signal_value(NGX_TERMINATE_SIGNAL));
@@ -117,7 +117,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
     size = sizeof(master_process);
 
     for (i = 0; i < ngx_argc; i++) {
-        size += ngx_strlen(ngx_argv[i]) + 1;
+        size += ngx_strlen(ngx_argv[i]) + 1; /*命令行参数的总字节数*/
     }
 
     title = ngx_pnalloc(cycle->pool, size);
@@ -134,14 +134,14 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
     ccf = (ngx_core_conf_t *) ngx_get_conf(cycle->conf_ctx, ngx_core_module);
 
     ngx_start_worker_processes(cycle, ccf->worker_processes,
-                               NGX_PROCESS_RESPAWN);
+                               NGX_PROCESS_RESPAWN); /*打开子进程，各自进入循环*/
     ngx_start_cache_manager_processes(cycle, 0);
 
     ngx_new_binary = 0;
     delay = 0;
     sigio = 0;
     live = 1;
-
+    /*主进程所在的循环*/
     for ( ;; ) {
         if (delay) {
             if (ngx_sigalrm) {
@@ -166,25 +166,25 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
 
         ngx_log_debug0(NGX_LOG_DEBUG_EVENT, cycle->log, 0, "sigsuspend");
 
-        sigsuspend(&set);
+        sigsuspend(&set); /*进程挂起，等待信号*/
 
-        ngx_time_update();
+        ngx_time_update(); /*更新时间缓存*/
 
         ngx_log_debug1(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
                        "wake up, sigio %i", sigio);
 
-        if (ngx_reap) {
+        if (ngx_reap) { /*有子进程退出*/
             ngx_reap = 0;
             ngx_log_debug0(NGX_LOG_DEBUG_EVENT, cycle->log, 0, "reap children");
 
             live = ngx_reap_children(cycle);
         }
 
-        if (!live && (ngx_terminate || ngx_quit)) {
+        if (!live && (ngx_terminate || ngx_quit)) { /*收到退出信号*/
             ngx_master_process_exit(cycle);
         }
 
-        if (ngx_terminate) {
+        if (ngx_terminate) { /*收到终止信号*/
             if (delay == 0) {
                 delay = 50;
             }
@@ -206,7 +206,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
             continue;
         }
 
-        if (ngx_quit) {
+        if (ngx_quit) { /*收到退出信号*/
             ngx_signal_worker_processes(cycle,
                                         ngx_signal_value(NGX_SHUTDOWN_SIGNAL));
 
@@ -223,7 +223,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
             continue;
         }
 
-        if (ngx_reconfigure) {
+        if (ngx_reconfigure) { /*重新加载配置*/
             ngx_reconfigure = 0;
 
             if (ngx_new_binary) {
@@ -237,7 +237,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
 
             ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "reconfiguring");
 
-            cycle = ngx_init_cycle(cycle);
+            cycle = ngx_init_cycle(cycle); /*重新构建一个 ngx_cycle_t*/
             if (cycle == NULL) {
                 cycle = (ngx_cycle_t *) ngx_cycle;
                 continue;
@@ -258,7 +258,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
                                         ngx_signal_value(NGX_SHUTDOWN_SIGNAL));
         }
 
-        if (ngx_restart) {
+        if (ngx_restart) { /*重新启动*/
             ngx_restart = 0;
             ngx_start_worker_processes(cycle, ccf->worker_processes,
                                        NGX_PROCESS_RESPAWN);
@@ -266,7 +266,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
             live = 1;
         }
 
-        if (ngx_reopen) {
+        if (ngx_reopen) { /*重新打开*/
             ngx_reopen = 0;
             ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "reopening logs");
             ngx_reopen_files(cycle, ccf->user);
@@ -274,13 +274,13 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
                                         ngx_signal_value(NGX_REOPEN_SIGNAL));
         }
 
-        if (ngx_change_binary) {
+        if (ngx_change_binary) { /*改变二进制文件*/
             ngx_change_binary = 0;
             ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "changing binary");
             ngx_new_binary = ngx_exec_new_binary(cycle, ngx_argv);
         }
 
-        if (ngx_noaccept) {
+        if (ngx_noaccept) { /*todo*/
             ngx_noaccept = 0;
             ngx_noaccepting = 1;
             ngx_signal_worker_processes(cycle,
@@ -325,7 +325,7 @@ ngx_single_process_cycle(ngx_cycle_t *cycle) /*单进程循环模式*/
             ngx_master_process_exit(cycle);
         }
 
-        if (ngx_reconfigure) { /*收到修改config的信号？todo*/
+        if (ngx_reconfigure) { /*重新加载配置*/
             ngx_reconfigure = 0;
             ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "reconfiguring");
 
@@ -346,7 +346,7 @@ ngx_single_process_cycle(ngx_cycle_t *cycle) /*单进程循环模式*/
     }
 }
 
-
+/*根据配置文件，启动子进程，子进程进入自己的事件循环*/
 static void
 ngx_start_worker_processes(ngx_cycle_t *cycle, ngx_int_t n, ngx_int_t type)
 {
@@ -362,7 +362,7 @@ ngx_start_worker_processes(ngx_cycle_t *cycle, ngx_int_t n, ngx_int_t type)
     for (i = 0; i < n; i++) {
 
         ngx_spawn_process(cycle, ngx_worker_process_cycle,
-                          (void *) (intptr_t) i, "worker process", type);
+                          (void *) (intptr_t) i, "worker process", type); /*fork子进程，进入自己的工作循环*/
 
         ch.pid = ngx_processes[ngx_process_slot].pid;
         ch.slot = ngx_process_slot;
@@ -726,21 +726,21 @@ ngx_master_process_exit(ngx_cycle_t *cycle)
     exit(0);
 }
 
-
+/*work process 工作进程主体函数*/
 static void
-ngx_worker_process_cycle(ngx_cycle_t *cycle, void *data)    /*work process 工作进程主体函数*/
+ngx_worker_process_cycle(ngx_cycle_t *cycle, void *data)    
 {
-    ngx_int_t worker = (intptr_t) data;
+    ngx_int_t worker = (intptr_t) data; /*进程编号*/
 
     ngx_uint_t         i;
     ngx_connection_t  *c;
 
-    ngx_process = NGX_PROCESS_WORKER;
+    ngx_process = NGX_PROCESS_WORKER; /*工作进程标志*/
 
-    ngx_worker_process_init(cycle, worker); /*init 初始化*/
+    ngx_worker_process_init(cycle, worker); /*process init 初始化*/
 
-    ngx_setproctitle("worker process");     /*设置标题*/
-
+    ngx_setproctitle("worker process");     /*设置进程标题*/
+/*是否开启线程*/
 #if (NGX_THREADS)
     {
     ngx_int_t         n;
@@ -789,7 +789,7 @@ ngx_worker_process_cycle(ngx_cycle_t *cycle, void *data)    /*work process 工�
 
     for ( ;; ) {
 
-        if (ngx_exiting) {
+        if (ngx_exiting) { /*退出信号*/
 
             c = cycle->connections;
 
@@ -813,15 +813,15 @@ ngx_worker_process_cycle(ngx_cycle_t *cycle, void *data)    /*work process 工�
 
         ngx_log_debug0(NGX_LOG_DEBUG_EVENT, cycle->log, 0, "worker cycle");
 
-        ngx_process_events_and_timers(cycle);
+        ngx_process_events_and_timers(cycle); /*阻塞等待事件发生*/
 
-        if (ngx_terminate) {
+        if (ngx_terminate) { /*终止信号*/
             ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "exiting");
 
             ngx_worker_process_exit(cycle);
         }
 
-        if (ngx_quit) {
+        if (ngx_quit) { /*终止信号*/
             ngx_quit = 0;
             ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0,
                           "gracefully shutting down");
@@ -833,7 +833,7 @@ ngx_worker_process_cycle(ngx_cycle_t *cycle, void *data)    /*work process 工�
             }
         }
 
-        if (ngx_reopen) {
+        if (ngx_reopen) { /*重新打开信号*/
             ngx_reopen = 0;
             ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "reopening logs");
             ngx_reopen_files(cycle, -1);
