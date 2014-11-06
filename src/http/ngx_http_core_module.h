@@ -279,8 +279,8 @@ typedef struct {
 
 
 typedef struct {
-    ngx_http_listen_opt_t      opt;
-
+    ngx_http_listen_opt_t      opt; /*监听套接字的属性*/
+    /*以下3个散列表用于加速寻找对应监听端口上的新连接，确定到底使用哪个server{}虚拟主机下的配置来处理它*/
     ngx_hash_t                 hash;
     ngx_hash_wildcard_t       *wc_head;
     ngx_hash_wildcard_t       *wc_tail;
@@ -291,7 +291,7 @@ typedef struct {
 #endif
 
     /* the default server configuration for this address:port */
-    ngx_http_core_srv_conf_t  *default_server;
+    ngx_http_core_srv_conf_t  *default_server; /*该监听端口下对应的默认server{}虚拟主机*/
     ngx_array_t                servers;  /* array of ngx_http_core_srv_conf_t */
 } ngx_http_conf_addr_t;
 
@@ -463,18 +463,18 @@ typedef struct {
     ngx_queue_t                      list;
 } ngx_http_location_queue_t;
 
-
+/*静态二叉平衡树*/
 struct ngx_http_location_tree_node_s {
-    ngx_http_location_tree_node_t   *left;
-    ngx_http_location_tree_node_t   *right;
-    ngx_http_location_tree_node_t   *tree;
+    ngx_http_location_tree_node_t   *left; /*左子树*/
+    ngx_http_location_tree_node_t   *right; /*右子树*/
+    ngx_http_location_tree_node_t   *tree; /*todo*/
 
-    ngx_http_core_loc_conf_t        *exact;
+    ngx_http_core_loc_conf_t        *exact; /*如果location对应的URI匹配字符串属于能够完全匹配的类型，则exact指向对应的ngx_http_core_loc_conf_t结构体，否则为NULL空指针*/
     ngx_http_core_loc_conf_t        *inclusive;
 
-    u_char                           auto_redirect;
-    u_char                           len;
-    u_char                           name[1];
+    u_char                           auto_redirect; /*自动重定向标志*/
+    u_char                           len; /*name字符串的实际长度*/
+    u_char                           name[1]; /*name指向location对应的URI匹配表达式*/
 };
 
 

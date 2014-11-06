@@ -246,9 +246,9 @@ ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) /*解析配置文
      * init http{} main_conf's, merge the server{}s' srv_conf's
      * and its location{}s' loc_conf's
      */
-
+     /* cmcf就是该http块下全局的 ngx_http_core_main_conf_t结构体 */
     cmcf = ctx->main_conf[ngx_http_core_module.ctx_index];
-    cscfp = cmcf->servers.elts;
+    cscfp = cmcf->servers.elts; /*cscfp指向保存所有 ngx_http_core_srv_conf_t 结构体指针的servers动态数组的第一个元素*/
     /* ngx_modules[]数组中包含所有的nginx模块 */
     for (m = 0; ngx_modules[m]; m++) {
         if (ngx_modules[m]->type != NGX_HTTP_MODULE) { /*遍历所有的http模块*/
