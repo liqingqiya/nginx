@@ -868,7 +868,7 @@ ngx_http_handler(ngx_http_request_t *r) /*该函数执行什么功能？*/
 #endif
 
     r->write_event_handler = ngx_http_core_run_phases; /*写事件回调函数*/
-    ngx_http_core_run_phases(r);
+    ngx_http_core_run_phases(r);  /*开始状态机阶段处理*/
 }
 
 
@@ -1399,7 +1399,7 @@ ngx_http_core_try_files_phase(ngx_http_request_t *r,
 
 ngx_int_t
 ngx_http_core_content_phase(ngx_http_request_t *r,
-    ngx_http_phase_handler_t *ph)
+    ngx_http_phase_handler_t *ph) /*todo*/
 {
     size_t     root;
     ngx_int_t  rc;

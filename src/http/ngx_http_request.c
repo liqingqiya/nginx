@@ -3178,7 +3178,7 @@ ngx_http_keepalive_handler(ngx_event_t *rev)
     ngx_del_timer(rev);
 
     rev->handler = ngx_http_process_request_line;
-    ngx_http_process_request_line(rev);
+    ngx_http_process_request_line(rev); /*处理流水线*/
 }
 
 
