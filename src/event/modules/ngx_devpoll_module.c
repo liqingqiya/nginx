@@ -48,7 +48,7 @@ static void *ngx_devpoll_create_conf(ngx_cycle_t *cycle);
 static char *ngx_devpoll_init_conf(ngx_cycle_t *cycle, void *conf);
 
 static int              dp = -1;
-static struct pollfd   *change_list, *event_list;
+static struct pollfd   *change_list, *event_list; /*事件数组*/
 static ngx_uint_t       nchanges, max_changes, nevents;
 
 static ngx_event_t    **change_index;

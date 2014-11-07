@@ -496,7 +496,7 @@ ngx_http_wait_request_handler(ngx_event_t *rev) /*step: 2*/
     }
 
     rev->handler = ngx_http_process_request_line;
-    ngx_http_process_request_line(rev); /*进入处理了吗？？todo*/
+    ngx_http_process_request_line(rev); /*进入处理链*/
 }
 
 

@@ -116,9 +116,9 @@ static void ngx_epoll_eventfd_handler(ngx_event_t *ev);
 static void *ngx_epoll_create_conf(ngx_cycle_t *cycle);
 static char *ngx_epoll_init_conf(ngx_cycle_t *cycle, void *conf);
 
-static int                  ep = -1;
-static struct epoll_event  *event_list;
-static ngx_uint_t           nevents;
+static int                  ep = -1;  /**/
+static struct epoll_event  *event_list; /*事件结构数组, epoll_event是linux针对c开放的一个接口，表示事件*/
+static ngx_uint_t           nevents;  /*todo*/
 
 #if (NGX_HAVE_FILE_AIO)
 
@@ -575,7 +575,7 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
 
     ngx_log_debug1(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
                    "epoll timer: %M", timer);
-
+    /*event_list为文件域静态变量*/
     events = epoll_wait(ep, event_list, (int) nevents, timer); /*等待内核通知进程,获得激活的描述符*/
 
     err = (events == -1) ? ngx_errno : 0;
@@ -612,17 +612,17 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
         return NGX_ERROR;
     }
 
-    ngx_mutex_lock(ngx_posted_events_mutex);
+    ngx_mutex_lock(ngx_posted_events_mutex); /*加锁*/
 
     for (i = 0; i < events; i++) { /*轮询处理活动的描述符*/
-        c = event_list[i].data.ptr;
+        c = event_list[i].data.ptr; /*connection*/
 
-        instance = (uintptr_t) c & 1;
+        instance = (uintptr_t) c & 1; /*是否过期的标志吗？？？todo*/
         c = (ngx_connection_t *) ((uintptr_t) c & (uintptr_t) ~1);
 
-        rev = c->read;
+        rev = c->read; /*这个连接的读事件*/
 
-        if (c->fd == -1 || rev->instance != instance) {
+        if (c->fd == -1 || rev->instance != instance) { /*连接有效*/
 
             /*
              * the stale event from a file descriptor
@@ -634,13 +634,13 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
             continue;
         }
 
-        revents = event_list[i].events;
+        revents = event_list[i].events; /*todo*/
 
         ngx_log_debug3(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
                        "epoll: fd:%d ev:%04XD d:%p",
                        c->fd, revents, event_list[i].data.ptr);
 
-        if (revents & (EPOLLERR|EPOLLHUP)) {
+        if (revents & (EPOLLERR|EPOLLHUP)) { /*todo*/
             ngx_log_debug2(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
                            "epoll_wait() error on fd:%d ev:%04XD",
                            c->fd, revents);
@@ -654,7 +654,7 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
         }
 #endif
 
-        if ((revents & (EPOLLERR|EPOLLHUP))
+        if ((revents & (EPOLLERR|EPOLLHUP)) /**/
              && (revents & (EPOLLIN|EPOLLOUT)) == 0)
         {
             /*
@@ -666,7 +666,7 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
             revents |= EPOLLIN|EPOLLOUT;
         }
 
-        if ((revents & EPOLLIN) && rev->active) {
+        if ((revents & EPOLLIN) && rev->active) { /**/
 
 #if (NGX_HAVE_EPOLLRDHUP)
             if (revents & EPOLLRDHUP) {
@@ -678,7 +678,7 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
                 rev->posted_ready = 1;
 
             } else {
-                rev->ready = 1;
+                rev->ready = 1; /*todo*/
             }
 
             if (flags & NGX_POST_EVENTS) {
@@ -688,13 +688,13 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
                 ngx_locked_post_event(rev, queue);
 
             } else {
-                rev->handler(rev); /*读事件的回调函数*/
+                rev->handler(rev); /*读事件的回调函数, handler->filter*/
             }
         }
 
-        wev = c->write;
+        wev = c->write; /*连接的写事件*/
 
-        if ((revents & EPOLLOUT) && wev->active) {
+        if ((revents & EPOLLOUT) && wev->active) { /*写事件*/
 
             if (c->fd == -1 || wev->instance != instance) {
 
@@ -719,12 +719,12 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
                 ngx_locked_post_event(wev, &ngx_posted_events);
 
             } else {
-                wev->handler(wev); /*写事件的回调函数*/
+                wev->handler(wev); /*写事件的回调函数, handler->filter*/
             }
         }
     }
 
-    ngx_mutex_unlock(ngx_posted_events_mutex);
+    ngx_mutex_unlock(ngx_posted_events_mutex); /*解锁*/
 
     return NGX_OK;
 }
