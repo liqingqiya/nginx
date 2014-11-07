@@ -104,14 +104,14 @@ ngx_slab_init(ngx_slab_pool_t *pool)
         slots[i].prev = 0;
     }
 
-    p += n * sizeof(ngx_slab_page_t);
+    p += n * sizeof(ngx_slab_page_t); /*跳过上面那些slab page*/
 
     pages = (ngx_uint_t) (size / (ngx_pagesize + sizeof(ngx_slab_page_t)));
 
-    ngx_memzero(p, pages * sizeof(ngx_slab_page_t));
+    ngx_memzero(p, pages * sizeof(ngx_slab_page_t)); /*把每个缓存页对应的slab page归0 */
 
-    pool->pages = (ngx_slab_page_t *) p;
-
+    pool->pages = (ngx_slab_page_t *) p; /*pool->pages指向slab page的头*/
+    /*初始化free，free.next是下次分配页时候的入口*/
     pool->free.prev = 0;
     pool->free.next = (ngx_slab_page_t *) p;
 
@@ -121,9 +121,9 @@ ngx_slab_init(ngx_slab_pool_t *pool)
 
     pool->start = (u_char *)
                   ngx_align_ptr((uintptr_t) p + pages * sizeof(ngx_slab_page_t),
-                                 ngx_pagesize);
+                                 ngx_pagesize); /*实际缓存区(页)的开头，对齐*/
 
-    m = pages - (pool->end - pool->start) / ngx_pagesize;
+    m = pages - (pool->end - pool->start) / ngx_pagesize; /*根据实际缓存区的开始和结尾再次更新内存页的数目*/
     if (m > 0) {
         pages -= m;
         pool->pages->slab = pages;
@@ -136,22 +136,22 @@ ngx_slab_init(ngx_slab_pool_t *pool)
 
 
 void *
-ngx_slab_alloc(ngx_slab_pool_t *pool, size_t size)
+ngx_slab_alloc(ngx_slab_pool_t *pool, size_t size) /*共享内存，加锁同步*/
 {
     void  *p;
 
-    ngx_shmtx_lock(&pool->mutex);
+    ngx_shmtx_lock(&pool->mutex); /*获取锁*/
 
     p = ngx_slab_alloc_locked(pool, size);
 
-    ngx_shmtx_unlock(&pool->mutex);
+    ngx_shmtx_unlock(&pool->mutex); /*解锁*/
 
     return p;
 }
 
 
 void *
-ngx_slab_alloc_locked(ngx_slab_pool_t *pool, size_t size)
+ngx_slab_alloc_locked(ngx_slab_pool_t *pool, size_t size) /*返回的值是所要分配的空间在内存缓存区的位置*/
 {
     size_t            s;
     uintptr_t         p, n, m, mask, *bitmap;

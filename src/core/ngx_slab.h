@@ -25,24 +25,24 @@ struct ngx_slab_page_s {
 typedef struct {
     ngx_shmtx_sh_t    lock;
 
-    size_t            min_size;
+    size_t            min_size; /**/
     size_t            min_shift;
 
-    ngx_slab_page_t  *pages;
-    ngx_slab_page_t   free;
+    ngx_slab_page_t  *pages; /*管理页数组*/
+    ngx_slab_page_t   free;    /*管理free的页数组*/
 
-    u_char           *start;
-    u_char           *end;
+    u_char           *start;    /*数据区的起始地址*/
+    u_char           *end;    /*数据区的结束地址*/
 
-    ngx_shmtx_t       mutex;
+    ngx_shmtx_t       mutex;    /*互斥锁*/
 
-    u_char           *log_ctx;
-    u_char            zero;
+    u_char           *log_ctx;    /*todo*/
+    u_char            zero;    /*todo*/
 
-    unsigned          log_nomem:1;
+    unsigned          log_nomem:1;    /*todo*/
 
-    void             *data;
-    void             *addr;
+    void             *data;    /*todo*/
+    void             *addr;    /*todo*/
 } ngx_slab_pool_t;
 
 
