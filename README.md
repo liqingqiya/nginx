@@ -1,7 +1,7 @@
 nginx
 =====
 
-nginx学习，添加注释，添加学习笔记
+nginx学习，学习代码，学习思路，学习设计
 
 1.generate the makefile
 
