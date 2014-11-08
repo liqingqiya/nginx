@@ -329,7 +329,7 @@ static ngx_command_t  ngx_http_core_commands[] = {
       offsetof(ngx_http_core_loc_conf_t, types_hash_bucket_size),
       NULL },
 
-    { ngx_string("types"),
+    { ngx_string("types"),                  /*http*/
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF
                                           |NGX_CONF_BLOCK|NGX_CONF_NOARGS,
       ngx_http_core_types,
@@ -337,7 +337,7 @@ static ngx_command_t  ngx_http_core_commands[] = {
       0,
       NULL },
 
-    { ngx_string("default_type"),
+    { ngx_string("default_type"),           /*http*/
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_str_slot,
       NGX_HTTP_LOC_CONF_OFFSET,
@@ -3301,7 +3301,7 @@ ngx_http_core_regex_location(ngx_conf_t *cf, ngx_http_core_loc_conf_t *clcf,
 
 
 static char *
-ngx_http_core_types(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ngx_http_core_types(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)  /*'types'的回调函数*/
 {
     ngx_http_core_loc_conf_t *clcf = conf;
 
@@ -3309,7 +3309,7 @@ ngx_http_core_types(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     ngx_conf_t   save;
 
     if (clcf->types == NULL) {
-        clcf->types = ngx_array_create(cf->pool, 64, sizeof(ngx_hash_key_t));
+        clcf->types = ngx_array_create(cf->pool, 64, sizeof(ngx_hash_key_t));  /*创建一个数组*/
         if (clcf->types == NULL) {
             return NGX_CONF_ERROR;
         }
@@ -3319,7 +3319,7 @@ ngx_http_core_types(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     cf->handler = ngx_http_core_type;
     cf->handler_conf = conf;
 
-    rv = ngx_conf_parse(cf, NULL);
+    rv = ngx_conf_parse(cf, NULL);      /*因为是block类型，调用 ngx_conf_parse() 解析*/
 
     *cf = save;
 
@@ -3328,7 +3328,7 @@ ngx_http_core_types(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
 static char *
-ngx_http_core_type(ngx_conf_t *cf, ngx_command_t *dummy, void *conf)
+ngx_http_core_type(ngx_conf_t *cf, ngx_command_t *dummy, void *conf)  /*存储没一个types的key的value的回调函数*/
 {
     ngx_http_core_loc_conf_t *clcf = conf;
 

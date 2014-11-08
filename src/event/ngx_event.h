@@ -467,18 +467,18 @@ extern ngx_os_io_t  ngx_io;
 
 
 typedef struct {
-    ngx_uint_t    connections;
-    ngx_uint_t    use;
+    ngx_uint_t    connections;                  /*连接数*/
+    ngx_uint_t    use;                           /*todo*/  
 
-    ngx_flag_t    multi_accept;
-    ngx_flag_t    accept_mutex;
+    ngx_flag_t    multi_accept;                 /*todo*/
+    ngx_flag_t    accept_mutex;                 /*负载均衡锁*/
 
-    ngx_msec_t    accept_mutex_delay;
+    ngx_msec_t    accept_mutex_delay;           /*todo*/
 
-    u_char       *name;
+    u_char       *name;                           /*todo*/
 
 #if (NGX_DEBUG)
-    ngx_array_t   debug_connection;
+    ngx_array_t   debug_connection;             /*todo*/
 #endif
 } ngx_event_conf_t;
 

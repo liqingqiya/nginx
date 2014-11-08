@@ -7,13 +7,13 @@
 extern ngx_module_t  ngx_core_module;                   /*num: 0*/
 extern ngx_module_t  ngx_errlog_module;                 /*num: 1*/
 extern ngx_module_t  ngx_conf_module;                   /*num: 2*/
-extern ngx_module_t  ngx_events_module;
-extern ngx_module_t  ngx_event_core_module;
-extern ngx_module_t  ngx_epoll_module;
-extern ngx_module_t  ngx_regex_module;
-extern ngx_module_t  ngx_http_module;
-extern ngx_module_t  ngx_http_core_module;
-extern ngx_module_t  ngx_http_log_module;
+extern ngx_module_t  ngx_events_module;                 /*num: 3*/
+extern ngx_module_t  ngx_event_core_module;             /*num: 4*/
+extern ngx_module_t  ngx_epoll_module;                  /*num: 5*/
+extern ngx_module_t  ngx_regex_module;                   /*num: 6*/
+extern ngx_module_t  ngx_http_module;                    /*num: 7*/
+extern ngx_module_t  ngx_http_core_module;              /*num: 8*/
+extern ngx_module_t  ngx_http_log_module;                /*num: 9*/
 extern ngx_module_t  ngx_http_upstream_module;
 extern ngx_module_t  ngx_http_static_module;
 extern ngx_module_t  ngx_http_autoindex_module;

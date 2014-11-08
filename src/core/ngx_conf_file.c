@@ -256,13 +256,13 @@ failed:
     rc = NGX_ERROR;
 
 done:
-
-    if (filename) {
+    /*如果file解析完了，就会进入这个if里面的处理逻辑。如果是解析完一个block，那么就会直接跳过。*/
+    if (filename) {                                                   /*解析完了文件 或者 是解析完了一个block配置模块*/
         if (cf->conf_file->buffer->start) {
-            ngx_free(cf->conf_file->buffer->start);
+            ngx_free(cf->conf_file->buffer->start);                 /*配置文件解析完毕，释放用于解析的缓存内存*/
         }
 
-        if (ngx_close_file(fd) == NGX_FILE_ERROR) {
+        if (ngx_close_file(fd) == NGX_FILE_ERROR) {                 /*关闭配置文件*/
             ngx_log_error(NGX_LOG_ALERT, cf->log, ngx_errno,
                           ngx_close_file_n " %s failed",
                           filename->data);
@@ -276,7 +276,7 @@ done:
         return NGX_CONF_ERROR;
     }
 
-    return NGX_CONF_OK;
+    return NGX_CONF_OK;                                             /*ok*/
 }
 
 
@@ -378,10 +378,10 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last) /*这个时候， cf的args数�
                 conf = ((void **) cf->ctx)[ngx_modules[i]->index];      /*为什么要强制转化成 (void**) ??todo*/
 
             } else if (cmd->type & NGX_MAIN_CONF) {
-                conf = &(((void **) cf->ctx)[ngx_modules[i]->index]);   /**/
+                conf = &(((void **) cf->ctx)[ngx_modules[i]->index]);   /*todo??为什么要进行这个转化？(void**)*/
 
             } else if (cf->ctx) {
-                confp = *(void **) ((char *) cf->ctx + cmd->conf);
+                confp = *(void **) ((char *) cf->ctx + cmd->conf);       /*todo？？为什么要进行这个转化？(void**)*/
 
                 if (confp) {
                     conf = confp[ngx_modules[i]->ctx_index];
@@ -735,7 +735,7 @@ ngx_conf_read_token(ngx_conf_t *cf)  /*读取配置文件中的token的值*/
 
 
 char *
-ngx_conf_include(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ngx_conf_include(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)  /*关于include的回调函数*/
 {
     char        *rv;
     ngx_int_t    n;

@@ -133,14 +133,14 @@ static ngx_command_t  ngx_event_core_commands[] = {
       0,
       0,
       NULL },
-      /*确定选择哪一个事件模块作为事件驱动机制*/
+    /*确定选择哪一个事件模块作为事件驱动机制*/
     { ngx_string("use"),
       NGX_EVENT_CONF|NGX_CONF_TAKE1,
       ngx_event_use,
       0,
       0,
       NULL },
-      /*意味着希望尽可能多的接收到新的连接*/
+    /*意味着希望尽可能多的接收到新的连接*/
     { ngx_string("multi_accept"),
       NGX_EVENT_CONF|NGX_CONF_FLAG,
       ngx_conf_set_flag_slot,
@@ -895,8 +895,8 @@ ngx_send_lowat(ngx_connection_t *c, size_t lowat)
 
     return NGX_OK;
 }
-
-
+/*创建event模块的配置结构/在我debian上，只遍历的两个时间模块 ngx_event_core_module, ngx_epoll_module,创建了两个配置结构体*/
+/*ngx_event_conf_t, ngx_epoll_conf_t 这两个配置模块，存储这两个模块关心的配置*/
 static char *
 ngx_events_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -932,13 +932,13 @@ ngx_events_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     }
 
     *(void **) conf = ctx;
-    /*筛选出event模块，并由每一个event模块创建各自的配置结构体*/
+    /*筛选出event模块，并由每一个event模块创建各自的配置结构体,linux上就两个：ngx_event_core_module, ngx_epoll_event*/
     for (i = 0; ngx_modules[i]; i++) {
         if (ngx_modules[i]->type != NGX_EVENT_MODULE) {
             continue;
         }
 
-        m = ngx_modules[i]->ctx;
+        m = ngx_modules[i]->ctx; /*ctx是我们相应一类模块的统一接口*/
 
         if (m->create_conf) {
             (*ctx)[ngx_modules[i]->ctx_index] = m->create_conf(cf->cycle);
@@ -953,7 +953,7 @@ ngx_events_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     cf->module_type = NGX_EVENT_MODULE; /*没有创建新的ngx_conf_t，而是将这个ngx_conf_t修改了一些变量而已,说明当前解析的是event模块*/
     cf->cmd_type = NGX_EVENT_CONF;
 
-    rv = ngx_conf_parse(cf, NULL); /*解析配置文件*/
+    rv = ngx_conf_parse(cf, NULL);      /*解析配置文件*/
 
     *cf = pcf;
 
@@ -980,7 +980,7 @@ ngx_events_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
 static char *
-ngx_event_connections(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ngx_event_connections(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) /*connections 的回调函数*/
 {
     ngx_event_conf_t  *ecf = conf;
 
@@ -997,7 +997,7 @@ ngx_event_connections(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     }
 
     value = cf->args->elts;
-    ecf->connections = ngx_atoi(value[1].data, value[1].len);
+    ecf->connections = ngx_atoi(value[1].data, value[1].len);  /*存储配置值到相应结构体中*/
     if (ecf->connections == (ngx_uint_t) NGX_ERROR) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
                            "invalid number \"%V\"", &value[1]);
@@ -1179,7 +1179,7 @@ ngx_event_debug_connection(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
 static void *
-ngx_event_core_create_conf(ngx_cycle_t *cycle)
+ngx_event_core_create_conf(ngx_cycle_t *cycle)  /*创建本模块关注的配置结构体*/
 {
     ngx_event_conf_t  *ecf;
 
@@ -1187,7 +1187,7 @@ ngx_event_core_create_conf(ngx_cycle_t *cycle)
     if (ecf == NULL) {
         return NULL;
     }
-
+    /*在内存池创建 ngx_event_conf_t , 进行最初的设置*/
     ecf->connections = NGX_CONF_UNSET_UINT;
     ecf->use = NGX_CONF_UNSET_UINT;
     ecf->multi_accept = NGX_CONF_UNSET;
@@ -1210,7 +1210,7 @@ ngx_event_core_create_conf(ngx_cycle_t *cycle)
 
 
 static char *
-ngx_event_core_init_conf(ngx_cycle_t *cycle, void *conf)
+ngx_event_core_init_conf(ngx_cycle_t *cycle, void *conf)  /*初始化 ngx_event_conf_t */
 {
     ngx_event_conf_t  *ecf = conf;
 
@@ -1229,11 +1229,11 @@ ngx_event_core_init_conf(ngx_cycle_t *cycle, void *conf)
 
 #if (NGX_HAVE_EPOLL) && !(NGX_TEST_BUILD_EPOLL)
 
-    fd = epoll_create(100);
+    fd = epoll_create(100);                         /*原来是在这里创建了epoll文件系统*/
 
     if (fd != -1) {
-        (void) close(fd);
-        module = &ngx_epoll_module;
+        (void) close(fd);                           /*todo????这里为什么要关闭fd这个文件描述符号*/
+        module = &ngx_epoll_module;                /**/
 
     } else if (ngx_errno != NGX_ENOSYS) {
         module = &ngx_epoll_module;
@@ -1297,17 +1297,17 @@ ngx_event_core_init_conf(ngx_cycle_t *cycle, void *conf)
         return NGX_CONF_ERROR;
     }
 
-    ngx_conf_init_uint_value(ecf->connections, DEFAULT_CONNECTIONS);
-    cycle->connection_n = ecf->connections;
+    ngx_conf_init_uint_value(ecf->connections, DEFAULT_CONNECTIONS);               /*如果没有设置，就设置一个默认值*/
+    cycle->connection_n = ecf->connections;                                           /*todo*/
 
-    ngx_conf_init_uint_value(ecf->use, module->ctx_index);
+    ngx_conf_init_uint_value(ecf->use, module->ctx_index);                           /*如果没有设置，就设置一个默认值*/
 
     event_module = module->ctx;
-    ngx_conf_init_ptr_value(ecf->name, event_module->name->data);
+    ngx_conf_init_ptr_value(ecf->name, event_module->name->data);                   /*如果没有设置，就设置一个默认值*/
 
-    ngx_conf_init_value(ecf->multi_accept, 0);
-    ngx_conf_init_value(ecf->accept_mutex, 1);
-    ngx_conf_init_msec_value(ecf->accept_mutex_delay, 500);
+    ngx_conf_init_value(ecf->multi_accept, 0);                                        /*todo*/
+    ngx_conf_init_value(ecf->accept_mutex, 1);                                        /*todo*/
+    ngx_conf_init_msec_value(ecf->accept_mutex_delay, 500);                          /*todo*/
 
 
 #if (NGX_HAVE_RTSIG)
@@ -1333,7 +1333,7 @@ ngx_event_core_init_conf(ngx_cycle_t *cycle, void *conf)
 
 #else
 
-    return NGX_CONF_OK;
+    return NGX_CONF_OK;                                     /*ok*/
 
 #endif
 }

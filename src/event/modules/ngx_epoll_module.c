@@ -92,9 +92,9 @@ struct io_event {
 
 
 typedef struct {
-    ngx_uint_t  events;
-    ngx_uint_t  aio_requests;
-} ngx_epoll_conf_t;
+    ngx_uint_t  events;             /*todo*/
+    ngx_uint_t  aio_requests;       /*todo*/
+} ngx_epoll_conf_t;                 /*epoll模块配置存储的结构体*/
 
 
 static ngx_int_t ngx_epoll_init(ngx_cycle_t *cycle, ngx_msec_t timer);
@@ -817,7 +817,7 @@ ngx_epoll_eventfd_handler(ngx_event_t *ev)
 
 
 static void *
-ngx_epoll_create_conf(ngx_cycle_t *cycle)
+ngx_epoll_create_conf(ngx_cycle_t *cycle) /*创建该模块需要关注的 ngx_epoll_conf_t的配置结构体*/
 {
     ngx_epoll_conf_t  *epcf;
 

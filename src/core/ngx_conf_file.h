@@ -217,22 +217,22 @@ char *ngx_conf_check_num_bounds(ngx_conf_t *cf, void *post, void *data);
 #define ngx_get_conf(conf_ctx, module)  conf_ctx[module.index]  /*获得上下文 - ngx_core_conf_t， 获取核心模块创建的一个数组, 每个数组元素指向一类模块的配置结构数组 */
 
 
-
+/*如果是 NGX_CONF_UNSET，那么就设置默认值*/
 #define ngx_conf_init_value(conf, default)                                   \
     if (conf == NGX_CONF_UNSET) {                                            \
         conf = default;                                                      \
     }
-
+/*如果是 NGX_CONF_UNSET，那么就设置默认值*/
 #define ngx_conf_init_ptr_value(conf, default)                               \
     if (conf == NGX_CONF_UNSET_PTR) {                                        \
         conf = default;                                                      \
     }
-
+/*如果是 NGX_CONF_UNSET，那么就设置默认值*/
 #define ngx_conf_init_uint_value(conf, default)                              \
     if (conf == NGX_CONF_UNSET_UINT) {                                       \
         conf = default;                                                      \
     }
-
+/*如果是 NGX_CONF_UNSET，那么就设置默认值*/
 #define ngx_conf_init_size_value(conf, default)                              \
     if (conf == NGX_CONF_UNSET_SIZE) {                                       \
         conf = default;                                                      \
