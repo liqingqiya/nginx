@@ -950,7 +950,7 @@ ngx_events_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     pcf = *cf;
     cf->ctx = ctx;
-    cf->module_type = NGX_EVENT_MODULE;
+    cf->module_type = NGX_EVENT_MODULE; /*没有创建新的ngx_conf_t，而是将这个ngx_conf_t修改了一些变量而已,说明当前解析的是event模块*/
     cf->cmd_type = NGX_EVENT_CONF;
 
     rv = ngx_conf_parse(cf, NULL); /*解析配置文件*/

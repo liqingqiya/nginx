@@ -106,9 +106,9 @@ ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename)
     ngx_buf_t         buf;
     ngx_conf_file_t  *prev, conf_file;
     enum {
-        parse_file = 0, /*解析配置文件*/
-        parse_block,  /*解析复杂项*/
-        parse_param  /*解析命令行*/
+        parse_file = 0,                             /*解析配置文件*/
+        parse_block,                                /*解析复杂项*/
+        parse_param                                 /*解析命令行*/
     } type;
 
 #if (NGX_SUPPRESS_WARN)
@@ -116,7 +116,7 @@ ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename)
     prev = NULL;
 #endif
 
-    if (filename) {  /*判断当前解析状态*/
+    if (filename) {                                 /*判断当前解析过程处于什么状态*/
 
         /* open configuration file */
 
@@ -158,17 +158,17 @@ ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename)
 
         type = parse_file;
 
-    } else if (cf->conf_file->file.fd != NGX_INVALID_FILE) {  /**/
+    } else if (cf->conf_file->file.fd != NGX_INVALID_FILE) {    /*nginx.conf already opened*/
 
-        type = parse_block;  /*文件已经打开了，处于解析复杂配置项的状态，间接递归调用*/
+        type = parse_block;                                         /*文件已经打开了，处于解析复杂配置项的状态，间接递归调用*/
 
-    } else {  /**/
-        type = parse_param;  /*将要解析命令行参数配置项*/
+    } else {                            
+        type = parse_param;                                         /*eg.nginx -g 'daemon on' 解析命令行参数配置项*/
     }
 
 
     for ( ;; ) {
-        rc = ngx_conf_read_token(cf);  /*解析出token对应的值*/
+        rc = ngx_conf_read_token(cf);                               /*解析出token对应的值*/
 
         /*
          * ngx_conf_read_token() may return
@@ -292,35 +292,35 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last) /*这个时候， cf的args数�
     name = cf->args->elts;
 
     found = 0;
+    /*nginx每一个配置指令都是对应一个ngx_command_s数据类型变量，所以我们现在要找到当前指令对应的ngx_command_s变量，通过遍历每一个模块的每一个ngx_command_s数组就能得到*/
+    for (i = 0; ngx_modules[i]; i++) {                              /*遍历模块*/
 
-    for (i = 0; ngx_modules[i]; i++) { /*遍历模块*/
-
-        cmd = ngx_modules[i]->commands; /*取得当前模块的指令数组*/
+        cmd = ngx_modules[i]->commands;                             /*取得当前模块的指令数组*/
         if (cmd == NULL) {
             continue;
         }
 
-        for ( /* void */ ; cmd->name.len; cmd++) {
+        for ( /* void */ ; cmd->name.len; cmd++) {                  /*遍历某个模块的指令数组*/
 
-            if (name->len != cmd->name.len) { /*先比较解析配置名的长度和指令名的长度是否一致*/
+            if (name->len != cmd->name.len) {                       /*先比较解析配置名的长度和指令名的长度是否一致*/
                 continue;
             }
 
-            if (ngx_strcmp(name->data, cmd->name.data) != 0) { /*比较指令名称*/
+            if (ngx_strcmp(name->data, cmd->name.data) != 0) {     /*比较指令名称*/
                 continue;
             }
 
-            found = 1; /*配置名和指令匹配*/
+            found = 1;                                                 /*标记，配置名和指令匹配*/
             /* 只有处理的模块的类型是 NGX_CONF_MODULE 或者 当前正在处理的模块类型，才可执行下面的逻辑 */
             if (ngx_modules[i]->type != NGX_CONF_MODULE
-                && ngx_modules[i]->type != cf->module_type) 
+                && ngx_modules[i]->type != cf->module_type)         /*todo??cf->module_type*/
             {
                 continue;
             }
 
             /* is the directive's location right ? */
 
-            if (!(cmd->type & cf->cmd_type)) {  /*指令的 type 和当前解析Context相符；*/
+            if (!(cmd->type & cf->cmd_type)) {                       /*todo???指令的 type 和当前解析Context相符；*/
                 continue;
             }
             
@@ -373,12 +373,12 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last) /*这个时候， cf的args数�
             /* set up the directive's configuration context */
 
             conf = NULL;
-            /*取得指令工作的conf指针。*/
+            /*取得指令工作的conf指针*/
             if (cmd->type & NGX_DIRECT_CONF) {
-                conf = ((void **) cf->ctx)[ngx_modules[i]->index];
+                conf = ((void **) cf->ctx)[ngx_modules[i]->index];      /*为什么要强制转化成 (void**) ??todo*/
 
             } else if (cmd->type & NGX_MAIN_CONF) {
-                conf = &(((void **) cf->ctx)[ngx_modules[i]->index]);
+                conf = &(((void **) cf->ctx)[ngx_modules[i]->index]);   /**/
 
             } else if (cf->ctx) {
                 confp = *(void **) ((char *) cf->ctx + cmd->conf);

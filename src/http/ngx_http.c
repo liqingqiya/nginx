@@ -83,7 +83,7 @@ static ngx_command_t  ngx_http_commands[] = {
 
     { ngx_string("http"),
       NGX_MAIN_CONF|NGX_CONF_BLOCK|NGX_CONF_NOARGS,
-      ngx_http_block,
+      ngx_http_block,                                       /*http配置块的回调函数*/
       0,
       0,
       NULL },

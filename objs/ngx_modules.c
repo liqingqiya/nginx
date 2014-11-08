@@ -4,9 +4,9 @@
 
 
 
-extern ngx_module_t  ngx_core_module;
-extern ngx_module_t  ngx_errlog_module;
-extern ngx_module_t  ngx_conf_module;
+extern ngx_module_t  ngx_core_module;                   /*num: 0*/
+extern ngx_module_t  ngx_errlog_module;                 /*num: 1*/
+extern ngx_module_t  ngx_conf_module;                   /*num: 2*/
 extern ngx_module_t  ngx_events_module;
 extern ngx_module_t  ngx_event_core_module;
 extern ngx_module_t  ngx_epoll_module;
@@ -52,15 +52,15 @@ extern ngx_module_t  ngx_http_range_body_filter_module;
 extern ngx_module_t  ngx_http_not_modified_filter_module;
 
 ngx_module_t *ngx_modules[] = {
-    &ngx_core_module,/*core类型模块*/
-    &ngx_errlog_module,/*core类型模块*/
-    &ngx_conf_module,/*conf类型模块*/
-    &ngx_events_module,/*core类型模块*/
-    &ngx_event_core_module,/*event类型模块*/
-    &ngx_epoll_module,/*event类型模块*/
-    &ngx_regex_module,/**/
-    &ngx_http_module,/*core类型模块*/
-    &ngx_http_core_module,/*http类型模块*/
+    &ngx_core_module,       /*core类型模块*/
+    &ngx_errlog_module,     /*core类型模块*/
+    &ngx_conf_module,       /*conf类型模块*/
+    &ngx_events_module,     /*core类型模块*/
+    &ngx_event_core_module, /*event类型模块*/
+    &ngx_epoll_module,      /*event类型模块*/
+    &ngx_regex_module,      /**/
+    &ngx_http_module,       /*core类型模块*/
+    &ngx_http_core_module,  /*http类型模块*/
     &ngx_http_log_module,         /*NGX_HTTP_LOG_PHASE阶段*/
     &ngx_http_upstream_module,
     &ngx_http_static_module,      /*NGX_HTTP_CONTENT_PHASE阶段*/

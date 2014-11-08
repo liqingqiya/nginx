@@ -38,7 +38,7 @@ static ngx_command_t  ngx_core_commands[] = {
       NGX_MAIN_CONF|NGX_DIRECT_CONF|NGX_CONF_FLAG,
       ngx_conf_set_flag_slot,
       0,
-      offsetof(ngx_core_conf_t, daemon),
+      offsetof(ngx_core_conf_t, daemon),                /*偏移量*/
       NULL },
 
     { ngx_string("master_process"),

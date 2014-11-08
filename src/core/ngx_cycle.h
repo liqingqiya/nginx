@@ -73,22 +73,22 @@ struct ngx_cycle_s {
 
 
 typedef struct {
-     ngx_flag_t               daemon;    /*存储daemon配置的值*/
-     ngx_flag_t               master;    /*存储master_process配置的值*/
+     ngx_flag_t               daemon;                       /*存储daemon配置的值*/
+     ngx_flag_t               master;                       /*存储master_process配置的值*/
 
-     ngx_msec_t               timer_resolution;  /*存储timer_resolution配置的值*/
+     ngx_msec_t               timer_resolution;             /*存储timer_resolution配置的值*/
 
-     ngx_int_t                worker_processes;  /*存储worker_processes配置的值*/
-     ngx_int_t                debug_points;  /**/
+     ngx_int_t                worker_processes;             /*存储worker_processes配置的值*/
+     ngx_int_t                debug_points;                  /**/
 
-     ngx_int_t                rlimit_nofile;  /**/
-     ngx_int_t                rlimit_sigpending;  /**/
-     off_t                    rlimit_core;  /**/
+     ngx_int_t                rlimit_nofile;                 /**/
+     ngx_int_t                rlimit_sigpending;             /**/
+     off_t                    rlimit_core;                  /**/
 
-     int                      priority;  /**/
+     int                      priority;                     /**/
 
-     ngx_uint_t               cpu_affinity_n;  /**/
-     uint64_t                *cpu_affinity;  /**/
+     ngx_uint_t               cpu_affinity_n;               /**/
+     uint64_t                *cpu_affinity;                 /**/
 
      char                    *username;
      ngx_uid_t                user;
@@ -97,7 +97,7 @@ typedef struct {
      ngx_str_t                working_directory;
      ngx_str_t                lock_file;
 
-     ngx_str_t                pid;  /*存储pid配置的值*/
+     ngx_str_t                pid;                          /*存储pid配置的值*/
      ngx_str_t                oldpid;
 
      ngx_array_t              env;
@@ -108,7 +108,7 @@ typedef struct {
      size_t                   thread_stack_size;
 #endif
 
-} ngx_core_conf_t;  /*核心模块的一个上下文配置结构*/
+} ngx_core_conf_t;              /*核心模块的一个上下文配置结构*/
 
 
 typedef struct {

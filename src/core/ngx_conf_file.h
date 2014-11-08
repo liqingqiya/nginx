@@ -40,16 +40,16 @@
                               |NGX_CONF_TAKE4)
 
 #define NGX_CONF_ARGS_NUMBER 0x000000ff
-#define NGX_CONF_BLOCK       0x00000100              /*todo，？为什么要定义这样的宏*/
+#define NGX_CONF_BLOCK       0x00000100              /*block块配置*/
 #define NGX_CONF_FLAG        0x00000200
 #define NGX_CONF_ANY         0x00000400
 #define NGX_CONF_1MORE       0x00000800
 #define NGX_CONF_2MORE       0x00001000
-#define NGX_CONF_MULTI       0x00000000  /* compatibility */
+#define NGX_CONF_MULTI       0x00000000             /* compatibility */
 
-#define NGX_DIRECT_CONF      0x00010000
+#define NGX_DIRECT_CONF      0x00010000             /*简单配置项*/
 
-#define NGX_MAIN_CONF        0x01000000
+#define NGX_MAIN_CONF        0x01000000             /*main级别的配置*/
 #define NGX_ANY_CONF         0x0F000000
 
 
@@ -61,12 +61,12 @@
 #define NGX_CONF_UNSET_MSEC  (ngx_msec_t) -1
 
 
-#define NGX_CONF_OK          NULL
-#define NGX_CONF_ERROR       (void *) -1
+#define NGX_CONF_OK          NULL               /*简单项解析成功*/
+#define NGX_CONF_ERROR       (void *) -1        /*解析出错*/
 
-#define NGX_CONF_BLOCK_START 1
-#define NGX_CONF_BLOCK_DONE  2
-#define NGX_CONF_FILE_DONE   3
+#define NGX_CONF_BLOCK_START 1                  /*遇到block解析块*/
+#define NGX_CONF_BLOCK_DONE  2                  /*block解析块解析完毕*/
+#define NGX_CONF_FILE_DONE   3                  /*nginx.conf文件解析完毕*/
 
 #define NGX_CORE_MODULE      0x45524F43  /* "CORE" */
 #define NGX_CONF_MODULE      0x464E4F43  /* "CONF" */
@@ -76,20 +76,20 @@
 
 
 struct ngx_command_s {
-    ngx_str_t             name;
-    ngx_uint_t            type;
-    char               *(*set)(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
-    ngx_uint_t            conf;
-    ngx_uint_t            offset;
-    void                 *post;
-};      /*该结构描述模块支持的指令，一个指令对应一个配置指令。*/
+    ngx_str_t             name;                                                     /*指令名称*/
+    ngx_uint_t            type;                                                     /*指令类型*/
+    char               *(*set)(ngx_conf_t *cf, ngx_command_t *cmd, void *conf); /*指令回调函数*/
+    ngx_uint_t            conf;                                                     /*存储指令结构*/
+    ngx_uint_t            offset;                                                   /*存储结构内的相对位置偏移*/
+    void                 *post;                                                      /*todo*/
+};                                                                                    /*该结构描述模块支持的指令，一个指令对应一个配置指令。*/
 
-#define ngx_null_command  { ngx_null_string, 0, NULL, 0, 0, NULL }  /*初始化一个空指令*/
+#define ngx_null_command  { ngx_null_string, 0, NULL, 0, 0, NULL }              /*初始化一个空指令*/
 
 
-struct ngx_open_file_s { /*指向一个已经打开的文件*/
-    ngx_fd_t              fd; /*文件描述符号*/
-    ngx_str_t             name; /*名称*/
+struct ngx_open_file_s {                                                           /*指向一个已经打开的文件*/
+    ngx_fd_t              fd;                                                       /*文件描述符号*/
+    ngx_str_t             name;                                                     /*名称*/
 
     void                (*flush)(ngx_open_file_t *file, ngx_log_t *log);
     void                 *data;
@@ -155,20 +155,20 @@ typedef char *(*ngx_conf_handler_pt)(ngx_conf_t *cf,
 
 
 struct ngx_conf_s {
-    char                 *name;     /*存放当前解析到的指令*/
-    ngx_array_t          *args;     /*存放所有的参数*/
+    char                 *name;             /*存放当前解析到的指令*/
+    ngx_array_t          *args;             /*存放所有的参数*/
 
-    ngx_cycle_t          *cycle; /*本次循环周期, 代表一次nginx运行周期*/
+    ngx_cycle_t          *cycle;            /*本次循环周期, 代表一次nginx运行周期*/
     ngx_pool_t           *pool;
-    ngx_pool_t           *temp_pool;    /*临时的内存池，解析完参数之后即释放*/
-    ngx_conf_file_t      *conf_file;    /*配置文件的结构体信息*/
-    ngx_log_t            *log;
+    ngx_pool_t           *temp_pool;        /*临时的内存池，解析完参数之后即释放*/
+    ngx_conf_file_t      *conf_file;        /*配置文件的结构体信息*/
+    ngx_log_t            *log;                /*日志*/
 
-    void                 *ctx; /*指向一个上下文结构 ngx_http_conf_ctx_t, 保存http所有模块的main，server，location配置级别的配置结构*/
-    ngx_uint_t            module_type;
-    ngx_uint_t            cmd_type;
+    void                 *ctx;                /*指向一个上下文结构 ngx_http_conf_ctx_t, 保存http所有模块的main，server，location配置级别的配置结构*/
+    ngx_uint_t            module_type;      /*todo??当前模块类型*/
+    ngx_uint_t            cmd_type;         /*todo??当前模块的指令类型*/
 
-    ngx_conf_handler_pt   handler; /*conf回调函数*/
+    ngx_conf_handler_pt   handler;          /*conf回调函数*/
     char                 *handler_conf;
 };
 
