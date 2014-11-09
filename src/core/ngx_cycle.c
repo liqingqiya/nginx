@@ -215,12 +215,12 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
 
         module = ngx_modules[i]->ctx;
 
-        if (module->create_conf) {
+        if (module->create_conf) {  /*不是所有的核心模块都实现了create_conf()函数*/
             /*
             module[0]->create_conf实际是调用了nginx.c中的ngx_core_module_create_conf（）函数，
             构造了一个ngx_core_conf_t结构体
             */
-            rv = module->create_conf(cycle);     
+            rv = module->create_conf(cycle);     /*rv是指向 ngx_core_conf_t 的结构体 */
             if (rv == NULL) {
                 ngx_destroy_pool(pool);
                 return NULL;
@@ -236,7 +236,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
 
     senv = environ;
 
-    /*继续初始化core模块的上下文结构??todo??ngx_conf_t是做什么的？ngx_core_conf_t呢？*/
+    /*ngx_conf_t用于解析配置文件，这个一个局部的临时的变量，在解析配置文件的时候时候，只有一个,但是会随着配置文件的解析和，配置上下文的切换而变化*/
     ngx_memzero(&conf, sizeof(ngx_conf_t));
     /* STUB: init array ? */
     conf.args = ngx_array_create(pool, 10, sizeof(ngx_str_t));
@@ -250,8 +250,8 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         ngx_destroy_pool(pool);
         return NULL;
     }
-
-    /*conf的初始化， 每一个模块都有一个conf吗？ todo */
+    /*cycle->conf_ctx是唯一能正确找到配置存储空间的指针，不能把这个弄乱，因此这里复制给conf.ctx供后续使用*/
+    /*conf的初始化，这个一个局部的临时的变量，在解析配置文件的时候时候，只有一个,但是会随着配置文件的解析和，配置上下文的切换而变化*/
     conf.ctx = cycle->conf_ctx; /*双层数组*/
     conf.cycle = cycle; /*此时的cycle已经赋值了很多的参数，比如路径，日志等等*/
     conf.pool = pool;
@@ -269,7 +269,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         ngx_destroy_cycle_pools(&conf);
         return NULL;
     }
-    /*ngx_conf_parse（）函数做了什么？？怎么做的？？ todo*/
+    /*解析配置文件 nginx.conf */
     /*解析nginx配置文件*/
     if (ngx_conf_parse(&conf, &cycle->conf_file) != NGX_CONF_OK) {
         environ = senv;

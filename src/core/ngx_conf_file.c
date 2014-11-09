@@ -374,11 +374,11 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last) /*这个时候， cf的args数�
 
             conf = NULL;
             /*取得指令工作的conf指针*/
-            if (cmd->type & NGX_DIRECT_CONF) {
-                conf = ((void **) cf->ctx)[ngx_modules[i]->index];      /*为什么要强制转化成 (void**) ??todo*/
+            if (cmd->type & NGX_DIRECT_CONF) {                           /*核心模块级别的配置&简单key-value配置*/
+                conf = ((void **) cf->ctx)[ngx_modules[i]->index];      /*取数组元素，如果是在0模块，那么元素就是一个指向ngx_core_conf_t结构体的指针，也就是conf就是那么一个指针*/
 
-            } else if (cmd->type & NGX_MAIN_CONF) {
-                conf = &(((void **) cf->ctx)[ngx_modules[i]->index]);   /*todo??为什么要进行这个转化？(void**)*/
+            } else if (cmd->type & NGX_MAIN_CONF) {                     /*http模块，mail模块，events模块，error_log模块*/
+                conf = &(((void **) cf->ctx)[ngx_modules[i]->index]);   /*取数组元素的地址*/
 
             } else if (cf->ctx) {
                 confp = *(void **) ((char *) cf->ctx + cmd->conf);       /*todo？？为什么要进行这个转化？(void**)*/

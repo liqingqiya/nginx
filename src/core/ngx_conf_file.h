@@ -47,7 +47,7 @@
 #define NGX_CONF_2MORE       0x00001000
 #define NGX_CONF_MULTI       0x00000000             /* compatibility */
 
-#define NGX_DIRECT_CONF      0x00010000             /*简单配置项*/
+#define NGX_DIRECT_CONF      0x00010000             /*核心模块级别的配置&简单key-value配置*/
 
 #define NGX_MAIN_CONF        0x01000000             /*main级别的配置*/
 #define NGX_ANY_CONF         0x0F000000
@@ -164,7 +164,7 @@ struct ngx_conf_s {
     ngx_conf_file_t      *conf_file;        /*配置文件的结构体信息*/
     ngx_log_t            *log;                /*日志*/
 
-    void                 *ctx;                /*指向一个上下文结构 ngx_http_conf_ctx_t, 保存http所有模块的main，server，location配置级别的配置结构*/
+    void                 *ctx;                /*通用指针，在ngx_init_cycle中被赋值 conf.ctx = cycle->conf_ctx; */
     ngx_uint_t            module_type;      /*todo??当前模块类型*/
     ngx_uint_t            cmd_type;         /*todo??当前模块的指令类型*/
 

@@ -139,7 +139,7 @@ ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) /*解析配置文
 
     /* count the number of the http modules and set up their indices */
 
-    ngx_http_max_module = 0;
+    ngx_http_max_module = 0;        /*计算http模块个数，标准38个http模块*/
     for (m = 0; ngx_modules[m]; m++) {
         if (ngx_modules[m]->type != NGX_HTTP_MODULE) { /*筛选出http模块*/
             continue;
@@ -215,8 +215,8 @@ ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) /*解析配置文
         }
     }
 
-    pcf = *cf;
-    cf->ctx = ctx;
+    pcf = *cf;  /*保存原来的cf，因为下一步要随着上下文的改变，改变cf*/
+    cf->ctx = ctx; /*改变 cf->ctx*/
 
     for (m = 0; ngx_modules[m]; m++) {
         if (ngx_modules[m]->type != NGX_HTTP_MODULE) {
@@ -234,7 +234,7 @@ ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) /*解析配置文
 
     /* parse inside the http{} block */
 
-    cf->module_type = NGX_HTTP_MODULE;
+    cf->module_type = NGX_HTTP_MODULE;  /*改变cf, 当前配置上下文环境从main切换到http*/
     cf->cmd_type = NGX_HTTP_MAIN_CONF;
     rv = ngx_conf_parse(cf, NULL);
 
