@@ -151,11 +151,11 @@ typedef struct {
 
 typedef struct {
     ngx_array_t                handlers;
-} ngx_http_phase_t;     /*为什么要单独的生命为一个结构体？ 就声明为一个ngx_array_t不久行了吗？*/
+} ngx_http_phase_t;     /*为什么要单独的声明为一个结构体？ 就声明为一个ngx_array_t不久行了吗？*/
 
 
 typedef struct {
-    ngx_array_t                servers;         /* ngx_http_core_srv_conf_t */
+    ngx_array_t                servers;         /* ngx_http_core_srv_conf_t */  /*代表server配置块的数组,嵌套上下文的联系*/
 
     ngx_http_phase_engine_t    phase_engine;
 
@@ -179,7 +179,7 @@ typedef struct {
     ngx_uint_t                 try_files;       /* unsigned  try_files:1 */
 
     ngx_http_phase_t           phases[NGX_HTTP_LOG_PHASE + 1];  /*结构体内嵌套数组*/
-} ngx_http_core_main_conf_t; /*http模块中的main级别的配置结构体*/
+} ngx_http_core_main_conf_t;            /*第一个http类型模块的配置上下文 main级别*/
 
 
 typedef struct {
@@ -187,9 +187,9 @@ typedef struct {
     ngx_array_t                 server_names;
 
     /* server ctx */
-    ngx_http_conf_ctx_t        *ctx;
+    ngx_http_conf_ctx_t        *ctx;    /*指向当前server配置模块所属的 ngx_http_conf_ctx_t结构体，是一个很重要的变量，联系了嵌套了环境联系*/
 
-    ngx_str_t                   server_name;
+    ngx_str_t                   server_name; /*当前server块的虚拟主机名，如果存在，则会与HTTP请求中的Host头部做匹配，匹配上后再由当前 ngx_http_core_srv_conf_t 处理请求*/
 
     size_t                      connection_pool_size;
     size_t                      request_pool_size;
@@ -209,7 +209,7 @@ typedef struct {
 #endif
 
     ngx_http_core_loc_conf_t  **named_locations;
-} ngx_http_core_srv_conf_t; /*http模块中的server级别结构体*/
+} ngx_http_core_srv_conf_t;     /*第一个http类型模块的配置上下文 srv级别*/
 
 
 /* list of structures to find core_srv_conf quickly at run time */
@@ -314,7 +314,7 @@ typedef struct {
 } ngx_http_try_file_t;
 
 
-struct ngx_http_core_loc_conf_s { /*http模块中的location级别结构体*/
+struct ngx_http_core_loc_conf_s { /*第一个http类型模块的配置上下文 loc级别*/
     ngx_str_t     name;          /* location name */
 
 #if (NGX_PCRE)

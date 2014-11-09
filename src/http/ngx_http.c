@@ -558,7 +558,7 @@ ngx_http_init_phase_handlers(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf)
     return NGX_OK;
 }
 
-
+/*合并servers配置块*/
 static char *
 ngx_http_merge_servers(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf,
     ngx_http_module_t *module, ngx_uint_t ctx_index)
@@ -587,12 +587,12 @@ ngx_http_merge_servers(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf,
                 goto failed;
             }
         }
-
+        /*如果当前http模块merge_srv_conf，再调用合并方法*/
         if (module->merge_loc_conf) { /*当前http模块实现了merge_loc_conf*/
 
             /* merge the server{}'s loc_conf */
 
-            ctx->loc_conf = cscfp[s]->ctx->loc_conf;
+            ctx->loc_conf = cscfp[s]->ctx->loc_conf; /*cscfp[s]->ctx->loc_conf这个动态数组中成员都是server{}块下所有http模块的create_loc_conf方法创建的结构体指针*/
 
             rv = module->merge_loc_conf(cf, saved.loc_conf[ctx_index],
                                         cscfp[s]->ctx->loc_conf[ctx_index]);
@@ -603,7 +603,7 @@ ngx_http_merge_servers(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf,
             /* merge the locations{}' loc_conf's */
 
             clcf = cscfp[s]->ctx->loc_conf[ngx_http_core_module.ctx_index];
-
+            /*调用ngx_http_merge_location方法，将server{}与其所包含的location{}块下的结构体进行合并*/
             rv = ngx_http_merge_locations(cf, clcf->locations,
                                           cscfp[s]->ctx->loc_conf,
                                           module, ctx_index);
