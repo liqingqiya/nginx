@@ -156,7 +156,7 @@ typedef char *(*ngx_conf_handler_pt)(ngx_conf_t *cf,
 
 struct ngx_conf_s {
     char                 *name;             /*存放当前解析到的指令*/
-    ngx_array_t          *args;             /*存放所有的参数*/
+    ngx_array_t          *args;             /*暂时存放解析好的，所有的参数，一行行解析，一行行存放*/
 
     ngx_cycle_t          *cycle;            /*本次循环周期, 代表一次nginx运行周期*/
     ngx_pool_t           *pool;

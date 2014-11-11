@@ -136,9 +136,9 @@ typedef ngx_int_t (*ngx_http_phase_handler_pt)(ngx_http_request_t *r,
     ngx_http_phase_handler_t *ph);
 
 struct ngx_http_phase_handler_s {
-    ngx_http_phase_handler_pt  checker;
-    ngx_http_handler_pt        handler;
-    ngx_uint_t                 next;
+    ngx_http_phase_handler_pt  checker;   /*回调函数*/
+    ngx_http_handler_pt        handler;   /**/
+    ngx_uint_t                 next;       /**/
 };
 
 

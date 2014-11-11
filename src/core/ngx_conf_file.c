@@ -66,10 +66,10 @@ ngx_conf_param(ngx_conf_t *cf)
     ngx_buf_t         b;
     ngx_conf_file_t   conf_file;
 
-    param = &cf->cycle->conf_param; /**/
+    param = &cf->cycle->conf_param; /*命令行参数*/
 
     if (param->len == 0) {
-        return NGX_CONF_OK;
+        return NGX_CONF_OK; /*没有设置命令行参数，则直接退出*/
     }
 
     ngx_memzero(&conf_file, sizeof(ngx_conf_file_t));

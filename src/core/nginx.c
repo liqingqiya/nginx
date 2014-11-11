@@ -977,7 +977,7 @@ ngx_core_module_create_conf(ngx_cycle_t *cycle) /* module[0]->create_conf调用 
 static char *
 ngx_core_module_init_conf(ngx_cycle_t *cycle, void *conf)
 {
-    ngx_core_conf_t  *ccf = conf;
+    ngx_core_conf_t  *ccf = conf; /*conf为创建的上下文配置结构体*/
 
     ngx_conf_init_value(ccf->daemon, 1);
     ngx_conf_init_value(ccf->master, 1);

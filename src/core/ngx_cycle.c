@@ -234,9 +234,9 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
     }
 
 
-    senv = environ;
+    senv = environ; /*shell 环境*/
 
-    /*ngx_conf_t用于解析配置文件，这个一个局部的临时的变量，在解析配置文件的时候时候，只有一个,但是会随着配置文件的解析和，配置上下文的切换而变化*/
+    /*初始化ngx_conf_t结构体，ngx_conf_t用于解析配置文件，这个一个局部的临时的变量，在解析配置文件的时候时候，只有一个,但是会随着配置文件的解析和，配置上下文的切换而变化*/
     ngx_memzero(&conf, sizeof(ngx_conf_t));
     /* STUB: init array ? */
     conf.args = ngx_array_create(pool, 10, sizeof(ngx_str_t));
@@ -254,10 +254,10 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
     /*conf的初始化，这个一个局部的临时的变量，在解析配置文件的时候时候，只有一个,但是会随着配置文件的解析和，配置上下文的切换而变化*/
     conf.ctx = cycle->conf_ctx; /*双层数组*/
     conf.cycle = cycle; /*此时的cycle已经赋值了很多的参数，比如路径，日志等等*/
-    conf.pool = pool;
-    conf.log = log;
-    conf.module_type = NGX_CORE_MODULE; /*核心模块*/
-    conf.cmd_type = NGX_MAIN_CONF;  /*main级别的配置*/
+    conf.pool = pool;   /*内存池*/
+    conf.log = log;      /*日志*/   
+    conf.module_type = NGX_CORE_MODULE; /*设置上下文： 核心模块*/
+    conf.cmd_type = NGX_MAIN_CONF;  /*设置指令类型*/
 
 #if 0
     log->log_level = NGX_LOG_DEBUG_ALL;
