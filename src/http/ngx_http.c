@@ -276,11 +276,11 @@ ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) /*解析配置文
 
     /* create location trees */
 
-    for (s = 0; s < cmcf->servers.nelts; s++) {
+    for (s = 0; s < cmcf->servers.nelts; s++) {  /*遍历各个server的location tree，开始修剪切并*/
 
         clcf = cscfp[s]->ctx->loc_conf[ngx_http_core_module.ctx_index];
 
-        if (ngx_http_init_locations(cf, cscfp[s], clcf) != NGX_OK) {
+        if (ngx_http_init_locations(cf, cscfp[s], clcf) != NGX_OK) { /*每次处理一个节点，也就是一个队列*/
             return NGX_CONF_ERROR;
         }
 
@@ -843,7 +843,7 @@ ngx_http_init_static_location_trees(ngx_conf_t *cf,
 
 ngx_int_t
 ngx_http_add_location(ngx_conf_t *cf, ngx_queue_t **locations,
-    ngx_http_core_loc_conf_t *clcf)
+    ngx_http_core_loc_conf_t *clcf)  /*将一个server下的所有的location挂载到一个队列中*/
 {
     ngx_http_location_queue_t  *lq;
 
@@ -854,7 +854,7 @@ ngx_http_add_location(ngx_conf_t *cf, ngx_queue_t **locations,
             return NGX_ERROR;
         }
 
-        ngx_queue_init(*locations);
+        ngx_queue_init(*locations); /*初始化队列*/
     }
 
     lq = ngx_palloc(cf->temp_pool, sizeof(ngx_http_location_queue_t));
@@ -882,7 +882,7 @@ ngx_http_add_location(ngx_conf_t *cf, ngx_queue_t **locations,
 
     ngx_queue_init(&lq->list);
 
-    ngx_queue_insert_tail(*locations, &lq->queue);
+    ngx_queue_insert_tail(*locations, &lq->queue); /*挂载到队列*/
 
     return NGX_OK;
 }

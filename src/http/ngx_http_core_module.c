@@ -1541,7 +1541,7 @@ ngx_http_update_location_config(ngx_http_request_t *r)
  */
 
 static ngx_int_t
-ngx_http_core_find_location(ngx_http_request_t *r)
+ngx_http_core_find_location(ngx_http_request_t *r) /*find the location*/
 {
     ngx_int_t                  rc;
     ngx_http_core_loc_conf_t  *pclcf;
@@ -3250,7 +3250,7 @@ ngx_http_core_location(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy) /*locati
 
     save = *cf;                             /*切换上下文*/
     cf->ctx = ctx;                          /*切换上下文配置结构体*/
-    cf->cmd_type = NGX_HTTP_LOC_CONF;
+    cf->cmd_type = NGX_HTTP_LOC_CONF;     /*切换上下文*/
 
     rv = ngx_conf_parse(cf, NULL);        /*解析配置*/
 
