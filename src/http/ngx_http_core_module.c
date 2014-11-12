@@ -294,7 +294,7 @@ static ngx_command_t  ngx_http_core_commands[] = {
       offsetof(ngx_http_core_srv_conf_t, underscores_in_headers),
       NULL },
 
-    { ngx_string("location"),
+    { ngx_string("location"),  /*http框架，location配置块*/ /*location指令只能出现在server,location上下文（NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF）,他是一个复杂配置项（NGX_CONF_BLOCK）*/
       NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_BLOCK|NGX_CONF_TAKE12,
       ngx_http_core_location,
       NGX_HTTP_SRV_CONF_OFFSET,
@@ -3067,7 +3067,7 @@ ngx_http_core_server(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
 
 
 static char *
-ngx_http_core_location(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
+ngx_http_core_location(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy) /*location配置块的回调函数*/
 {
     char                      *rv;
     u_char                    *mod;
@@ -3079,21 +3079,21 @@ ngx_http_core_location(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
     ngx_http_conf_ctx_t       *ctx, *pctx;
     ngx_http_core_loc_conf_t  *clcf, *pclcf;
 
-    ctx = ngx_pcalloc(cf->pool, sizeof(ngx_http_conf_ctx_t));
+    ctx = ngx_pcalloc(cf->pool, sizeof(ngx_http_conf_ctx_t)); /*create ngx_http_conf_ctx_t*/
     if (ctx == NULL) {
         return NGX_CONF_ERROR;
     }
 
-    pctx = cf->ctx;
-    ctx->main_conf = pctx->main_conf;
-    ctx->srv_conf = pctx->srv_conf;
+    pctx = cf->ctx;                         /*keep cf->ctx/cycle->conf_ctx*/
+    ctx->main_conf = pctx->main_conf;     /*cycle->conf_ctx->main_conf*/
+    ctx->srv_conf = pctx->srv_conf;       /*cycle->conf_ctx->srv_conf*/
 
-    ctx->loc_conf = ngx_pcalloc(cf->pool, sizeof(void *) * ngx_http_max_module);
+    ctx->loc_conf = ngx_pcalloc(cf->pool, sizeof(void *) * ngx_http_max_module); /*loc_conf*/
     if (ctx->loc_conf == NULL) {
         return NGX_CONF_ERROR;
     }
 
-    for (i = 0; ngx_modules[i]; i++) {
+    for (i = 0; ngx_modules[i]; i++) {  /*创建loc_conf结构*/
         if (ngx_modules[i]->type != NGX_HTTP_MODULE) {
             continue;
         }
@@ -3112,7 +3112,7 @@ ngx_http_core_location(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
     clcf = ctx->loc_conf[ngx_http_core_module.ctx_index];
     clcf->loc_conf = ctx->loc_conf;
 
-    value = cf->args->elts;
+    value = cf->args->elts; /*数组元素*/
 
     if (cf->args->nelts == 3) {
 
@@ -3120,23 +3120,23 @@ ngx_http_core_location(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
         mod = value[1].data;
         name = &value[2];
 
-        if (len == 1 && mod[0] == '=') {
+        if (len == 1 && mod[0] == '=') {  /*完全匹配*/
 
             clcf->name = *name;
             clcf->exact_match = 1;
 
-        } else if (len == 2 && mod[0] == '^' && mod[1] == '~') {
+        } else if (len == 2 && mod[0] == '^' && mod[1] == '~') { /**/
 
             clcf->name = *name;
             clcf->noregex = 1;
 
-        } else if (len == 1 && mod[0] == '~') {
+        } else if (len == 1 && mod[0] == '~') { /*区分大小写*/
 
             if (ngx_http_core_regex_location(cf, clcf, name, 0) != NGX_OK) {
                 return NGX_CONF_ERROR;
             }
 
-        } else if (len == 2 && mod[0] == '~' && mod[1] == '*') {
+        } else if (len == 2 && mod[0] == '~' && mod[1] == '*') { /*不区分大小写*/
 
             if (ngx_http_core_regex_location(cf, clcf, name, 1) != NGX_OK) {
                 return NGX_CONF_ERROR;
@@ -3194,7 +3194,7 @@ ngx_http_core_location(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
         }
     }
 
-    pclcf = pctx->loc_conf[ngx_http_core_module.ctx_index];
+    pclcf = pctx->loc_conf[ngx_http_core_module.ctx_index]; /*http_core_module对应的loc_conf*/
 
     if (pclcf->name.len) {
 
@@ -3243,16 +3243,16 @@ ngx_http_core_location(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
             return NGX_CONF_ERROR;
         }
     }
-
-    if (ngx_http_add_location(cf, &pclcf->locations, clcf) != NGX_OK) {
+    /*一个server里所有location会以队列的形式管理在locations字段下，具体实现在函数ngx_http_add_location()内*/
+    if (ngx_http_add_location(cf, &pclcf->locations, clcf) != NGX_OK) { /**/
         return NGX_CONF_ERROR;
     }
 
-    save = *cf;
-    cf->ctx = ctx;
+    save = *cf;                             /*切换上下文*/
+    cf->ctx = ctx;                          /*切换上下文配置结构体*/
     cf->cmd_type = NGX_HTTP_LOC_CONF;
 
-    rv = ngx_conf_parse(cf, NULL);
+    rv = ngx_conf_parse(cf, NULL);        /*解析配置*/
 
     *cf = save;
 
