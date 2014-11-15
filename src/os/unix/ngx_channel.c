@@ -194,7 +194,7 @@ ngx_read_channel(ngx_socket_t s, ngx_channel_t *ch, size_t size, ngx_log_t *log)
     return n;
 }
 
-
+/*设置当前进程从 channel[1]中监听事件*/
 ngx_int_t
 ngx_add_channel_event(ngx_cycle_t *cycle, ngx_fd_t fd, ngx_int_t event,
     ngx_event_handler_pt handler)
@@ -202,7 +202,7 @@ ngx_add_channel_event(ngx_cycle_t *cycle, ngx_fd_t fd, ngx_int_t event,
     ngx_event_t       *ev, *rev, *wev;
     ngx_connection_t  *c;
 
-    c = ngx_get_connection(fd, cycle->log);
+    c = ngx_get_connection(fd, cycle->log);                 /*获取一个连接，为 ngx_connection_t 的成员赋值*/
 
     if (c == NULL) {
         return NGX_ERROR;
@@ -210,8 +210,8 @@ ngx_add_channel_event(ngx_cycle_t *cycle, ngx_fd_t fd, ngx_int_t event,
 
     c->pool = cycle->pool;
 
-    rev = c->read;
-    wev = c->write;
+    rev = c->read;                                            /*读事件*/
+    wev = c->write;                                           /*写事件*/
 
     rev->log = cycle->log;
     wev->log = cycle->log;
@@ -223,21 +223,21 @@ ngx_add_channel_event(ngx_cycle_t *cycle, ngx_fd_t fd, ngx_int_t event,
     wev->own_lock = &c->lock;
 #endif
 
-    rev->channel = 1;
-    wev->channel = 1;
+    rev->channel = 1;                                       /*todo*/
+    wev->channel = 1;                                       /*todo*/
 
-    ev = (event == NGX_READ_EVENT) ? rev : wev;
+    ev = (event == NGX_READ_EVENT) ? rev : wev;         /*初始化监听任务*/
 
-    ev->handler = handler;
+    ev->handler = handler;                               /*设置事件处理函数*/
 
     if (ngx_add_conn && (ngx_event_flags & NGX_USE_EPOLL_EVENT) == 0) {
-        if (ngx_add_conn(c) == NGX_ERROR) {
+        if (ngx_add_conn(c) == NGX_ERROR) {             
             ngx_free_connection(c);
             return NGX_ERROR;
         }
 
     } else {
-        if (ngx_add_event(ev, event, 0) == NGX_ERROR) {
+        if (ngx_add_event(ev, event, 0) == NGX_ERROR) { /*将监听任务添加到任务队列*/
             ngx_free_connection(c);
             return NGX_ERROR;
         }

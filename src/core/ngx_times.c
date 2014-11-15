@@ -20,15 +20,15 @@
 
 #define NGX_TIME_SLOTS   64
 
-static ngx_uint_t        slot;
-static ngx_atomic_t      ngx_time_lock;
+static ngx_uint_t        slot;                            /*槽数目*/
+static ngx_atomic_t      ngx_time_lock;                  /*原子变量*/
 
-volatile ngx_msec_t      ngx_current_msec;
-volatile ngx_time_t     *ngx_cached_time;
-volatile ngx_str_t       ngx_cached_err_log_time;
-volatile ngx_str_t       ngx_cached_http_time;
-volatile ngx_str_t       ngx_cached_http_log_time;
-volatile ngx_str_t       ngx_cached_http_log_iso8601;
+volatile ngx_msec_t      ngx_current_msec;               /*todo*/
+volatile ngx_time_t     *ngx_cached_time;                /*todo*/
+volatile ngx_str_t       ngx_cached_err_log_time;        /*todo*/
+volatile ngx_str_t       ngx_cached_http_time;           /*todo*/
+volatile ngx_str_t       ngx_cached_http_log_time;       /*todo*/
+volatile ngx_str_t       ngx_cached_http_log_iso8601;    /*todo*/
 
 #if !(NGX_WIN32)
 
@@ -80,40 +80,40 @@ ngx_time_update(void)
     ngx_time_t      *tp;
     struct timeval   tv;
 
-    if (!ngx_trylock(&ngx_time_lock)) {
+    if (!ngx_trylock(&ngx_time_lock)) { /*原子变量锁，解决信号处理过程中更新时间缓存产生的数据一致性问题*/
         return;
     }
 
-    ngx_gettimeofday(&tv);  /*系统调用*/
+    ngx_gettimeofday(&tv);                                      /*系统调用，获取最新的时间*/
 
-    sec = tv.tv_sec;
-    msec = tv.tv_usec / 1000;
+    sec = tv.tv_sec;                                            /*秒*/
+    msec = tv.tv_usec / 1000;                                   /*毫秒（微秒/1000）*/
 
-    ngx_current_msec = (ngx_msec_t) sec * 1000 + msec;
+    ngx_current_msec = (ngx_msec_t) sec * 1000 + msec;        /*总共毫秒数目*/
 
-    tp = &cached_time[slot]; /*时间缓存槽中最新的缓存时间*/
+    tp = &cached_time[slot];                                    /*时间缓存槽*/
 
-    if (tp->sec == sec) {
-        tp->msec = msec;
-        ngx_unlock(&ngx_time_lock);
+    if (tp->sec == sec) {                                        /*如果当前获取到的最新时间和缓存槽中的一致，那么，解锁退出*/
+        tp->msec = msec;                                         /*todo*/
+        ngx_unlock(&ngx_time_lock);                             /*todo*/
         return;
     }
 
-    if (slot == NGX_TIME_SLOTS - 1) {
+    if (slot == NGX_TIME_SLOTS - 1) {                           /*时间slot数组是循环使用的*/
         slot = 0;
     } else {
         slot++;
     }
 
-    tp = &cached_time[slot];    /*cached_time为时间缓存数组*/
+    tp = &cached_time[slot];                                    /*cached_time为时间缓存数组*/
 
-    tp->sec = sec;
+    tp->sec = sec;                                               /*更新时间*/
     tp->msec = msec;
 
-    ngx_gmtime(sec, &gmt);  /*转换为可读的时间表示结构*/
+    ngx_gmtime(sec, &gmt);                                      /*转换为可读的时间表示结构*/
 
 
-    p0 = &cached_http_time[slot][0]; /*用于记录http请求的时间*/
+    p0 = &cached_http_time[slot][0];                            /*用于记录http请求的时间*/
 
     (void) ngx_sprintf(p0, "%s, %02d %s %4d %02d:%02d:%02d GMT",
                        week[gmt.ngx_tm_wday], gmt.ngx_tm_mday,
@@ -140,7 +140,7 @@ ngx_time_update(void)
 #endif
 
 
-    p1 = &cached_err_log_time[slot][0];  /*用于记录错误日志的时间*/
+    p1 = &cached_err_log_time[slot][0];                             /*用于记录错误日志的时间*/
 
     (void) ngx_sprintf(p1, "%4d/%02d/%02d %02d:%02d:%02d",
                        tm.ngx_tm_year, tm.ngx_tm_mon,
@@ -148,7 +148,7 @@ ngx_time_update(void)
                        tm.ngx_tm_min, tm.ngx_tm_sec);
 
 
-    p2 = &cached_http_log_time[slot][0];  /*用于记录http请求日志的时间*/
+    p2 = &cached_http_log_time[slot][0];                            /*用于记录http请求日志的时间*/
 
     (void) ngx_sprintf(p2, "%02d/%s/%d:%02d:%02d:%02d %c%02d%02d",
                        tm.ngx_tm_mday, months[tm.ngx_tm_mon - 1],
@@ -157,7 +157,7 @@ ngx_time_update(void)
                        tp->gmtoff < 0 ? '-' : '+',
                        ngx_abs(tp->gmtoff / 60), ngx_abs(tp->gmtoff % 60));
 
-    p3 = &cached_http_log_iso8601[slot][0];  /*符合iso8601标准格式的时间*/
+    p3 = &cached_http_log_iso8601[slot][0];                         /*符合iso8601标准格式的时间*/
 
     (void) ngx_sprintf(p3, "%4d-%02d-%02dT%02d:%02d:%02d%c%02d:%02d",
                        tm.ngx_tm_year, tm.ngx_tm_mon,

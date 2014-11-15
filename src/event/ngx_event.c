@@ -221,23 +221,23 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle) /*等待事件发生的函数�
 #endif
     }
 
-    if (ngx_use_accept_mutex) { /*检查accept_mutex锁是否打开*/
-        if (ngx_accept_disabled > 0) { /*通过检验ngx_accept_disabled是否大于0来判断当前进程是否过载*/
-            ngx_accept_disabled--; /*当前进程连接数超过阀值*/
+    if (ngx_use_accept_mutex) {             /*检查accept_mutex锁是否打开*/
+        if (ngx_accept_disabled > 0) {      /*通过检验ngx_accept_disabled是否大于0来判断当前进程是否过载*/
+            ngx_accept_disabled--;          /*当前进程连接数超过阀值*/
 
         } else {
             if (ngx_trylock_accept_mutex(cycle) == NGX_ERROR) {
                 return;
             }
 
-            if (ngx_accept_mutex_held) {/*当前进程获取到了锁*/
-                flags |= NGX_POST_EVENTS;/*flags参数带上NGX_POST_EVENTS*/
+            if (ngx_accept_mutex_held) {    /*当前进程获取到了锁*/
+                flags |= NGX_POST_EVENTS;   /*标记当前到来的事件已经被该工作进程接收*/
 
             } else {
                 if (timer == NGX_TIMER_INFINITE
                     || timer > ngx_accept_mutex_delay)
                 {
-                    timer = ngx_accept_mutex_delay; /*没抢到锁，那么至少等ngx_accept_mutex_delay毫秒再去试图抢锁*/
+                    timer = ngx_accept_mutex_delay; /*推迟一段时间，再去抢锁*/
                 }
             }
         }
@@ -245,19 +245,19 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle) /*等待事件发生的函数�
 
     delta = ngx_current_msec;
 
-    (void) ngx_process_events(cycle, timer, flags); /*实际进入ngx_epoll_module模块*/
+    (void) ngx_process_events(cycle, timer, flags); /*调用各种事件驱动机制下的事件处理函数，实际进入ngx_epoll_module模块*/
 
-    delta = ngx_current_msec - delta; /*delta是ngx_process_events执行时候消耗的毫秒数,会影响到下面触发定时器的执行*/
+    delta = ngx_current_msec - delta;                /*delta是ngx_process_events执行时候消耗的毫秒数,会影响到下面触发定时器的执行*/
 
     ngx_log_debug1(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
                    "timer delta: %M", delta);
 
-    if (ngx_posted_accept_events) {
+    if (ngx_posted_accept_events) {                  /*存放事件的队列*/
         ngx_event_process_posted(cycle, &ngx_posted_accept_events);
     }
 
     if (ngx_accept_mutex_held) {
-        ngx_shmtx_unlock(&ngx_accept_mutex);
+        ngx_shmtx_unlock(&ngx_accept_mutex);        /*释放accept_mutex互斥量*/
     }
 
     if (delta) {
@@ -267,7 +267,7 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle) /*等待事件发生的函数�
     ngx_log_debug1(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
                    "posted events %p", ngx_posted_events);
 
-    if (ngx_posted_events) {
+    if (ngx_posted_events) {                        /*非网络请求事件,这些事件来自与事件驱动模块本身，都调用每个事件自己的处理方法进行处理*/
         if (ngx_threaded) {
             ngx_wakeup_worker_thread(cycle);
 

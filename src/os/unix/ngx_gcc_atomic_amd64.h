@@ -77,6 +77,6 @@ ngx_atomic_fetch_add(ngx_atomic_t *value, ngx_atomic_int_t add)
 }
 
 
-#define ngx_memory_barrier()    __asm__ volatile ("" ::: "memory")
+#define ngx_memory_barrier()    __asm__ volatile ("" ::: "memory")   /*避免上下语句合并优化，导致数据不一致的错误*/
 
 #define ngx_cpu_pause()         __asm__ ("pause")

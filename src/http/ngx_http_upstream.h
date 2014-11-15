@@ -62,14 +62,14 @@ typedef struct {
     off_t                            response_length;
 
     ngx_str_t                       *peer;
-} ngx_http_upstream_state_t;
+} ngx_http_upstream_state_t;                            /*todo*/
 
 
 typedef struct {
     ngx_hash_t                       headers_in_hash;
     ngx_array_t                      upstreams;
                                              /* ngx_http_upstream_srv_conf_t */
-} ngx_http_upstream_main_conf_t;
+} ngx_http_upstream_main_conf_t;            /*main级别的配置结构体*/
 
 typedef struct ngx_http_upstream_srv_conf_s  ngx_http_upstream_srv_conf_t;
 
@@ -83,19 +83,19 @@ typedef struct {
     ngx_http_upstream_init_pt        init_upstream;
     ngx_http_upstream_init_peer_pt   init;
     void                            *data;
-} ngx_http_upstream_peer_t;
+} ngx_http_upstream_peer_t;                                /*todo*/
 
 
 typedef struct {
-    ngx_addr_t                      *addrs;     /*数组指针，指向一个ip地址数组，因为一个域名可能有多个ip地址*/
-    ngx_uint_t                       naddrs;    /*指定ip地址数组元素的个数*/
-    ngx_uint_t                       weight;
+    ngx_addr_t                      *addrs;                 /*数组指针，指向一个ip地址数组，因为一个域名可能有多个ip地址*/
+    ngx_uint_t                       naddrs;                /*指定ip地址数组元素的个数*/
+    ngx_uint_t                       weight;                /*初始权重*/
     ngx_uint_t                       max_fails;
     time_t                           fail_timeout;
 
-    unsigned                         down:1;         /*宕机标记*/
-    unsigned                         backup:1;      /*后备标记*/
-} ngx_http_upstream_server_t;       /* todo 该结构体？？不懂*/
+    unsigned                         down:1;                /*宕机标记*/
+    unsigned                         backup:1;              /*后备标记*/
+} ngx_http_upstream_server_t;                              /*上游服务器*/
 
 
 #define NGX_HTTP_UPSTREAM_CREATE        0x0001
@@ -106,7 +106,7 @@ typedef struct {
 #define NGX_HTTP_UPSTREAM_BACKUP        0x0020
 
 
-struct ngx_http_upstream_srv_conf_s {
+struct ngx_http_upstream_srv_conf_s {  /*server级别*/
     ngx_http_upstream_peer_t         peer;
     void                           **srv_conf;
 
@@ -125,15 +125,15 @@ struct ngx_http_upstream_srv_conf_s {
 typedef struct {
     ngx_addr_t                      *addr;
     ngx_http_complex_value_t        *value;
-} ngx_http_upstream_local_t;
+} ngx_http_upstream_local_t;                    /*todo*/
 
 
 typedef struct {
     ngx_http_upstream_srv_conf_t    *upstream;
 
-    ngx_msec_t                       connect_timeout;   /*连接上游服务器的超时时间，单位为毫秒*/
-    ngx_msec_t                       send_timeout;  /*发送TCP包到上游服务器超时时间，单位为毫秒*/
-    ngx_msec_t                       read_timeout;/*接收TCP包到上游服务器超时时间，单位为毫秒*/
+    ngx_msec_t                       connect_timeout;           /*连接上游服务器的超时时间，单位为毫秒*/
+    ngx_msec_t                       send_timeout;              /*发送TCP包到上游服务器超时时间，单位为毫秒*/
+    ngx_msec_t                       read_timeout;              /*接收TCP包到上游服务器超时时间，单位为毫秒*/
     ngx_msec_t                       timeout;
 
     size_t                           send_lowat;
@@ -198,7 +198,7 @@ typedef struct {
 #endif
 
     ngx_str_t                        module;
-} ngx_http_upstream_conf_t; /*用于设置upstream模块处理请求时候的参数*/
+} ngx_http_upstream_conf_t;                                     /*用于设置upstream模块处理请求时候的参数*/
 
 
 typedef struct {
@@ -207,8 +207,8 @@ typedef struct {
     ngx_uint_t                       offset;
     ngx_http_header_handler_pt       copy_handler;
     ngx_uint_t                       conf;
-    ngx_uint_t                       redirect;  /* unsigned   redirect:1; */
-} ngx_http_upstream_header_t;
+    ngx_uint_t                       redirect;           /* unsigned   redirect:1; */
+} ngx_http_upstream_header_t;                           /**/
 
 
 typedef struct {
@@ -253,16 +253,16 @@ typedef struct {
 typedef struct {
     ngx_str_t                        host;
     in_port_t                        port;
-    ngx_uint_t                       no_port; /* unsigned no_port:1 */
+    ngx_uint_t                       no_port;       /* unsigned no_port:1 */
 
-    ngx_uint_t                       naddrs;/*地址个数*/
-    ngx_addr_t                      *addrs;/*？？？*/
+    ngx_uint_t                       naddrs;        /*地址个数*/
+    ngx_addr_t                      *addrs;         /*todo*/
 
-    struct sockaddr                 *sockaddr;/*上游服务器的地址*/
+    struct sockaddr                 *sockaddr;     /*上游服务器的地址*/
     socklen_t                        socklen;
 
     ngx_resolver_ctx_t              *ctx;
-} ngx_http_upstream_resolved_t; /*设置上游服务器的地址结构*/
+} ngx_http_upstream_resolved_t;                    /*设置上游服务器的地址结构*/
 
 
 typedef void (*ngx_http_upstream_handler_pt)(ngx_http_request_t *r,
@@ -277,20 +277,20 @@ struct ngx_http_upstream_s {
 
     ngx_event_pipe_t                *pipe;
 
-    ngx_chain_t                     *request_bufs;  /*request_bufs决定发送什么样的请求给上有服务器，在实现create_request方法时需要设置它*/
+    ngx_chain_t                     *request_bufs;              /*request_bufs决定发送什么样的请求给上有服务器，在实现create_request方法时需要设置它*/
 
     ngx_output_chain_ctx_t           output;
     ngx_chain_writer_ctx_t           writer;
 
-    ngx_http_upstream_conf_t        *conf;  /*upstream访问的时的所有限制性参数*/
+    ngx_http_upstream_conf_t        *conf;                     /*upstream访问的时的所有限制性参数*/
 
     ngx_http_upstream_headers_in_t   headers_in;
 
-    ngx_http_upstream_resolved_t    *resolved;/*通过resolved可以直接指定上游服务器地址*/
+    ngx_http_upstream_resolved_t    *resolved;                /*通过resolved可以直接指定上游服务器地址*/
 
     ngx_buf_t                        from_client;
 
-    ngx_buf_t                        buffer;    /*存储接受自上游服务器发来的相应内容*/
+    ngx_buf_t                        buffer;                    /*存储接受自上游服务器发来的相应内容*/
     off_t                            length;
 
     ngx_chain_t                     *out_bufs;
@@ -309,7 +309,7 @@ struct ngx_http_upstream_s {
     ngx_int_t                      (*process_header)(ngx_http_request_t *r);
     void                           (*abort_request)(ngx_http_request_t *r);
     void                           (*finalize_request)(ngx_http_request_t *r,
-                                         ngx_int_t rc); /*销毁upstream请求时候调用*/
+                                         ngx_int_t rc);             /*销毁upstream请求时候调用*/
     ngx_int_t                      (*rewrite_redirect)(ngx_http_request_t *r,
                                          ngx_table_elt_t *h, size_t prefix);
     ngx_int_t                      (*rewrite_cookie)(ngx_http_request_t *r,
@@ -345,14 +345,14 @@ struct ngx_http_upstream_s {
 typedef struct {
     ngx_uint_t                      status;
     ngx_uint_t                      mask;
-} ngx_http_upstream_next_t;
+} ngx_http_upstream_next_t;                 /*todo*/
 
 
 typedef struct {
     ngx_str_t   key;
     ngx_str_t   value;
     ngx_uint_t  skip_empty;
-} ngx_http_upstream_param_t;
+} ngx_http_upstream_param_t;                /*todo*/
 
 
 ngx_int_t ngx_http_upstream_header_variable(ngx_http_request_t *r,
