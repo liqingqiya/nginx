@@ -285,7 +285,7 @@ ngx_http_upstream_header_t  ngx_http_upstream_headers_in[] = {
 };
 
 
-static ngx_command_t  ngx_http_upstream_commands[] = {      /*指令结构，但是现在我还没有深刻的理解？？*/
+static ngx_command_t  ngx_http_upstream_commands[] = {      /**/
 
     { ngx_string("upstream"),
       NGX_HTTP_MAIN_CONF|NGX_CONF_BLOCK|NGX_CONF_TAKE1,
@@ -403,9 +403,9 @@ ngx_conf_bitmask_t  ngx_http_upstream_ignore_headers_masks[] = {
 
 
 ngx_int_t
-ngx_http_upstream_create(ngx_http_request_t *r)
+ngx_http_upstream_create(ngx_http_request_t *r) /*当作为反向代理的时候，会用到，这里创建upstream结构*/
 {
-    ngx_http_upstream_t  *u;
+    ngx_http_upstream_t  *u; /*upstream , as proxy*/
 
     u = r->upstream;
 
@@ -414,14 +414,14 @@ ngx_http_upstream_create(ngx_http_request_t *r)
         ngx_http_upstream_cleanup(r);
     }
 
-    u = ngx_pcalloc(r->pool, sizeof(ngx_http_upstream_t));
+    u = ngx_pcalloc(r->pool, sizeof(ngx_http_upstream_t));  /*在内存池中创建upstream结构*/
     if (u == NULL) {
         return NGX_ERROR;
     }
 
-    r->upstream = u;
+    r->upstream = u;                     /*赋值给request结构*/
 
-    u->peer.log = r->connection->log;
+    u->peer.log = r->connection->log;  /*初始化日志*/
     u->peer.log_error = NGX_ERROR_ERR;
 #if (NGX_THREADS)
     u->peer.lock = &r->connection->lock;

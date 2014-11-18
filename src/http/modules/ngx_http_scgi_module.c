@@ -402,7 +402,7 @@ ngx_http_scgi_handler(ngx_http_request_t *r)
     ngx_http_upstream_t       *u;
     ngx_http_scgi_loc_conf_t  *scf;
 
-    if (ngx_http_upstream_create(r) != NGX_OK) {
+    if (ngx_http_upstream_create(r) != NGX_OK) { /*当作为反向代理的时候，会用到，这里创建upstream结构*/
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 

@@ -589,25 +589,25 @@ static ngx_path_init_t  ngx_http_fastcgi_temp_path = {
 
 
 static ngx_int_t
-ngx_http_fastcgi_handler(ngx_http_request_t *r)
+ngx_http_fastcgi_handler(ngx_http_request_t *r) /*proxy module*/
 {
     ngx_int_t                     rc;
     ngx_http_upstream_t          *u;
     ngx_http_fastcgi_ctx_t       *f;
     ngx_http_fastcgi_loc_conf_t  *flcf;
 
-    if (ngx_http_upstream_create(r) != NGX_OK) {
+    if (ngx_http_upstream_create(r) != NGX_OK) { /*当作为反向代理的时候，会用到，这里创建upstream结构*/
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
-    f = ngx_pcalloc(r->pool, sizeof(ngx_http_fastcgi_ctx_t));
+    f = ngx_pcalloc(r->pool, sizeof(ngx_http_fastcgi_ctx_t)); /* 该模块的上下文结构 ngx_http_fastcgi_ctx_t */
     if (f == NULL) {
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
-    ngx_http_set_ctx(r, f, ngx_http_fastcgi_module);
+    ngx_http_set_ctx(r, f, ngx_http_fastcgi_module);  /*todo*/
 
-    flcf = ngx_http_get_module_loc_conf(r, ngx_http_fastcgi_module);
+    flcf = ngx_http_get_module_loc_conf(r, ngx_http_fastcgi_module); /*获取该模块设置在location配置块的配置结构*/
 
     if (flcf->fastcgi_lengths) {
         if (ngx_http_fastcgi_eval(r, flcf) != NGX_OK) {
@@ -617,7 +617,7 @@ ngx_http_fastcgi_handler(ngx_http_request_t *r)
 
     u = r->upstream;
 
-    ngx_str_set(&u->schema, "fastcgi://");
+    ngx_str_set(&u->schema, "fastcgi://");                          /*todo???这里就是对r->upstream结构做设置吗？*/
     u->output.tag = (ngx_buf_tag_t) &ngx_http_fastcgi_module;
 
     u->conf = &flcf->upstream;
@@ -646,13 +646,13 @@ ngx_http_fastcgi_handler(ngx_http_request_t *r)
     u->input_filter = ngx_http_fastcgi_non_buffered_filter;
     u->input_filter_ctx = r;
 
-    rc = ngx_http_read_client_request_body(r, ngx_http_upstream_init);
+    rc = ngx_http_read_client_request_body(r, ngx_http_upstream_init); /*todo*/
 
     if (rc >= NGX_HTTP_SPECIAL_RESPONSE) {
         return rc;
     }
 
-    return NGX_DONE;
+    return NGX_DONE;            /*result*/
 }
 
 
