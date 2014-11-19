@@ -1,4 +1,4 @@
-
+/*自动化脚本生成的头文件，根据自身的操作系统定义了很多的宏定义，用于选择跨平台的头文件*/
 
 #ifndef NGX_HAVE_UNISTD_H
 #define NGX_HAVE_UNISTD_H  1

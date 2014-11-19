@@ -39,7 +39,7 @@
 
 
 #else /* POSIX */
-#include <ngx_posix_config.h>
+#include <ngx_posix_config.h>    			/*跨平台文件,这个文件会导入所有的要用到的头文件*/
 
 #endif
 
@@ -51,13 +51,13 @@
 
 #if !(NGX_WIN32)
 
-#define ngx_signal_helper(n)     SIG##n  /*SIG##n 粘接符号*/
+#define ngx_signal_helper(n)     SIG##n   			/*SIG##n 粘接符号*/
 #define ngx_signal_value(n)      ngx_signal_helper(n)  
 
 #define ngx_random               random
 
 /* TODO: #ifndef */
-#define NGX_SHUTDOWN_SIGNAL      QUIT /*nginx自己封装的信号*/
+#define NGX_SHUTDOWN_SIGNAL      QUIT   				/*nginx自己封装的信号*/
 #define NGX_TERMINATE_SIGNAL     TERM
 #define NGX_NOACCEPT_SIGNAL      WINCH
 #define NGX_RECONFIGURE_SIGNAL   HUP

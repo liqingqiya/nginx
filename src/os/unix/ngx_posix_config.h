@@ -4,7 +4,7 @@
  * Copyright (C) Nginx, Inc.
  */
 
-
+/*与系统相关的头文件，几乎所有的头文件都是包含在这个文件的*/
 #ifndef _NGX_POSIX_CONFIG_H_INCLUDED_
 #define _NGX_POSIX_CONFIG_H_INCLUDED_
 
