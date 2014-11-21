@@ -7,7 +7,7 @@
 
 #include <ngx_config.h>
 #include <ngx_core.h>
-#include <ngx_event.h>
+#include <ngx_event.h>                      /*事件驱动模块的通用接口*/
 
 
 #if (NGX_TEST_BUILD_EPOLL)
@@ -34,14 +34,14 @@
 #define EPOLL_CTL_DEL  2
 #define EPOLL_CTL_MOD  3
 
-typedef union epoll_data {
+typedef union epoll_data {                      /*这个结构体是存储什么数据的？？todo*/
     void         *ptr;
     int           fd;
     uint32_t      u32;
     uint64_t      u64;
 } epoll_data_t;
 
-struct epoll_event {
+struct epoll_event {                             /*这个结构体是存储什么数据的？？todo*/
     uint32_t      events;
     epoll_data_t  data;
 };
@@ -93,7 +93,7 @@ struct io_event {
 
 typedef struct {
     ngx_uint_t  events;             /*todo*/
-    ngx_uint_t  aio_requests;       /*todo*/
+    ngx_uint_t  aio_requests;      /*todo*/
 } ngx_epoll_conf_t;                 /*epoll模块配置存储的结构体*/
 
 
@@ -116,9 +116,9 @@ static void ngx_epoll_eventfd_handler(ngx_event_t *ev);
 static void *ngx_epoll_create_conf(ngx_cycle_t *cycle);
 static char *ngx_epoll_init_conf(ngx_cycle_t *cycle, void *conf);
 
-static int                  ep = -1;  /**/
-static struct epoll_event  *event_list; /*事件结构数组, epoll_event是linux针对c开放的一个接口，表示事件*/
-static ngx_uint_t           nevents;  /*todo*/
+static int                  ep = -1;                    /*创建epoll结构的时候的返回值*/
+static struct epoll_event  *event_list;              /*事件结构数组, epoll_event是linux针对c开放的一个接口，表示事件*/
+static ngx_uint_t           nevents;                  /*事件的个数*/
 
 #if (NGX_HAVE_FILE_AIO)
 
@@ -134,14 +134,14 @@ static ngx_str_t      epoll_name = ngx_string("epoll");
 
 static ngx_command_t  ngx_epoll_commands[] = {
 
-    { ngx_string("epoll_events"),
+    { ngx_string("epoll_events"),                       /*epoll模块会从这两个指令中获取配置值*/
       NGX_EVENT_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_num_slot,
       0,
       offsetof(ngx_epoll_conf_t, events),
       NULL },
 
-    { ngx_string("worker_aio_requests"),
+    { ngx_string("worker_aio_requests"),               /*epoll模块会从这两个指令中获取配置值*/
       NGX_EVENT_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_num_slot,
       0,
@@ -383,13 +383,13 @@ ngx_epoll_done(ngx_cycle_t *cycle)
 
 
 static ngx_int_t
-ngx_epoll_add_event(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags)
+ngx_epoll_add_event(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags)    /*epoll模型库删除事件的一个封装*/
 {
     int                  op;
     uint32_t             events, prev;
     ngx_event_t         *e;
     ngx_connection_t    *c;
-    struct epoll_event   ee;
+    struct epoll_event   ee;                        /*与操作系统相关的一个结构体,epoll事件结构体*/
 
     c = ev->data;
 
@@ -425,7 +425,7 @@ ngx_epoll_add_event(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags)
                    "epoll add event: fd:%d op:%d ev:%08XD",
                    c->fd, op, ee.events);
 
-    if (epoll_ctl(ep, op, c->fd, &ee) == -1) {
+    if (epoll_ctl(ep, op, c->fd, &ee) == -1) {                      /*加入事件到epoll模型监控中*/
         ngx_log_error(NGX_LOG_ALERT, ev->log, ngx_errno,
                       "epoll_ctl(%d, %d) failed", op, c->fd);
         return NGX_ERROR;
@@ -441,7 +441,7 @@ ngx_epoll_add_event(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags)
 
 
 static ngx_int_t
-ngx_epoll_del_event(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags)
+ngx_epoll_del_event(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags)     /*epoll模型库删除事件的一个封装*/
 {
     int                  op;
     uint32_t             prev;
@@ -499,7 +499,7 @@ ngx_epoll_del_event(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags)
 
 
 static ngx_int_t
-ngx_epoll_add_connection(ngx_connection_t *c)
+ngx_epoll_add_connection(ngx_connection_t *c)   /*todo*/
 {
     struct epoll_event  ee;
 
