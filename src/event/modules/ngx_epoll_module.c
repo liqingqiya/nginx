@@ -296,10 +296,10 @@ ngx_epoll_init(ngx_cycle_t *cycle, ngx_msec_t timer)
 {
     ngx_epoll_conf_t  *epcf;
 
-    epcf = ngx_event_get_conf(cycle->conf_ctx, ngx_epoll_module);
+    epcf = ngx_event_get_conf(cycle->conf_ctx, ngx_epoll_module);       /*获取配置*/
 
     if (ep == -1) {
-        ep = epoll_create(cycle->connection_n / 2);
+        ep = epoll_create(cycle->connection_n / 2);                       /*系统调用，创建epoll对象*/
 
         if (ep == -1) {
             ngx_log_error(NGX_LOG_EMERG, cycle->log, ngx_errno,
@@ -309,7 +309,7 @@ ngx_epoll_init(ngx_cycle_t *cycle, ngx_msec_t timer)
 
 #if (NGX_HAVE_FILE_AIO)
 
-        ngx_epoll_aio_init(cycle, epcf);
+        ngx_epoll_aio_init(cycle, epcf);        /*异步？？todo默认编译不会被执行到*/
 
 #endif
     }
@@ -320,17 +320,17 @@ ngx_epoll_init(ngx_cycle_t *cycle, ngx_msec_t timer)
         }
 
         event_list = ngx_alloc(sizeof(struct epoll_event) * epcf->events,
-                               cycle->log);
-        if (event_list == NULL) {
+                               cycle->log);                                         /*创建事件列表,epcf->events为512*/
+        if (event_list == NULL) {                                                  /*事件列表*/
             return NGX_ERROR;
         }
     }
 
-    nevents = epcf->events;
+    nevents = epcf->events; 
 
-    ngx_io = ngx_os_io;
+    ngx_io = ngx_os_io;                                         /*todo*/
 
-    ngx_event_actions = ngx_epoll_module_ctx.actions; /*ngx_event_actions的赋值*/
+    ngx_event_actions = ngx_epoll_module_ctx.actions;       /*在特定的事件驱动模块里对全局变量ngx_event_actions进行赋值*/
 
 #if (NGX_HAVE_CLEAR_EVENT)
     ngx_event_flags = NGX_USE_CLEAR_EVENT

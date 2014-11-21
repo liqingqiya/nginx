@@ -218,25 +218,25 @@ struct ngx_event_aio_s {
 
 
 typedef struct {
-    ngx_int_t  (*add)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);  /*将某描述符的事件添加到事件驱动列表中*/
-    ngx_int_t  (*del)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);/*将某描述符的事件从事件驱动列表中删除*/
+    ngx_int_t  (*add)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);      /*将某描述符的事件添加到事件驱动列表中*/
+    ngx_int_t  (*del)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);      /*将某描述符的事件从事件驱动列表中删除*/
 
-    ngx_int_t  (*enable)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);/*启动对某个事件的监控*/
-    ngx_int_t  (*disable)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);/*禁止对某个事件的监控*/
+    ngx_int_t  (*enable)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);   /*启动对某个事件的监控*/
+    ngx_int_t  (*disable)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);  /*禁止对某个事件的监控*/
 
-    ngx_int_t  (*add_conn)(ngx_connection_t *c);/*将指定的连接关联的描述符添加到多路io复用的监控里*/
-    ngx_int_t  (*del_conn)(ngx_connection_t *c, ngx_uint_t flags);/*将指定的连接关联的描述符从多路复用的监控里删除*/
+    ngx_int_t  (*add_conn)(ngx_connection_t *c);                                    /*将指定的连接关联的描述符添加到多路io复用的监控里*/
+    ngx_int_t  (*del_conn)(ngx_connection_t *c, ngx_uint_t flags);                /*将指定的连接关联的描述符从多路复用的监控里删除*/
 
     ngx_int_t  (*process_changes)(ngx_cycle_t *cycle, ngx_uint_t nowait);
     ngx_int_t  (*process_events)(ngx_cycle_t *cycle, ngx_msec_t timer,
-                   ngx_uint_t flags);/*阻塞等待事件发生,对发生的事件进行逐个处理*/
+                   ngx_uint_t flags);                                                   /*阻塞等待事件发生,对发生的事件进行逐个处理*/
 
-    ngx_int_t  (*init)(ngx_cycle_t *cycle, ngx_msec_t timer);/*初始化*/
-    void       (*done)(ngx_cycle_t *cycle);/*释放资源*/
-} ngx_event_actions_t; /*I/O多路复用模型统一接口*/
+    ngx_int_t  (*init)(ngx_cycle_t *cycle, ngx_msec_t timer);                       /*初始化*/
+    void       (*done)(ngx_cycle_t *cycle);                                            /*释放资源*/
+} ngx_event_actions_t;                                                                 /*I/O多路复用模型统一接口*/
 
 
-extern ngx_event_actions_t   ngx_event_actions;
+extern ngx_event_actions_t   ngx_event_actions;                                     /*初始化赋值是在各个事件处理模块的初始化函数内，比如epoll模块，事件行为接口*/
 
 
 /*
@@ -440,17 +440,17 @@ extern ngx_event_actions_t   ngx_event_actions;
 #endif
 
 
-#define ngx_process_changes  ngx_event_actions.process_changes
-#define ngx_process_events   ngx_event_actions.process_events
-#define ngx_done_events      ngx_event_actions.done
+#define ngx_process_changes  ngx_event_actions.process_changes    /*定义宏，简化使用*/
+#define ngx_process_events   ngx_event_actions.process_events     /*阻塞等待事件发生，对发生的事件逐个处理, 定义宏，简化使用*/
+#define ngx_done_events      ngx_event_actions.done                 /*定义宏，简化使用*/
 
-#define ngx_add_event        ngx_event_actions.add /*添加事件*/
-#define ngx_del_event        ngx_event_actions.del  /*删除事件*/
+#define ngx_add_event        ngx_event_actions.add                  /*添加事件*/
+#define ngx_del_event        ngx_event_actions.del                  /*删除事件*/
 #define ngx_add_conn         ngx_event_actions.add_conn
 #define ngx_del_conn         ngx_event_actions.del_conn
 
-#define ngx_add_timer        ngx_event_add_timer
-#define ngx_del_timer        ngx_event_del_timer
+#define ngx_add_timer        ngx_event_add_timer                    /*定时器事件？？todo*/
+#define ngx_del_timer        ngx_event_del_timer                    /*定时器事件？？todo*/
 
 
 extern ngx_os_io_t  ngx_io;
