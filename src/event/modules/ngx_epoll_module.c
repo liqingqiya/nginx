@@ -561,7 +561,7 @@ ngx_epoll_del_connection(ngx_connection_t *c, ngx_uint_t flags)
 
 /*nginx事件机制的核心*/
 static ngx_int_t
-ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
+ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)    /*进程处理事件*/
 {
     int                events;
     uint32_t           revents;
@@ -681,13 +681,13 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
                 rev->ready = 1; /*todo*/
             }
 
-            if (flags & NGX_POST_EVENTS) {
+            if (flags & NGX_POST_EVENTS) { /*获取到锁的进程，处理事件延后，事件缓存*/
                 queue = (ngx_event_t **) (rev->accept ?
                                &ngx_posted_accept_events : &ngx_posted_events);
 
-                ngx_locked_post_event(rev, queue);
+                ngx_locked_post_event(rev, queue);  /*事件缓存*/
 
-            } else {
+            } else { /*调用事件回调函数*/
                 rev->handler(rev); /*读事件的回调函数, handler->filter*/
             }
         }
@@ -715,10 +715,10 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
                 wev->ready = 1;
             }
 
-            if (flags & NGX_POST_EVENTS) {
-                ngx_locked_post_event(wev, &ngx_posted_events);
+            if (flags & NGX_POST_EVENTS) { /*获取到锁的进程，处理事件延后，事件缓存*/
+                ngx_locked_post_event(wev, &ngx_posted_events); /*事件缓存*/
 
-            } else {
+            } else { /*直接处理,调用事件回调函数*/
                 wev->handler(wev); /*写事件的回调函数, handler->filter*/
             }
         }

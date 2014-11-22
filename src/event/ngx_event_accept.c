@@ -380,7 +380,7 @@ ngx_trylock_accept_mutex(ngx_cycle_t *cycle)
         {
             return NGX_OK;
         }
-        /*将所有监听连接的读事件添加到当前的epoll等事件驱动模块中*/
+        /*将所有监听连接的读事件添加到当前的epoll等事件驱动模块中/添加到自身的进程的事件监听机制中*/
         if (ngx_enable_accept_events(cycle) == NGX_ERROR) {
             ngx_shmtx_unlock(&ngx_accept_mutex); /*添加失败，那么就必须释放ngx_accept_mutex锁*/
             return NGX_ERROR;

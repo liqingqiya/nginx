@@ -20,7 +20,7 @@ ngx_mutex_t                      *ngx_posted_events_mutex;
 
 void
 ngx_event_process_posted(ngx_cycle_t *cycle,
-    ngx_thread_volatile ngx_event_t **posted)
+    ngx_thread_volatile ngx_event_t **posted)       /*处理缓存队列的事件*/
 {
     ngx_event_t  *ev;
 
@@ -35,9 +35,9 @@ ngx_event_process_posted(ngx_cycle_t *cycle,
             return;
         }
 
-        ngx_delete_posted_event(ev);
+        ngx_delete_posted_event(ev);                  /*将事件从缓存队列中删除*/
 
-        ev->handler(ev);
+        ev->handler(ev);                                /*回调函数*/
     }
 }
 
