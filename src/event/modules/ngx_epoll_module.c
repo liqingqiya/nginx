@@ -14,34 +14,34 @@
 
 /* epoll declarations */
 
-#define EPOLLIN        0x001
-#define EPOLLPRI       0x002
-#define EPOLLOUT       0x004
-#define EPOLLRDNORM    0x040
-#define EPOLLRDBAND    0x080
-#define EPOLLWRNORM    0x100
-#define EPOLLWRBAND    0x200
-#define EPOLLMSG       0x400
-#define EPOLLERR       0x008
-#define EPOLLHUP       0x010
+#define EPOLLIN        0x001                /*普通数据可读 TODO*/
+#define EPOLLPRI       0x002                /*高级优先级数据可读 TODO*/
+#define EPOLLOUT       0x004                /*普通数据可写 TODO*/
+#define EPOLLRDNORM    0x040                /*TODO*/
+#define EPOLLRDBAND    0x080                /*TODO*/
+#define EPOLLWRNORM    0x100                /*TODO*/
+#define EPOLLWRBAND    0x200                /**/
+#define EPOLLMSG       0x400                /**/
+#define EPOLLERR       0x008                /*发生错误*/
+#define EPOLLHUP       0x010                /*发生挂起*/
 
 #define EPOLLRDHUP     0x2000
 
-#define EPOLLET        0x80000000
+#define EPOLLET        0x80000000           /*边缘方式触发*/
 #define EPOLLONESHOT   0x40000000
 
 #define EPOLL_CTL_ADD  1
 #define EPOLL_CTL_DEL  2
 #define EPOLL_CTL_MOD  3
 
-typedef union epoll_data {                      /*这个结构体是存储什么数据的？？todo*/
+typedef union epoll_data {                      /*这个结构体是存储什么数据的？用户数据？todo*/
     void         *ptr;
     int           fd;
     uint32_t      u32;
     uint64_t      u64;
 } epoll_data_t;
 
-struct epoll_event {                             /*这个结构体是存储什么数据的？？todo*/
+struct epoll_event {                             /*这个结构体是存储什么数据的？epoll_ctl第四个参数？todo*/
     uint32_t      events;
     epoll_data_t  data;
 };

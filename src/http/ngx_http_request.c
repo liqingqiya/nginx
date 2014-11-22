@@ -2166,7 +2166,7 @@ ngx_http_find_virtual_server(ngx_connection_t *c,
 
 
 static void
-ngx_http_request_handler(ngx_event_t *ev)
+ngx_http_request_handler(ngx_event_t *ev)  /*写事件的回调函数，将响应数据发回给客户端之后，将写事件的回调函数设置为ngx_http_empty_handler()*/
 {
     ngx_connection_t    *c;
     ngx_http_request_t  *r;
@@ -3052,7 +3052,7 @@ ngx_http_set_keepalive(ngx_http_request_t *r)
 
 
 static void
-ngx_http_keepalive_handler(ngx_event_t *rev)
+ngx_http_keepalive_handler(ngx_event_t *rev)  /*如果客户端关闭了连接，那么nginx同样能够收到一个可读事件，调用ngx_http_keepalive_handler()函数却读取不到数据，于是关闭连接，回收资源，函数返回。*/
 {
     size_t             size;
     ssize_t            n;
@@ -3081,7 +3081,7 @@ ngx_http_keepalive_handler(ngx_event_t *rev)
                 c->ssl->no_send_shutdown = 1;
             }
 #endif
-            ngx_http_close_connection(c);
+            ngx_http_close_connection(c);  /*关闭连接*/
             return;
         }
     }
@@ -3178,7 +3178,7 @@ ngx_http_keepalive_handler(ngx_event_t *rev)
     ngx_del_timer(rev);
 
     rev->handler = ngx_http_process_request_line;
-    ngx_http_process_request_line(rev); /*处理流水线*/
+    ngx_http_process_request_line(rev);             /*处理流水线*/
 }
 
 
