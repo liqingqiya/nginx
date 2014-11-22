@@ -25,7 +25,7 @@ static ngx_rbtree_node_t          ngx_event_timer_sentinel;
  */
 
 ngx_int_t
-ngx_event_timer_init(ngx_log_t *log)
+ngx_event_timer_init(ngx_log_t *log)                    /*event_timer模块初始化函数*/
 {
     ngx_rbtree_init(&ngx_event_timer_rbtree, &ngx_event_timer_sentinel,
                     ngx_rbtree_insert_timer_value);
@@ -49,7 +49,7 @@ ngx_event_timer_init(ngx_log_t *log)
 
 
 ngx_msec_t
-ngx_event_find_timer(void) /*得到最近超时时间*/
+ngx_event_find_timer(void)                  /*该函数就是从红黑树中找到key最小的节点，得到最近超时时间*/
 {
     ngx_msec_int_t      timer;
     ngx_rbtree_node_t  *node, *root, *sentinel;
@@ -74,7 +74,7 @@ ngx_event_find_timer(void) /*得到最近超时时间*/
 
 
 void
-ngx_event_expire_timers(void)
+ngx_event_expire_timers(void)                       /*超时检测函数*/
 {
     ngx_event_t        *ev;
     ngx_rbtree_node_t  *node, *root, *sentinel;
@@ -88,7 +88,7 @@ ngx_event_expire_timers(void)
         root = ngx_event_timer_rbtree.root;
 
         if (root == sentinel) {
-            return;
+            return;                     /*空树*/
         }
 
         node = ngx_rbtree_min(root, sentinel);
