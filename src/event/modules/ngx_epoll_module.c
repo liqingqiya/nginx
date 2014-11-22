@@ -681,14 +681,14 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
                 rev->ready = 1; /*todo*/
             }
 
-            if (flags & NGX_POST_EVENTS) { /*获取到锁的进程，处理事件延后，事件缓存*/
+            if (flags & NGX_POST_EVENTS) {                      /*获取到锁的进程，处理事件延后，事件缓存*/
                 queue = (ngx_event_t **) (rev->accept ?
                                &ngx_posted_accept_events : &ngx_posted_events);
+                                                                    /*ngx_posted_accept_events队列存放的是监听套接口发生的可读事件*/
+                ngx_locked_post_event(rev, queue);              /*事件缓存*/
 
-                ngx_locked_post_event(rev, queue);  /*事件缓存*/
-
-            } else { /*调用事件回调函数*/
-                rev->handler(rev); /*读事件的回调函数, handler->filter*/
+            } else {                                                /*调用事件回调函数*/
+                rev->handler(rev);                                 /*读事件的回调函数, handler->filter*/
             }
         }
 
