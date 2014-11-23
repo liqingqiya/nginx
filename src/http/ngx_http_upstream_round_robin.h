@@ -55,15 +55,15 @@ struct ngx_http_upstream_rr_peers_s {
     ngx_http_upstream_rr_peers_t   *next;     /*指向后备服务器列表的指针*/
 
     ngx_http_upstream_rr_peer_t     peer[1]; /*不懂这里的意思？？？？*/
-};          /*该结构体对应一个非后备服务器列表，这里实现为一个链表结构*/
+};          /*该结构体对应一个上游服务器列表，这里实现为一个链表结构*/
 
 
 typedef struct {
     ngx_http_upstream_rr_peers_t   *peers;      /*非后备服务器链表*/
-    ngx_uint_t                      current;      /*当前？？*/
+    ngx_uint_t                      current;      /*todo*/
     uintptr_t                      *tried;        /*是否已经尝试连接？且失败？*/
-    uintptr_t                       data;
-} ngx_http_upstream_rr_peer_data_t;     /*？？？*/
+    uintptr_t                       data;         /*todo*/
+} ngx_http_upstream_rr_peer_data_t;             /*todo*/
 
 
 ngx_int_t ngx_http_upstream_init_round_robin(ngx_conf_t *cf,
