@@ -238,7 +238,7 @@ ngx_http_upstream_get_ip_hash_peer(ngx_peer_connection_t *pc, void *data)
 
     iphp->rrp.current = p;
 
-    pc->sockaddr = peer->sockaddr;   /*对nginx主动与后端服务器建立的连接赋值*/
+    pc->sockaddr = peer->sockaddr;   /*对nginx主动与后端服务器建立的连接进行赋值*/
     pc->socklen = peer->socklen;
     pc->name = &peer->name;
 
