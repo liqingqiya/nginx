@@ -20,13 +20,13 @@ typedef ngx_int_t   ngx_rbtree_key_int_t;
 typedef struct ngx_rbtree_node_s  ngx_rbtree_node_t;
 
 struct ngx_rbtree_node_s {
-    ngx_rbtree_key_t       key;     /*数据*/
-    ngx_rbtree_node_t     *left;    /*左子树*/
-    ngx_rbtree_node_t     *right;   /*右子树*/
-    ngx_rbtree_node_t     *parent;  /*父节点*/
-    u_char                 color;       /*颜色*/
-    u_char                 data;        /**/
-};          /*红黑树的一个节点结构*/
+    ngx_rbtree_key_t       key;         /*数据*/
+    ngx_rbtree_node_t     *left;        /*左子树*/
+    ngx_rbtree_node_t     *right;       /*右子树*/
+    ngx_rbtree_node_t     *parent;      /*父节点*/
+    u_char                 color;        /*颜色*/
+    u_char                 data;         /**/
+};                                        /*红黑树的一个节点结构*/
 
 
 typedef struct ngx_rbtree_s  ngx_rbtree_t;  /*红黑树类型*/
@@ -36,9 +36,9 @@ typedef void (*ngx_rbtree_insert_pt) (ngx_rbtree_node_t *root,
 
 struct ngx_rbtree_s {
     ngx_rbtree_node_t     *root;            /*指向根节点*/
-    ngx_rbtree_node_t     *sentinel;        /*？？？*/
-    ngx_rbtree_insert_pt   insert;      /*插入节点的函数指针*/
-};      /*红黑树管理结构*/
+    ngx_rbtree_node_t     *sentinel;        /*哨兵节点*/
+    ngx_rbtree_insert_pt   insert;          /*插入节点的函数指针*/
+};                                             /*红黑树管理结构*/
 
 /*红黑树初始化*/
 #define ngx_rbtree_init(tree, s, i)                                           \
@@ -67,7 +67,7 @@ void ngx_rbtree_insert_timer_value(ngx_rbtree_node_t *root,
 
 /* a sentinel must be black */
 
-#define ngx_rbtree_sentinel_init(node)  ngx_rbt_black(node)             /*？？？*/
+#define ngx_rbtree_sentinel_init(node)  ngx_rbt_black(node)             /*初始化哨兵节点*/
 
 
 static ngx_inline ngx_rbtree_node_t *

@@ -23,13 +23,13 @@ static ngx_inline void ngx_rbtree_right_rotate(ngx_rbtree_node_t **root,
 
 void
 ngx_rbtree_insert(ngx_thread_volatile ngx_rbtree_t *tree,
-    ngx_rbtree_node_t *node)
+    ngx_rbtree_node_t *node)                                        /*插入一个节点*/
 {
     ngx_rbtree_node_t  **root, *temp, *sentinel;
 
     /* a binary tree insert */
 
-    root = (ngx_rbtree_node_t **) &tree->root;
+    root = (ngx_rbtree_node_t **) &tree->root;                     /**/
     sentinel = tree->sentinel;
 
     if (*root == sentinel) {
