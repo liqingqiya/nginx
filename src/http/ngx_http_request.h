@@ -357,30 +357,30 @@ typedef void (*ngx_http_event_handler_pt)(ngx_http_request_t *r);
 
 
 struct ngx_http_request_s { /*表示一个客户端请求*/
-    uint32_t                          signature;         /* "HTTP" */
+    uint32_t                          signature;                /* "HTTP" */
 
     ngx_connection_t                 *connection;
 
-    void                            **ctx; /* 指向 ngx_http_conf_ctx_t ??? todo，上下文结构*/
-    void                            **main_conf; /*主结构环境下的配置结构体?todo*/
-    void                            **srv_conf; /*server的配置?todo*/
-    void                            **loc_conf; /*location的配置？todo*/
+    void                            **ctx;                      /* 指向 ngx_http_conf_ctx_t ??? todo，上下文结构*/
+    void                            **main_conf;                /*主结构环境下的配置结构体?todo*/
+    void                            **srv_conf;                 /*server的配置?todo*/
+    void                            **loc_conf;                 /*location的配置？todo*/
 
-    ngx_http_event_handler_pt         read_event_handler; /*读事件回调函数*/
-    ngx_http_event_handler_pt         write_event_handler; /*写事件回调函数*/
+    ngx_http_event_handler_pt         read_event_handler;   /*读事件回调函数*/
+    ngx_http_event_handler_pt         write_event_handler;  /*写事件回调函数*/
 
 #if (NGX_HTTP_CACHE)
     ngx_http_cache_t                 *cache;
 #endif
 
-    ngx_http_upstream_t              *upstream; /*上游服务器*/
+    ngx_http_upstream_t              *upstream;                 /*上游服务器*/
     ngx_array_t                      *upstream_states;
                                          /* of ngx_http_upstream_state_t */
 
-    ngx_pool_t                       *pool; /*所在内存池*/
-    ngx_buf_t                        *header_in; /*缓存区*/
+    ngx_pool_t                       *pool;                     /*所在内存池*/
+    ngx_buf_t                        *header_in;                /*缓存区*/
 
-    ngx_http_headers_in_t             headers_in; /*请求头部*/
+    ngx_http_headers_in_t             headers_in;             /*请求头部*/
     ngx_http_headers_out_t            headers_out;
 
     ngx_http_request_body_t          *request_body;
@@ -389,11 +389,11 @@ struct ngx_http_request_s { /*表示一个客户端请求*/
     time_t                            start_sec;
     ngx_msec_t                        start_msec;
 
-    ngx_uint_t                        method; /*方法*/
-    ngx_uint_t                        http_version;/*http协议版本*/
+    ngx_uint_t                        method;                   /*方法*/
+    ngx_uint_t                        http_version;             /*http协议版本*/
 
     ngx_str_t                         request_line;
-    ngx_str_t                         uri; /*uri*/
+    ngx_str_t                         uri;                      /*uri*/
     ngx_str_t                         args;
     ngx_str_t                         exten;
     ngx_str_t                         unparsed_uri;

@@ -438,7 +438,7 @@ ngx_http_upstream_create(ngx_http_request_t *r) /*当作为反向代理的时候
 
 
 void
-ngx_http_upstream_init(ngx_http_request_t *r)
+ngx_http_upstream_init(ngx_http_request_t *r)               /*启动/设置upstream机制*/
 {
     ngx_connection_t     *c;
 
@@ -454,7 +454,7 @@ ngx_http_upstream_init(ngx_http_request_t *r)
     }
 #endif
 
-    if (c->read->timer_set) {
+    if (c->read->timer_set) {  /*todo?what*/
         ngx_del_timer(c->read);
     }
 

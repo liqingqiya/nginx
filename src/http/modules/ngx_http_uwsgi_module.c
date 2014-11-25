@@ -485,7 +485,7 @@ ngx_http_uwsgi_handler(ngx_http_request_t *r)
     ngx_http_upstream_t        *u;
     ngx_http_uwsgi_loc_conf_t  *uwcf;
 
-    if (ngx_http_upstream_create(r) != NGX_OK) {
+    if (ngx_http_upstream_create(r) != NGX_OK) {      /*create upstream*/
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
@@ -528,11 +528,11 @@ ngx_http_uwsgi_handler(ngx_http_request_t *r)
 #if (NGX_HTTP_CACHE)
     u->create_key = ngx_http_uwsgi_create_key;
 #endif
-    u->create_request = ngx_http_uwsgi_create_request;
+    u->create_request = ngx_http_uwsgi_create_request;          /*create request*/
     u->reinit_request = ngx_http_uwsgi_reinit_request;
-    u->process_header = ngx_http_uwsgi_process_status_line;
+    u->process_header = ngx_http_uwsgi_process_status_line;     /*process header*/
     u->abort_request = ngx_http_uwsgi_abort_request;
-    u->finalize_request = ngx_http_uwsgi_finalize_request;
+    u->finalize_request = ngx_http_uwsgi_finalize_request;      /*finalize request*/
     r->state = 0;
 
     u->buffering = uwcf->upstream.buffering;

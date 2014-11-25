@@ -251,8 +251,8 @@ typedef struct {
 
 
 typedef struct {
-    ngx_str_t                        host;
-    in_port_t                        port;
+    ngx_str_t                        host;          /*主机*/
+    in_port_t                        port;          /*端口*/
     ngx_uint_t                       no_port;       /* unsigned no_port:1 */
 
     ngx_uint_t                       naddrs;        /*地址个数*/
@@ -270,10 +270,10 @@ typedef void (*ngx_http_upstream_handler_pt)(ngx_http_request_t *r,
 
 
 struct ngx_http_upstream_s {
-    ngx_http_upstream_handler_pt     read_event_handler;
-    ngx_http_upstream_handler_pt     write_event_handler;
+    ngx_http_upstream_handler_pt     read_event_handler;     /*读事件回调函数*/
+    ngx_http_upstream_handler_pt     write_event_handler;    /*写事件回调函数*/
 
-    ngx_peer_connection_t            peer;
+    ngx_peer_connection_t            peer;                      /*与上游服务器建立的主动连接*/
 
     ngx_event_pipe_t                *pipe;
 
@@ -304,12 +304,12 @@ struct ngx_http_upstream_s {
 #if (NGX_HTTP_CACHE)
     ngx_int_t                      (*create_key)(ngx_http_request_t *r);
 #endif
-    ngx_int_t                      (*create_request)(ngx_http_request_t *r);/*构造发往上游服务器的请求内容*/
-    ngx_int_t                      (*reinit_request)(ngx_http_request_t *r);/*某服务器出错，nginx会尝试另一服务器。选定新服务器后，会先调用此函数，以重新初始化 upstream模块的工作状态，然后再次进行upstream连接。*/
-    ngx_int_t                      (*process_header)(ngx_http_request_t *r);
+    ngx_int_t                      (*create_request)(ngx_http_request_t *r);    /*构造发往上游服务器的请求内容*/
+    ngx_int_t                      (*reinit_request)(ngx_http_request_t *r);    /*某服务器出错，nginx会尝试另一服务器。选定新服务器后，会先调用此函数，以重新初始化 upstream模块的工作状态，然后再次进行upstream连接。*/
+    ngx_int_t                      (*process_header)(ngx_http_request_t *r);    /*收到上游服务器的响应就回调这个函数*/
     void                           (*abort_request)(ngx_http_request_t *r);
     void                           (*finalize_request)(ngx_http_request_t *r,
-                                         ngx_int_t rc);             /*销毁upstream请求时候调用*/
+                                         ngx_int_t rc);                             /*销毁upstream请求时候调用*/
     ngx_int_t                      (*rewrite_redirect)(ngx_http_request_t *r,
                                          ngx_table_elt_t *h, size_t prefix);
     ngx_int_t                      (*rewrite_cookie)(ngx_http_request_t *r,
