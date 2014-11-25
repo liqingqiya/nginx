@@ -324,7 +324,7 @@ ngx_rbtree_delete(ngx_thread_volatile ngx_rbtree_t *tree,
 
 static ngx_inline void
 ngx_rbtree_left_rotate(ngx_rbtree_node_t **root, ngx_rbtree_node_t *sentinel,
-    ngx_rbtree_node_t *node)
+    ngx_rbtree_node_t *node)            /*旋转改变的只有指针,不改变其他任何东西*/
 {
     ngx_rbtree_node_t  *temp;
 
