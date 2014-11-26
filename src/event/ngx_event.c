@@ -199,12 +199,12 @@ ngx_module_t  ngx_event_core_module = {
 
 
 void
-ngx_process_events_and_timers(ngx_cycle_t *cycle) /*等待事件发生的函数，核心函数*/
+ngx_process_events_and_timers(ngx_cycle_t *cycle)   /* 等待事件发生的函数，核心函数  处理读写事件&定时事件 */
 {
     ngx_uint_t  flags;
     ngx_msec_t  timer, delta;
 
-    if (ngx_timer_resolution) {
+    if (ngx_timer_resolution) {                         /*timer_resolution应该是我们在nginx.conf设置的*/
         timer = NGX_TIMER_INFINITE;
         flags = 0;
 
@@ -584,7 +584,7 @@ ngx_timer_signal_handler(int signo)
 
 /*将所有监听的地址挂到事件驱动模块上*/
 static ngx_int_t
-ngx_event_process_init(ngx_cycle_t *cycle)
+ngx_event_process_init(ngx_cycle_t *cycle)          /**/
 {
     ngx_uint_t           m, i;
     ngx_event_t         *rev, *wev;
@@ -597,7 +597,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
     ccf = (ngx_core_conf_t *) ngx_get_conf(cycle->conf_ctx, ngx_core_module);
     ecf = ngx_event_get_conf(cycle->conf_ctx, ngx_event_core_module);
 
-    if (ccf->master && ccf->worker_processes > 1 && ecf->accept_mutex) { /*多进程/用户配置开启*/
+    if (ccf->master && ccf->worker_processes > 1 && ecf->accept_mutex) {    /*多进程/用户配置开启*/
         ngx_use_accept_mutex = 1;
         ngx_accept_mutex_held = 0;
         ngx_accept_mutex_delay = ecf->accept_mutex_delay;
@@ -628,7 +628,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
         return NGX_ERROR;
     }
 
-    for (m = 0; ngx_modules[m]; m++) {  /* 初始化事件模型 */
+    for (m = 0; ngx_modules[m]; m++) {                          /* 初始化事件模型 */
         if (ngx_modules[m]->type != NGX_EVENT_MODULE) {
             continue;
         }

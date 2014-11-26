@@ -23,7 +23,7 @@
 static ngx_uint_t        slot;                            /*槽数目*/
 static ngx_atomic_t      ngx_time_lock;                  /*原子变量*/
 
-volatile ngx_msec_t      ngx_current_msec;               /*todo*/
+volatile ngx_msec_t      ngx_current_msec;               /*当前时刻*/
 volatile ngx_time_t     *ngx_cached_time;                /*todo*/
 volatile ngx_str_t       ngx_cached_err_log_time;        /*todo*/
 volatile ngx_str_t       ngx_cached_http_time;           /*todo*/
