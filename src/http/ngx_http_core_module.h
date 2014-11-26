@@ -130,15 +130,15 @@ typedef enum {                          /*状态机的定义*/
     NGX_HTTP_LOG_PHASE          /*todo阶段*/
 } ngx_http_phases;
 
-typedef struct ngx_http_phase_handler_s  ngx_http_phase_handler_t;
+typedef struct ngx_http_phase_handler_s  ngx_http_phase_handler_t;           /*状态机挂载函数*/
 
 typedef ngx_int_t (*ngx_http_phase_handler_pt)(ngx_http_request_t *r,
     ngx_http_phase_handler_t *ph);
 
 struct ngx_http_phase_handler_s {
     ngx_http_phase_handler_pt  checker;   /*回调函数*/
-    ngx_http_handler_pt        handler;   /**/
-    ngx_uint_t                 next;       /**/
+    ngx_http_handler_pt        handler;    /**/
+    ngx_uint_t                 next;        /**/
 };
 
 
@@ -146,7 +146,7 @@ typedef struct {
     ngx_http_phase_handler_t  *handlers;
     ngx_uint_t                 server_rewrite_index;
     ngx_uint_t                 location_rewrite_index;
-} ngx_http_phase_engine_t;
+} ngx_http_phase_engine_t;              /*状态机器引擎*/
 
 
 typedef struct {
@@ -178,8 +178,8 @@ typedef struct {
 
     ngx_uint_t                 try_files;       /* unsigned  try_files:1 */
 
-    ngx_http_phase_t           phases[NGX_HTTP_LOG_PHASE + 1];  /*结构体内嵌套数组*/
-} ngx_http_core_main_conf_t;            /*第一个http类型模块的配置上下文 main级别*/
+    ngx_http_phase_t           phases[NGX_HTTP_LOG_PHASE + 1];    /*结构体内嵌套数组*/
+} ngx_http_core_main_conf_t;                                        /*第一个http类型模块的配置上下文 main级别*/
 
 
 typedef struct {

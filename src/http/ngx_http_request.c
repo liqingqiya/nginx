@@ -901,7 +901,7 @@ ngx_http_ssl_servername(ngx_ssl_conn_t *ssl_conn, int *ad, void *arg)
 
 
 static void
-ngx_http_process_request_line(ngx_event_t *rev)
+ngx_http_process_request_line(ngx_event_t *rev)     /*处理请求首部行*/
 {
     ssize_t              n;
     ngx_int_t            rc, rv;
@@ -927,7 +927,7 @@ ngx_http_process_request_line(ngx_event_t *rev)
     for ( ;; ) {
 
         if (rc == NGX_AGAIN) {
-            n = ngx_http_read_request_header(r); /*读取http报文的头部*/
+            n = ngx_http_read_request_header(r);    /*读取http报文的头部*/
 
             if (n == NGX_AGAIN || n == NGX_ERROR) {
                 return;
@@ -1899,7 +1899,7 @@ ngx_http_process_request(ngx_http_request_t *r) /*进入请求链的处理过程
     c->write->handler = ngx_http_request_handler; /*写事件的回调函数*/
     r->read_event_handler = ngx_http_block_reading; /*??todo*/
 
-    ngx_http_handler(r); /*执行请求处理链模块*/
+    ngx_http_handler(r); /*真正开始处理一个完整的http请求, 执行请求处理链模块*/
 
     ngx_http_run_posted_requests(c); /*todo*/
 }

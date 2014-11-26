@@ -209,7 +209,7 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle)   /* 等待事件发生的函�
         flags = 0;
 
     } else {
-        timer = ngx_event_find_timer(); /*得到最近超时time，并将flags设置为 NGX_UPDATE_TIME */
+        timer = ngx_event_find_timer(); /*拿到所有定时器事件的最小时间，在计算出epoll_wait的超时时间*/
         flags = NGX_UPDATE_TIME;
 
 #if (NGX_THREADS)

@@ -873,17 +873,17 @@ ngx_http_handler(ngx_http_request_t *r) /*该函数执行什么功能？*/
 
 
 void
-ngx_http_core_run_phases(ngx_http_request_t *r)
+ngx_http_core_run_phases(ngx_http_request_t *r)                     /*阶段啊, 状态机啊*/
 {
     ngx_int_t                   rc;
     ngx_http_phase_handler_t   *ph;
     ngx_http_core_main_conf_t  *cmcf;
 
-    cmcf = ngx_http_get_module_main_conf(r, ngx_http_core_module); /*??todo??*/
+    cmcf = ngx_http_get_module_main_conf(r, ngx_http_core_module); /*从cycle中获取配置信息*/
 
-    ph = cmcf->phase_engine.handlers; /**/
+    ph = cmcf->phase_engine.handlers;                                 /**/
     /*最后一条处理链是NULL，作为哨兵，作为我们简化思想，简化编程的常用技巧*/
-    while (ph[r->phase_handler].checker) { /*这里是实际的处理链吗？？todo*/
+    while (ph[r->phase_handler].checker) {                            /*这里是实际的处理链吗？？todo*/
 
         rc = ph[r->phase_handler].checker(r, &ph[r->phase_handler]);
 
