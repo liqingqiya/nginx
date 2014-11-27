@@ -828,9 +828,9 @@ ngx_str_t  ngx_http_core_get_method = { 3, (u_char *) "GET " };
 
 
 void
-ngx_http_handler(ngx_http_request_t *r) /*该函数执行什么功能？*/
+ngx_http_handler(ngx_http_request_t *r)       /*真正开始处理一个完整的http请求*/
 {
-    ngx_http_core_main_conf_t  *cmcf; /*上下文结构*/
+    ngx_http_core_main_conf_t  *cmcf;          /*上下文结构*/
 
     r->connection->log->action = NULL;
 
@@ -1399,7 +1399,7 @@ ngx_http_core_try_files_phase(ngx_http_request_t *r,
 
 ngx_int_t
 ngx_http_core_content_phase(ngx_http_request_t *r,
-    ngx_http_phase_handler_t *ph) /*todo*/
+    ngx_http_phase_handler_t *ph)                               /*产生内容阶段的状态机*/
 {
     size_t     root;
     ngx_int_t  rc;
@@ -1414,7 +1414,7 @@ ngx_http_core_content_phase(ngx_http_request_t *r,
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "content phase: %ui", r->phase_handler);
 
-    rc = ph->handler(r);
+    rc = ph->handler(r);                          /*执行处理函数*/
 
     if (rc != NGX_DECLINED) {
         ngx_http_finalize_request(r, rc);
@@ -2560,7 +2560,7 @@ ngx_http_subrequest(ngx_http_request_t *r,
 
 ngx_int_t
 ngx_http_internal_redirect(ngx_http_request_t *r,
-    ngx_str_t *uri, ngx_str_t *args)
+    ngx_str_t *uri, ngx_str_t *args)                                  /*这个函数是做什么的??为什么会存在间接递归??todo*/
 {
     ngx_http_core_srv_conf_t  *cscf;
 
@@ -2607,7 +2607,7 @@ ngx_http_internal_redirect(ngx_http_request_t *r,
     r->add_uri_to_alias = 0;
     r->main->count++;
 
-    ngx_http_handler(r);
+    ngx_http_handler(r);            /*递归调用了ngx_http_handler()函数*/
 
     return NGX_DONE;
 }

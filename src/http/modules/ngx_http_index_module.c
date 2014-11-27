@@ -94,7 +94,7 @@ ngx_module_t  ngx_http_index_module = {
  */
 
 static ngx_int_t
-ngx_http_index_handler(ngx_http_request_t *r)
+ngx_http_index_handler(ngx_http_request_t *r)           /*回调函数, 生成index页面*/
 {
     u_char                       *p, *name;
     size_t                        len, root, reserve, allocated;
@@ -117,8 +117,8 @@ ngx_http_index_handler(ngx_http_request_t *r)
         return NGX_DECLINED;
     }
 
-    ilcf = ngx_http_get_module_loc_conf(r, ngx_http_index_module);
-    clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
+    ilcf = ngx_http_get_module_loc_conf(r, ngx_http_index_module);          /**/
+    clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);           /**/
 
     allocated = 0;
     root = 0;
@@ -274,7 +274,7 @@ ngx_http_index_handler(ngx_http_request_t *r)
             ngx_memcpy(p, name, len - 1);
         }
 
-        return ngx_http_internal_redirect(r, &uri, &r->args);
+        return ngx_http_internal_redirect(r, &uri, &r->args);       /*看不懂这个函数是做什么的??为什么这里会存在间接递归??todo*/
     }
 
     return NGX_DECLINED;

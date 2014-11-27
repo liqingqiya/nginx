@@ -937,9 +937,9 @@ ngx_conf_log_error(ngx_uint_t level, ngx_conf_t *cf, ngx_err_t err,
 
 
 char *
-ngx_conf_set_flag_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ngx_conf_set_flag_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) /*读取NGX_CONF_FLAG类型的参数*/
 {
-    char  *p = conf;
+    char  *p = conf;                             /*有点不懂为什么会强制转化为char*类型???todo*/
 
     ngx_str_t        *value;
     ngx_flag_t       *fp;
@@ -977,24 +977,24 @@ ngx_conf_set_flag_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
 char *
-ngx_conf_set_str_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ngx_conf_set_str_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) /*读取字符串类型的参数*/
 {
     char  *p = conf;
 
     ngx_str_t        *field, *value;
     ngx_conf_post_t  *post;
 
-    field = (ngx_str_t *) (p + cmd->offset);
+    field = (ngx_str_t *) (p + cmd->offset);        /*计算存储字段位置*/
 
     if (field->data) {
         return "is duplicate";
     }
 
-    value = cf->args->elts;
+    value = cf->args->elts;                          /*值*/
 
     *field = value[1];
 
-    if (cmd->post) {
+    if (cmd->post) {                                  /*用于清理的回调函数*/
         post = cmd->post;
         return post->post_handler(cf, post, field);
     }
@@ -1004,15 +1004,15 @@ ngx_conf_set_str_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
 char *
-ngx_conf_set_str_array_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ngx_conf_set_str_array_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) /*读取字符串数组类型的参数*/
 {
-    char  *p = conf;
+    char  *p = conf;                                    /*强制转化*/
 
     ngx_str_t         *value, *s;
     ngx_array_t      **a;
     ngx_conf_post_t   *post;
 
-    a = (ngx_array_t **) (p + cmd->offset);
+    a = (ngx_array_t **) (p + cmd->offset);            /*计算地址*/
 
     if (*a == NGX_CONF_UNSET_PTR) {
         *a = ngx_array_create(cf->pool, 4, sizeof(ngx_str_t));
@@ -1026,11 +1026,11 @@ ngx_conf_set_str_array_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         return NGX_CONF_ERROR;
     }
 
-    value = cf->args->elts;
+    value = cf->args->elts;                             /*抽取值*/
 
-    *s = value[1];
+    *s = value[1];                                       /*赋值*/
 
-    if (cmd->post) {
+    if (cmd->post) {                                     /*清理*/
         post = cmd->post;
         return post->post_handler(cf, post, s);
     }
@@ -1040,7 +1040,7 @@ ngx_conf_set_str_array_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
 char *
-ngx_conf_set_keyval_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ngx_conf_set_keyval_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) /*读取键值对类型的参数*/
 {
     char  *p = conf;
 
@@ -1078,7 +1078,7 @@ ngx_conf_set_keyval_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
 char *
-ngx_conf_set_num_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ngx_conf_set_num_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) /*读取整数类型*/
 {
     char  *p = conf;
 
@@ -1109,7 +1109,7 @@ ngx_conf_set_num_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
 char *
-ngx_conf_set_size_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ngx_conf_set_size_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) /*读取size_t类型的参数*/
 {
     char  *p = conf;
 
@@ -1140,7 +1140,7 @@ ngx_conf_set_size_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
 char *
-ngx_conf_set_off_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ngx_conf_set_off_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) /*读取off_t类型的参数*/
 {
     char  *p = conf;
 
@@ -1171,7 +1171,7 @@ ngx_conf_set_off_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
 char *
-ngx_conf_set_msec_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ngx_conf_set_msec_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) /*读取毫秒值类型的参数*/
 {
     char  *p = conf;
 
@@ -1202,7 +1202,7 @@ ngx_conf_set_msec_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
 char *
-ngx_conf_set_sec_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ngx_conf_set_sec_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) /*读取秒值类型的参数*/
 {
     char  *p = conf;
 
@@ -1263,7 +1263,7 @@ ngx_conf_set_bufs_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
 char *
-ngx_conf_set_enum_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ngx_conf_set_enum_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) /*读取枚举类型的参数，将其转换成整数ngx_uint_t类型*/
 {
     char  *p = conf;
 
@@ -1300,7 +1300,7 @@ ngx_conf_set_enum_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
 char *
-ngx_conf_set_bitmask_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ngx_conf_set_bitmask_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) /*读取参数的值，并将这些参数的值以bit位的形式存储*/
 {
     char  *p = conf;
 

@@ -933,7 +933,7 @@ ngx_http_process_request_line(ngx_event_t *rev)     /*处理请求首部行*/
                 return;
             }
         }
-        /*读取http报文头部*/
+        /*解析http报文头部*/
         rc = ngx_http_parse_request_line(r, r->header_in); /*将数据读到了缓存区r->header_in内,并解析*/
 
         if (rc == NGX_OK) {
@@ -1330,7 +1330,7 @@ ngx_http_process_request_headers(ngx_event_t *rev)
                 return;
             }
 
-            ngx_http_process_request(r); /*开始正式的处理我们的请求，调用 handler 处理链*/
+            ngx_http_process_request(r);        /*开始正式的处理我们的请求，调用 handler 处理链*/
 
             return;
         }
@@ -1824,7 +1824,7 @@ ngx_http_process_request_header(ngx_http_request_t *r)
 
 
 void
-ngx_http_process_request(ngx_http_request_t *r) /*进入请求链的处理过程*/
+ngx_http_process_request(ngx_http_request_t *r)             /*进入请求链的处理过程*/
 {
     ngx_connection_t  *c;
 
@@ -1884,8 +1884,8 @@ ngx_http_process_request(ngx_http_request_t *r) /*进入请求链的处理过程
 
 #endif
 
-    if (c->read->timer_set) { /*定时器的设置吗？？todo*/
-        ngx_del_timer(c->read); /*如果设置了定时器时间就删除？todo*/
+    if (c->read->timer_set) {       /*定时器的设置吗？？todo*/
+        ngx_del_timer(c->read);     /*如果设置了定时器时间就删除？todo*/
     }
 
 #if (NGX_STAT_STUB)
@@ -1895,13 +1895,13 @@ ngx_http_process_request(ngx_http_request_t *r) /*进入请求链的处理过程
     r->stat_writing = 1;
 #endif
 
-    c->read->handler = ngx_http_request_handler; /*读事件的回调函数*/
-    c->write->handler = ngx_http_request_handler; /*写事件的回调函数*/
-    r->read_event_handler = ngx_http_block_reading; /*??todo*/
+    c->read->handler = ngx_http_request_handler;        /*读事件的回调函数*/
+    c->write->handler = ngx_http_request_handler;       /*写事件的回调函数*/
+    r->read_event_handler = ngx_http_block_reading;     /*??todo*/
 
-    ngx_http_handler(r); /*真正开始处理一个完整的http请求, 执行请求处理链模块*/
+    ngx_http_handler(r);                                  /*真正开始处理一个完整的http请求, 执行请求处理链模块*/
 
-    ngx_http_run_posted_requests(c); /*todo*/
+    ngx_http_run_posted_requests(c);                    /*todo*/
 }
 
 
