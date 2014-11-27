@@ -440,19 +440,19 @@ ngx_http_index_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 
 
 static ngx_int_t
-ngx_http_index_init(ngx_conf_t *cf)
+ngx_http_index_init(ngx_conf_t *cf)                                            /*挂载动作一般出现在这个函数中,解析配置文件后调用*/
 {
     ngx_http_handler_pt        *h;
     ngx_http_core_main_conf_t  *cmcf;
 
-    cmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_core_module);
+    cmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_core_module);    /*得到配置结构*/
 
-    h = ngx_array_push(&cmcf->phases[NGX_HTTP_CONTENT_PHASE].handlers);
-    if (h == NULL) {
+    h = ngx_array_push(&cmcf->phases[NGX_HTTP_CONTENT_PHASE].handlers);     /*挂载函数到状态机上*/
+    if (h == NULL) {                                                              /*错误处理*/
         return NGX_ERROR;
     }
 
-    *h = ngx_http_index_handler;
+    *h = ngx_http_index_handler;                                                /*挂载到状态机上*/
 
     return NGX_OK;
 }
