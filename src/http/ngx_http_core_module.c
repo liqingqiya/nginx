@@ -1933,7 +1933,7 @@ ngx_http_send_response(ngx_http_request_t *r, ngx_uint_t status,
 
 /*header 过滤链的入口*/
 ngx_int_t
-ngx_http_send_header(ngx_http_request_t *r) /*通过这个函数，经过nginx的过滤链，以此调用下去*/
+ngx_http_send_header(ngx_http_request_t *r)           /*通过这个函数，经过nginx的过滤链，以此调用下去*/
 {
     if (r->header_sent) {
         ngx_log_error(NGX_LOG_ALERT, r->connection->log, 0,
@@ -1946,10 +1946,10 @@ ngx_http_send_header(ngx_http_request_t *r) /*通过这个函数，经过nginx�
         r->headers_out.status_line.len = 0;
     }
     /*ngx_http_top_header_filter是头部过滤链的头指针*/
-    return ngx_http_top_header_filter(r); /*调用过滤链step:1*/ 
+    return ngx_http_top_header_filter(r);               /*调用过滤链step:1*/ 
 }
 
-/*body 过滤链的入口*/
+/*body 过滤链的入口, 响应内容过滤，然后发给客户端*/
 ngx_int_t
 ngx_http_output_filter(ngx_http_request_t *r, ngx_chain_t *in)/*通过这个函数，经过nginx的过滤链，以此调用下去*/
 {

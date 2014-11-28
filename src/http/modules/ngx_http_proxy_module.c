@@ -671,25 +671,25 @@ static ngx_path_init_t  ngx_http_proxy_temp_path = {
 
 
 static ngx_int_t
-ngx_http_proxy_handler(ngx_http_request_t *r)
+ngx_http_proxy_handler(ngx_http_request_t *r)                         /*todo*/
 {
     ngx_int_t                   rc;
     ngx_http_upstream_t        *u;
     ngx_http_proxy_ctx_t       *ctx;
     ngx_http_proxy_loc_conf_t  *plcf;
 
-    if (ngx_http_upstream_create(r) != NGX_OK) {  /*当作为反向代理的时候，会用到，这里创建upstream结构*/
+    if (ngx_http_upstream_create(r) != NGX_OK) {                        /*step:1 创建upstream数据结构*/
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
-    ctx = ngx_pcalloc(r->pool, sizeof(ngx_http_proxy_ctx_t));
+    ctx = ngx_pcalloc(r->pool, sizeof(ngx_http_proxy_ctx_t));         /*step:2 创建并设置upstream环境数据结构*/
     if (ctx == NULL) {
         return NGX_ERROR;
     }
 
     ngx_http_set_ctx(r, ctx, ngx_http_proxy_module);
 
-    plcf = ngx_http_get_module_loc_conf(r, ngx_http_proxy_module);
+    plcf = ngx_http_get_module_loc_conf(r, ngx_http_proxy_module);    /*step:3 设置upstream的后端服务器列表数据结构*/
 
     u = r->upstream;
 
@@ -706,14 +706,14 @@ ngx_http_proxy_handler(ngx_http_request_t *r)
         }
     }
 
-    u->output.tag = (ngx_buf_tag_t) &ngx_http_proxy_module;
+    u->output.tag = (ngx_buf_tag_t) &ngx_http_proxy_module;               /*step:4 设置模块的tag和schema. schema现在只会用于日志，tag会用于buf_chain管理*/
 
     u->conf = &plcf->upstream;
 
 #if (NGX_HTTP_CACHE)
     u->create_key = ngx_http_proxy_create_key;
 #endif
-    u->create_request = ngx_http_proxy_create_request;
+    u->create_request = ngx_http_proxy_create_request;                    /*step:5 设置upstream回调函数*/ 
     u->reinit_request = ngx_http_proxy_reinit_request;
     u->process_header = ngx_http_proxy_process_status_line;
     u->abort_request = ngx_http_proxy_abort_request;
@@ -744,7 +744,7 @@ ngx_http_proxy_handler(ngx_http_request_t *r)
 
     u->accel = 1;
 
-    rc = ngx_http_read_client_request_body(r, ngx_http_upstream_init);
+    rc = ngx_http_read_client_request_body(r, ngx_http_upstream_init);  /*todo*/
 
     if (rc >= NGX_HTTP_SPECIAL_RESPONSE) {
         return rc;
