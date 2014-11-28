@@ -873,7 +873,7 @@ ngx_http_handler(ngx_http_request_t *r)       /*真正开始处理一个完整�
 
 
 void
-ngx_http_core_run_phases(ngx_http_request_t *r)                     /*阶段啊, 状态机啊*/
+ngx_http_core_run_phases(ngx_http_request_t *r) /*运行每个阶段的checker函数*/  /*阶段啊, 状态机啊*/
 {
     ngx_int_t                   rc;
     ngx_http_phase_handler_t   *ph;
@@ -895,7 +895,7 @@ ngx_http_core_run_phases(ngx_http_request_t *r)                     /*阶段啊,
 
 
 ngx_int_t
-ngx_http_core_generic_phase(ngx_http_request_t *r, ngx_http_phase_handler_t *ph)
+ngx_http_core_generic_phase(ngx_http_request_t *r, ngx_http_phase_handler_t *ph)  /*POST_READ阶段的checker函数*/
 {
     ngx_int_t  rc;
 
@@ -909,21 +909,21 @@ ngx_http_core_generic_phase(ngx_http_request_t *r, ngx_http_phase_handler_t *ph)
 
     rc = ph->handler(r);
 
-    if (rc == NGX_OK) {
+    if (rc == NGX_OK) {                              /*NGX_OK: 表示该阶段已经处理完成，需要转入下一个阶段*/
         r->phase_handler = ph->next;
         return NGX_AGAIN;
     }
 
-    if (rc == NGX_DECLINED) {
+    if (rc == NGX_DECLINED) {                        /*NG_DECLINED: 表示需要转入本阶段的下一个handler继续处理*/
         r->phase_handler++;
         return NGX_AGAIN;
     }
 
-    if (rc == NGX_AGAIN || rc == NGX_DONE) {
+    if (rc == NGX_AGAIN || rc == NGX_DONE) {        /*NGX_AGAIN, NGX_DONE: 表示需要等待某个事件发生才能继续处理*/
         return NGX_OK;
     }
 
-    /* rc == NGX_ERROR || rc == NGX_HTTP_...  */
+    /* rc == NGX_ERROR || rc == NGX_HTTP_...  */    /*NGX_ERROR: 表示发生了错误，需要结束该请求*/
 
     ngx_http_finalize_request(r, rc);
 
@@ -1103,7 +1103,7 @@ ngx_http_core_access_phase(ngx_http_request_t *r, ngx_http_phase_handler_t *ph)
     ngx_int_t                  rc;
     ngx_http_core_loc_conf_t  *clcf;
 
-    if (r != r->main) {   /*回调函数准入判断，如果当前不是主请求，那么就无需进行访问权限检测，直接让状态机进入到下一个处理阶段*/
+    if (r != r->main) {                   /*回调函数准入判断，如果当前不是主请求，那么就无需进行访问权限检测，直接让状态机进入到下一个处理阶段*/
         r->phase_handler = ph->next;    /*让状态机直接进入到下一个处理阶段*/
         return NGX_AGAIN;
     }
@@ -1119,7 +1119,7 @@ ngx_http_core_access_phase(ngx_http_request_t *r, ngx_http_phase_handler_t *ph)
     }
 
     if (rc == NGX_AGAIN || rc == NGX_DONE) {  /*判断成功则表示当前回调需要再次调用或者回调成功*/
-        return NGX_OK;              /*这里返回NGX_OK导致ngx_http_core_run_phases()函数里的循环处理会退出*/
+        return NGX_OK;                          /*这里返回NGX_OK导致ngx_http_core_run_phases()函数里的循环处理会退出*/
     }
 
     clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
@@ -1405,7 +1405,7 @@ ngx_http_core_content_phase(ngx_http_request_t *r,
     ngx_int_t  rc;
     ngx_str_t  path;
 
-    if (r->content_handler) {
+    if (r->content_handler) {         /*检查是否设置了r->content_handler??todo??content_handler是什么??*/
         r->write_event_handler = ngx_http_request_empty_handler;
         ngx_http_finalize_request(r, r->content_handler(r));
         return NGX_OK;
@@ -1414,7 +1414,7 @@ ngx_http_core_content_phase(ngx_http_request_t *r,
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "content phase: %ui", r->phase_handler);
 
-    rc = ph->handler(r);                          /*执行处理函数*/
+    rc = ph->handler(r);                                          /*执行处理函数*/
 
     if (rc != NGX_DECLINED) {
         ngx_http_finalize_request(r, rc);
@@ -1541,7 +1541,7 @@ ngx_http_update_location_config(ngx_http_request_t *r)
  */
 
 static ngx_int_t
-ngx_http_core_find_location(ngx_http_request_t *r) /*find the location*/
+ngx_http_core_find_location(ngx_http_request_t *r)      /*location过程  find the location*/
 {
     ngx_int_t                  rc;
     ngx_http_core_loc_conf_t  *pclcf;
@@ -2557,7 +2557,7 @@ ngx_http_subrequest(ngx_http_request_t *r,
     return ngx_http_post_request(sr, NULL);
 }
 
-
+/*修改了request header, 重新调用ngx_http_handler, 重新进行http处理流程*/
 ngx_int_t
 ngx_http_internal_redirect(ngx_http_request_t *r,
     ngx_str_t *uri, ngx_str_t *args)                                  /*这个函数是做什么的??为什么会存在间接递归??todo*/

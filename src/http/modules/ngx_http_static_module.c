@@ -246,7 +246,7 @@ ngx_http_static_handler(ngx_http_request_t *r) /*处理函数*/
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
-    rc = ngx_http_send_header(r); /*send response 发送响应头*/
+    rc = ngx_http_send_header(r); /*头部过滤链也是在这里. ngx_http_top_header_filter / send response 发送响应头*/
 
     if (rc == NGX_ERROR || rc > NGX_OK || r->header_only) {
         return rc;
