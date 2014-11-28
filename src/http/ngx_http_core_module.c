@@ -1795,21 +1795,21 @@ ngx_http_set_content_type(ngx_http_request_t *r)
 
 
 void
-ngx_http_set_exten(ngx_http_request_t *r)
+ngx_http_set_exten(ngx_http_request_t *r)                           /*获取并设置拓展名称*/
 {
     ngx_int_t  i;
 
-    ngx_str_null(&r->exten);
+    ngx_str_null(&r->exten);                                          /*清零*/
 
     for (i = r->uri.len - 1; i > 1; i--) {
-        if (r->uri.data[i] == '.' && r->uri.data[i - 1] != '/') {
+        if (r->uri.data[i] == '.' && r->uri.data[i - 1] != '/') {     /*遇到 '.' 就停*/
 
             r->exten.len = r->uri.len - i - 1;
             r->exten.data = &r->uri.data[i + 1];
 
             return;
 
-        } else if (r->uri.data[i] == '/') {
+        } else if (r->uri.data[i] == '/') {                             /*遇到'/'则返回*/
             return;
         }
     }
@@ -2588,7 +2588,7 @@ ngx_http_internal_redirect(ngx_http_request_t *r,
     ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "internal redirect: \"%V?%V\"", uri, &r->args);
 
-    ngx_http_set_exten(r);
+    ngx_http_set_exten(r);                                               /*设置拓展名称*/
 
     /* clear the modules contexts */
     ngx_memzero(r->ctx, sizeof(void *) * ngx_http_max_module);
@@ -2602,7 +2602,7 @@ ngx_http_internal_redirect(ngx_http_request_t *r,
     r->cache = NULL;
 #endif
 
-    r->internal = 1;
+    r->internal = 1;                 /*修改request结构*/
     r->valid_unparsed_uri = 0;
     r->add_uri_to_alias = 0;
     r->main->count++;
