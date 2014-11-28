@@ -489,7 +489,7 @@ ngx_http_write_request_body(ngx_http_request_t *r)
 
 
 ngx_int_t
-ngx_http_discard_request_body(ngx_http_request_t *r)
+ngx_http_discard_request_body(ngx_http_request_t *r)        /*todo*/
 {
     ssize_t       size;
     ngx_int_t     rc;
@@ -506,7 +506,7 @@ ngx_http_discard_request_body(ngx_http_request_t *r)
         return NGX_OK;
     }
 
-    if (ngx_http_test_expect(r) != NGX_OK) {
+    if (ngx_http_test_expect(r) != NGX_OK) {                /*just for test*/
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
@@ -514,7 +514,7 @@ ngx_http_discard_request_body(ngx_http_request_t *r)
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, rev->log, 0, "http set discard body");
 
-    if (rev->timer_set) {
+    if (rev->timer_set) {                                   /*是否设置定时器事件??todo*/
         ngx_del_timer(rev);
     }
 
@@ -634,7 +634,7 @@ ngx_http_discarded_request_body_handler(ngx_http_request_t *r)
 
 
 static ngx_int_t
-ngx_http_read_discarded_request_body(ngx_http_request_t *r)
+ngx_http_read_discarded_request_body(ngx_http_request_t *r)         /*todo*/
 {
     size_t     size;
     ssize_t    n;

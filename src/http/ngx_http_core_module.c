@@ -2725,7 +2725,7 @@ ngx_http_cleanup_add(ngx_http_request_t *r, size_t size)
 
 ngx_int_t
 ngx_http_set_disable_symlinks(ngx_http_request_t *r,
-    ngx_http_core_loc_conf_t *clcf, ngx_str_t *path, ngx_open_file_info_t *of)
+    ngx_http_core_loc_conf_t *clcf, ngx_str_t *path, ngx_open_file_info_t *of)      /*todo*/
 {
 #if (NGX_HAVE_OPENAT)
     u_char     *p;

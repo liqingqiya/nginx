@@ -142,7 +142,7 @@ ngx_open_file_cache_cleanup(void *data)
 
 ngx_int_t
 ngx_open_cached_file(ngx_open_file_cache_t *cache, ngx_str_t *name,
-    ngx_open_file_info_t *of, ngx_pool_t *pool)
+    ngx_open_file_info_t *of, ngx_pool_t *pool)                                 /*打开文件*/
 {
     time_t                          now;
     uint32_t                        hash;
@@ -218,7 +218,7 @@ ngx_open_cached_file(ngx_open_file_cache_t *cache, ngx_str_t *name,
 
             /* file was not used often enough to keep open */
 
-            rc = ngx_open_and_stat_file(name, of, pool->log);
+            rc = ngx_open_and_stat_file(name, of, pool->log);                   /*打开文件*/
 
             if (rc != NGX_OK && (of->err == 0 || !of->errors)) {
                 goto failed;
@@ -612,7 +612,7 @@ ngx_file_o_path_info(ngx_fd_t fd, ngx_file_info_t *fi, ngx_log_t *log)
 
 static ngx_fd_t
 ngx_open_file_wrapper(ngx_str_t *name, ngx_open_file_info_t *of,
-    ngx_int_t mode, ngx_int_t create, ngx_int_t access, ngx_log_t *log)
+    ngx_int_t mode, ngx_int_t create, ngx_int_t access, ngx_log_t *log)             /*打开文件*/
 {
     ngx_fd_t  fd;
 

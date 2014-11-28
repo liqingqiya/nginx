@@ -242,7 +242,7 @@ ngx_http_write_filter(ngx_http_request_t *r, ngx_chain_t *in)
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, c->log, 0,
                    "http write filter limit %O", limit);
 
-    chain = c->send_chain(c, r->out, limit);
+    chain = c->send_chain(c, r->out, limit);               /*linux平台上是通过sendfile系统调用, 直接将磁盘上的数据发送到网络的.*/
 
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, c->log, 0,
                    "http write filter %p", chain);

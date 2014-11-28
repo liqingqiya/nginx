@@ -26,7 +26,7 @@ ngx_http_module_t  ngx_http_static_module_ctx = {
 
     NULL,                                  /* create location configuration */
     NULL                                   /* merge location configuration */
-};  /*特有的上下文结构基本都是些回调函数*/
+};                                          /*http模块的上下文接口*/
 
 
 ngx_module_t  ngx_http_static_module = {
@@ -58,7 +58,7 @@ ngx_http_static_handler(ngx_http_request_t *r) /*处理函数*/
     ngx_chain_t                out;
     ngx_open_file_info_t       of;
     ngx_http_core_loc_conf_t  *clcf;
-
+    /*这里使用位运算而不是字符串的比较是为了减少cpu的执行次数*/
     if (!(r->method & (NGX_HTTP_GET|NGX_HTTP_HEAD|NGX_HTTP_POST))) {        /*静态请求的方法只限于这三种*/
         return NGX_HTTP_NOT_ALLOWED;
     }
@@ -74,7 +74,7 @@ ngx_http_static_handler(ngx_http_request_t *r) /*处理函数*/
      * so we do not need to reserve memory for '/' for possible redirect
      */
      /*该函数的作用是把请求的http协议的路径转化成一个文件系统的路径*/
-    last = ngx_http_map_uri_to_path(r, &path, &root, 0);   /*解析uri*/
+    last = ngx_http_map_uri_to_path(r, &path, &root, 0);   
     if (last == NULL) {
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
@@ -144,7 +144,7 @@ ngx_http_static_handler(ngx_http_request_t *r) /*处理函数*/
 
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, log, 0, "http static fd: %d", of.fd);
 
-    if (of.is_dir) {    /*如果请求的是一个名称，是一个目录的名字，也返回错误。*/
+    if (of.is_dir) {            /*如果请求的是一个名称，是一个目录的名字，也返回错误。*/
 
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, log, 0, "http dir");
 
@@ -187,8 +187,8 @@ ngx_http_static_handler(ngx_http_request_t *r) /*处理函数*/
          * r->headers_out.location->key fields
          */
 
-        r->headers_out.location->value.len = len;
-        r->headers_out.location->value.data = location;
+        r->headers_out.location->value.len = len;               /*todo??这两行的作用是??*/
+        r->headers_out.location->value.data = location;        /*todo??这两行的作用是??*/
 
         return NGX_HTTP_MOVED_PERMANENTLY;
     }
@@ -204,11 +204,11 @@ ngx_http_static_handler(ngx_http_request_t *r) /*处理函数*/
 
 #endif
 
-    if (r->method & NGX_HTTP_POST) {    /*POST请求，拒绝？*/
+    if (r->method & NGX_HTTP_POST) {    /*POST请求拒绝,因为这是一个static模块*/
         return NGX_HTTP_NOT_ALLOWED;
     }
 
-    rc = ngx_http_discard_request_body(r);
+    rc = ngx_http_discard_request_body(r);  /*这个是???todo*/
 
     if (rc != NGX_OK) {
         return rc;
@@ -236,12 +236,12 @@ ngx_http_static_handler(ngx_http_request_t *r) /*处理函数*/
 
     /* we need to allocate all before the header would be sent */
 
-    b = ngx_pcalloc(r->pool, sizeof(ngx_buf_t));    /*？？我们需要分配内存，在相应头发送之前*/
+    b = ngx_pcalloc(r->pool, sizeof(ngx_buf_t));    /* */
     if (b == NULL) {
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
-    b->file = ngx_pcalloc(r->pool, sizeof(ngx_file_t)); /*？？我们需要分配内存，在相应头发送之前*/
+    b->file = ngx_pcalloc(r->pool, sizeof(ngx_file_t)); /* */
     if (b->file == NULL) {
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
@@ -264,8 +264,8 @@ ngx_http_static_handler(ngx_http_request_t *r) /*处理函数*/
     b->file->log = log;
     b->file->directio = of.is_directio;
 
-    out.buf = b;
-    out.next = NULL;
+    out.buf = b;                                    /*输出的内容*/
+    out.next = NULL;                                /**/
 
     return ngx_http_output_filter(r, &out);     /*把产生的内容传递给后续的filter去处理*/
 }

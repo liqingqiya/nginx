@@ -17,7 +17,7 @@
 
 
 typedef struct {
-    ngx_fd_t                 fd;
+    ngx_fd_t                 fd;                        /*文件描述符*/
     ngx_file_uniq_t          uniq;
     time_t                   mtime;
     off_t                    size;
@@ -48,7 +48,7 @@ typedef struct {
     unsigned                 is_link:1;
     unsigned                 is_exec:1;
     unsigned                 is_directio:1;
-} ngx_open_file_info_t;
+} ngx_open_file_info_t;                                     /*指代一个打开的文件*/
 
 
 typedef struct ngx_cached_open_file_s  ngx_cached_open_file_t;
@@ -89,14 +89,14 @@ struct ngx_cached_open_file_s {
 
 
 typedef struct {
-    ngx_rbtree_t             rbtree;
-    ngx_rbtree_node_t        sentinel;
+    ngx_rbtree_t             rbtree;                /*红黑树*/
+    ngx_rbtree_node_t        sentinel;              /*哨兵*/
     ngx_queue_t              expire_queue;
 
     ngx_uint_t               current;
     ngx_uint_t               max;
     time_t                   inactive;
-} ngx_open_file_cache_t;
+} ngx_open_file_cache_t;                            /*一个打开文件的缓存*/
 
 
 typedef struct {
