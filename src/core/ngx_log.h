@@ -105,7 +105,7 @@ void ngx_log_error_core(ngx_uint_t level, ngx_log_t *log, ngx_err_t err,
 
 #else /* NO VARIADIC MACROS */
 
-#define NGX_HAVE_VARIADIC_MACROS  0
+#define NGX_HAVE_VARIADIC_MACROS  0                 /*无可变参数的宏*/
 
 void ngx_cdecl ngx_log_error(ngx_uint_t level, ngx_log_t *log, ngx_err_t err,
     const char *fmt, ...);
