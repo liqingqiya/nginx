@@ -100,7 +100,7 @@ ngx_pstrdup(ngx_pool_t *pool, ngx_str_t *src)
  *    %C                        wchar
  */
 
-
+/*以下的三个函数都是能够打印不定参数的函数,是以ngx_vslprintf()为基础的.*/
 u_char * ngx_cdecl
 ngx_sprintf(u_char *buf, const char *fmt, ...)
 {
@@ -144,7 +144,7 @@ ngx_slprintf(u_char *buf, u_char *last, const char *fmt, ...)
 
 
 u_char *
-ngx_vslprintf(u_char *buf, u_char *last, const char *fmt, va_list args)
+ngx_vslprintf(u_char *buf, u_char *last, const char *fmt, va_list args)  /*打印格式化日志信息的关键函数*/
 {
     u_char                *p, zero;
     int                    d;
@@ -619,7 +619,7 @@ ngx_strncasecmp(u_char *s1, u_char *s2, size_t n)
 
 
 u_char *
-ngx_strnstr(u_char *s1, char *s2, size_t len)
+ngx_strnstr(u_char *s1, char *s2, size_t len)       /*找到s2出现的最早的位置*/
 {
     u_char  c1, c2;
     size_t  n;
@@ -741,7 +741,7 @@ ngx_strlcasestrn(u_char *s1, u_char *last, u_char *s2, size_t n)
 
 
 ngx_int_t
-ngx_rstrncmp(u_char *s1, u_char *s2, size_t n)
+ngx_rstrncmp(u_char *s1, u_char *s2, size_t n)  /*逆向比较的*/
 {
     if (n == 0) {
         return 0;
@@ -895,7 +895,7 @@ ngx_filename_cmp(u_char *s1, u_char *s2, size_t n)
 
 
 ngx_int_t
-ngx_atoi(u_char *line, size_t n)
+ngx_atoi(u_char *line, size_t n)        /*数字字符串转化为整形数字*/
 {
     ngx_int_t  value;
 
