@@ -34,36 +34,36 @@ typedef struct {
     unsigned    escape:1;
 
     u_char     *data;
-} ngx_variable_value_t;
+} ngx_variable_value_t;     /*变量的值*/
 
 
-#define ngx_string(str)     { sizeof(str) - 1, (u_char *) str }     /*u_char进行转化，提高可移植性*/
+#define ngx_string(str)     { sizeof(str) - 1, (u_char *) str }                     /*u_char进行转化，提高可移植性*/
 #define ngx_null_string     { 0, NULL }
 #define ngx_str_set(str, text)                                               \
-    (str)->len = sizeof(text) - 1; (str)->data = (u_char *) text /*将text字符串转化成ngx_str_t类型存储*/
+    (str)->len = sizeof(text) - 1; (str)->data = (u_char *) text                    /*将text字符串转化成ngx_str_t类型存储*/
 #define ngx_str_null(str)   (str)->len = 0; (str)->data = NULL
 
-
-#define ngx_tolower(c)      (u_char) ((c >= 'A' && c <= 'Z') ? (c | 0x20) : c)  /*转化为小写字符*/
-#define ngx_toupper(c)      (u_char) ((c >= 'a' && c <= 'z') ? (c & ~0x20) : c)  /*转化为大写字符*/
-
+/*大写在前,小写在后*/
+#define ngx_tolower(c)      (u_char) ((c >= 'A' && c <= 'Z') ? (c | 0x20) : c)      /*转化为小写字符*/
+#define ngx_toupper(c)      (u_char) ((c >= 'a' && c <= 'z') ? (c & ~0x20) : c)     /*转化为大写字符*/
+/*转化成小写, 前n个字符*/
 void ngx_strlow(u_char *dst, u_char *src, size_t n);
 
-
+/*字符比较*/
 #define ngx_strncmp(s1, s2, n)  strncmp((const char *) s1, (const char *) s2, n)
 
 
 /* msvc and icc7 compile strcmp() to inline loop */
-#define ngx_strcmp(s1, s2)  strcmp((const char *) s1, (const char *) s2) /*字符串比较*/
+#define ngx_strcmp(s1, s2)  strcmp((const char *) s1, (const char *) s2)            /*字符串比较*/
 
 
-#define ngx_strstr(s1, s2)  strstr((const char *) s1, (const char *) s2)
-#define ngx_strlen(s)       strlen((const char *) s)   /*计算字符串长度*/
+#define ngx_strstr(s1, s2)  strstr((const char *) s1, (const char *) s2)           /*s2在s1最先出现的位置*/
+#define ngx_strlen(s)       strlen((const char *) s)                                /*计算字符串长度*/
 
-#define ngx_strchr(s1, c)   strchr((const char *) s1, (int) c)
+#define ngx_strchr(s1, c)   strchr((const char *) s1, (int) c)                      /*字符c在s1最先出现的位置*/
 
 static ngx_inline u_char *
-ngx_strlchr(u_char *p, u_char *last, u_char c)
+ngx_strlchr(u_char *p, u_char *last, u_char c)                                      /*字符c在p-last之间最先出现的位置*/
 {
     while (p < last) {
 
@@ -83,12 +83,12 @@ ngx_strlchr(u_char *p, u_char *last, u_char c)
  * while ZeroMemory() and bzero() are the calls.
  * icc7 may also inline several mov's of a zeroed register for small blocks.
  */
-#define ngx_memzero(buf, n)       (void) memset(buf, 0, n)
-#define ngx_memset(buf, c, n)     (void) memset(buf, c, n)
+#define ngx_memzero(buf, n)       (void) memset(buf, 0, n)      /*内存块清零*/
+#define ngx_memset(buf, c, n)     (void) memset(buf, c, n)      /*内存块填充*/
 
 
 #if (NGX_MEMCPY_LIMIT)
-
+/**/
 void *ngx_memcpy(void *dst, const void *src, size_t n);
 #define ngx_cpymem(dst, src, n)   (((u_char *) ngx_memcpy(dst, src, n)) + (n))
 
@@ -115,7 +115,7 @@ void *ngx_memcpy(void *dst, const void *src, size_t n);
 static ngx_inline u_char *
 ngx_copy(u_char *dst, u_char *src, size_t len)
 {
-    if (len < 17) {
+    if (len < 17) {         /*为什么要加一个17的限制??todo*/
 
         while (len) {
             *dst++ = *src++;
@@ -204,15 +204,15 @@ u_char *ngx_utf8_cpystrn(u_char *dst, u_char *src, size_t n, size_t len);
 #define NGX_UNESCAPE_REDIRECT  2
 
 uintptr_t ngx_escape_uri(u_char *dst, u_char *src, size_t size,
-    ngx_uint_t type);
-void ngx_unescape_uri(u_char **dst, u_char **src, size_t size, ngx_uint_t type);
-uintptr_t ngx_escape_html(u_char *dst, u_char *src, size_t size);
+    ngx_uint_t type);       /*编码*/
+void ngx_unescape_uri(u_char **dst, u_char **src, size_t size, ngx_uint_t type); /*解码*/
+uintptr_t ngx_escape_html(u_char *dst, u_char *src, size_t size); /*编码*/
 
 
 typedef struct {
-    ngx_rbtree_node_t         node;
-    ngx_str_t                 str;
-} ngx_str_node_t;
+    ngx_rbtree_node_t         node;     /**/
+    ngx_str_t                 str;        /**/
+} ngx_str_node_t;                       /*这个节点是用来做什么的??todo*/
 
 
 void ngx_str_rbtree_insert_value(ngx_rbtree_node_t *temp,

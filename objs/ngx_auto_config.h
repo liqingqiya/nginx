@@ -6,7 +6,7 @@
 
 
 #ifndef NGX_HAVE_GCC_ATOMIC
-#define NGX_HAVE_GCC_ATOMIC  1
+#define NGX_HAVE_GCC_ATOMIC  1  					/*原子变量,用于同步操作, 主要用在 src/os/unix/ngx_atomic.h 文件*/
 #endif
 
 
@@ -129,7 +129,7 @@
 
 
 #ifndef NGX_PTR_SIZE
-#define NGX_PTR_SIZE  8
+#define NGX_PTR_SIZE  8 					/*定义为了 8 , 这个宏在原子变量文件中定义很多:src/os/unix/ngx_atomic.h */
 #endif
 
 

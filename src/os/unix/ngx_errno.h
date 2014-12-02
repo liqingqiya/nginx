@@ -14,7 +14,7 @@
 
 
 typedef int               ngx_err_t;
-
+/* 关于错误码的封装定义, 为了跨平台考虑 */
 #define NGX_EPERM         EPERM
 #define NGX_ENOENT        ENOENT
 #define NGX_ENOPATH       ENOENT
