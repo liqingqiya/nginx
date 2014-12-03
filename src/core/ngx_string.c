@@ -564,7 +564,7 @@ ngx_sprintf_num(u_char *buf, u_char *last, uint64_t ui64, u_char zero,
  */
 
 ngx_int_t
-ngx_strcasecmp(u_char *s1, u_char *s2)
+ngx_strcasecmp(u_char *s1, u_char *s2)                  /*字符串比较, 忽略大小写*/
 {
     ngx_uint_t  c1, c2;
 
@@ -590,7 +590,7 @@ ngx_strcasecmp(u_char *s1, u_char *s2)
 
 
 ngx_int_t
-ngx_strncasecmp(u_char *s1, u_char *s2, size_t n)
+ngx_strncasecmp(u_char *s1, u_char *s2, size_t n)   /*字符串比较, 忽略大小写, 只比较前n个*/
 {
     ngx_uint_t  c1, c2;
 
@@ -741,7 +741,7 @@ ngx_strlcasestrn(u_char *s1, u_char *last, u_char *s2, size_t n)
 
 
 ngx_int_t
-ngx_rstrncmp(u_char *s1, u_char *s2, size_t n)  /*逆向比较的*/
+ngx_rstrncmp(u_char *s1, u_char *s2, size_t n)      /*逆向比较的*/
 {
     if (n == 0) {
         return 0;
