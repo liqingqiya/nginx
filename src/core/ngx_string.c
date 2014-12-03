@@ -108,7 +108,7 @@ ngx_sprintf(u_char *buf, const char *fmt, ...)
     va_list   args;
 
     va_start(args, fmt);
-    p = ngx_vslprintf(buf, (void *) -1, fmt, args);
+    p = ngx_vslprintf(buf, (void *) -1, fmt, args);  /*(void *)-1是无穷大:0xffffffffffffffff. 打印不定参数*/
     va_end(args);
 
     return p;
@@ -164,7 +164,7 @@ ngx_vslprintf(u_char *buf, u_char *last, const char *fmt, va_list args)  /*打�
          * the plain character, "%%", "%c", and minus without the checking
          */
 
-        if (*fmt == '%') {
+        if (*fmt == '%') {      /* `%` */
 
             i64 = 0;
             ui64 = 0;
@@ -177,11 +177,11 @@ ngx_vslprintf(u_char *buf, u_char *last, const char *fmt, va_list args)  /*打�
             frac_width = 0;
             slen = (size_t) -1;
 
-            while (*fmt >= '0' && *fmt <= '9') {
-                width = width * 10 + *fmt++ - '0';
+            while (*fmt >= '0' && *fmt <= '9') {  /*如果使用了数字描述了宽度*/
+                width = width * 10 + *fmt++ - '0'; /*那么就计算宽度*/
             }
 
-
+            /*数值类型的描述*/
             for ( ;; ) {
                 switch (*fmt) {
 
@@ -225,7 +225,7 @@ ngx_vslprintf(u_char *buf, u_char *last, const char *fmt, va_list args)  /*打�
                     break;
                 }
 
-                break;
+                break;      /*非数值类型, 那么就直接要退出了*/
             }
 
 
@@ -249,7 +249,7 @@ ngx_vslprintf(u_char *buf, u_char *last, const char *fmt, va_list args)  /*打�
 
                 continue;
 
-            case 's':
+            case 's':                                       /*字符串类型*/
                 p = va_arg(args, u_char *);
 
                 if (slen == (size_t) -1) {
@@ -462,7 +462,7 @@ ngx_vslprintf(u_char *buf, u_char *last, const char *fmt, va_list args)  /*打�
             fmt++;
 
         } else {
-            *buf++ = *fmt++;
+            *buf++ = *fmt++;    /*直接对应赋值, 因为没有出现`%`转义字符*/
         }
     }
 
@@ -538,7 +538,7 @@ ngx_sprintf_num(u_char *buf, u_char *last, uint64_t ui64, u_char zero,
 
     /* zero or space padding */
 
-    len = (temp + NGX_INT64_LEN) - p;
+    len = (temp + NGX_INT64_LEN) - p;               /*计算字符串长度, 注意使用高地址减去低地址*/
 
     while (len++ < width && buf < last) {
         *buf++ = zero;
