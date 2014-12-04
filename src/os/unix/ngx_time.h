@@ -4,7 +4,7 @@
  * Copyright (C) Nginx, Inc.
  */
 
-
+/*对unix系统时间的封装*/
 #ifndef _NGX_TIME_H_INCLUDED_
 #define _NGX_TIME_H_INCLUDED_
 

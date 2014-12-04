@@ -34,28 +34,28 @@ typedef void (*ngx_connection_handler_pt)(ngx_connection_t *c);
 #define  NGX_DECLINED   -5
 #define  NGX_ABORT      -6
 
-
-#include <ngx_errno.h>
-#include <ngx_atomic.h>
-#include <ngx_thread.h>
-#include <ngx_rbtree.h>
-#include <ngx_time.h>
-#include <ngx_socket.h>
-#include <ngx_string.h>
-#include <ngx_files.h>
-#include <ngx_shmem.h>
-#include <ngx_process.h>
-#include <ngx_user.h>
-#include <ngx_parse.h>
-#include <ngx_log.h>
-#include <ngx_alloc.h>
-#include <ngx_palloc.h>
-#include <ngx_buf.h>
-#include <ngx_queue.h>
-#include <ngx_array.h>
-#include <ngx_list.h>
-#include <ngx_hash.h>
-#include <ngx_file.h>
+/*这些文件的导入是有严格的先后顺序的*/
+#include <ngx_errno.h> 						/*linux 错误定义*/
+#include <ngx_atomic.h> 						/*linux 原子量*/
+#include <ngx_thread.h> 						/*linux 线程有关设置*/
+#include <ngx_rbtree.h> 						/*红黑树*/
+#include <ngx_time.h> 			 			/*linux 系统上时间的封装*/
+#include <ngx_socket.h> 						/*linux 套接字*/
+#include <ngx_string.h> 						/*字符串*/
+#include <ngx_files.h>						/*linux 文件*/
+#include <ngx_shmem.h> 						/*共享内存*/
+#include <ngx_process.h> 					/*linux 进程*/
+#include <ngx_user.h> 						/**/
+#include <ngx_parse.h> 						/**/
+#include <ngx_log.h> 						/*日志*/
+#include <ngx_alloc.h> 						/**/
+#include <ngx_palloc.h> 						/*内存池*/
+#include <ngx_buf.h>   						/*缓存*/
+#include <ngx_queue.h>   						/*队列*/
+#include <ngx_array.h> 						/*数组*/
+#include <ngx_list.h> 	 					/*链表*/
+#include <ngx_hash.h> 						/*哈希*/
+#include <ngx_file.h> 						/*文件接口*/
 #include <ngx_crc.h>
 #include <ngx_crc32.h>
 #include <ngx_murmurhash.h>
@@ -63,7 +63,7 @@ typedef void (*ngx_connection_handler_pt)(ngx_connection_t *c);
 #include <ngx_regex.h>
 #endif
 #include <ngx_radix_tree.h>
-#include <ngx_times.h>
+#include <ngx_times.h> 						/*nginx关于时间的功能接口*/
 #include <ngx_shmtx.h>
 #include <ngx_slab.h>
 #include <ngx_inet.h>
@@ -73,16 +73,16 @@ typedef void (*ngx_connection_handler_pt)(ngx_connection_t *c);
 #include <ngx_event_openssl.h>
 #endif
 #include <ngx_process_cycle.h>
-#include <ngx_conf_file.h>
+#include <ngx_conf_file.h> 					/*框架定义*/
 #include <ngx_open_file_cache.h>
 #include <ngx_os.h>
 #include <ngx_connection.h>
 #include <ngx_proxy_protocol.h>
 
 
-#define LF     (u_char) 10
-#define CR     (u_char) 13
-#define CRLF   "\x0d\x0a"
+#define LF     (u_char) 10 					/*换行符号*/
+#define CR     (u_char) 13 					/*回车*/
+#define CRLF   "\x0d\x0a" 					/*请求行/首部行之间的标准间隔*/
 
 
 #define ngx_abs(value)       (((value) >= 0) ? (value) : - (value))

@@ -30,7 +30,7 @@ ngx_nonblocking(ngx_socket_t s) /*套接字是否阻塞*/
 
     nb = 1;
 
-    return ioctl(s, FIONBIO, &nb);
+    return ioctl(s, FIONBIO, &nb);      /*设置该套接字为非阻塞*/
 }
 
 
@@ -72,7 +72,7 @@ ngx_tcp_push(ngx_socket_t s)
                       (const void *) &tcp_nopush, sizeof(int));
 }
 
-#elif (NGX_LINUX)
+#elif (NGX_LINUX)  /* linux */
 
 
 int
@@ -83,7 +83,7 @@ ngx_tcp_nopush(ngx_socket_t s)
     cork = 1;
 
     return setsockopt(s, IPPROTO_TCP, TCP_CORK,
-                      (const void *) &cork, sizeof(int));
+                      (const void *) &cork, sizeof(int));       /*设置套接字属性*/
 }
 
 
