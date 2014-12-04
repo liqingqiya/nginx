@@ -13,7 +13,7 @@
 #include <ngx_core.h>
 
 
-typedef int               ngx_err_t;
+typedef int               ngx_err_t; 		/*错误结构*/
 /* 关于错误码的封装定义, 为了跨平台考虑 */
 #define NGX_EPERM         EPERM
 #define NGX_ENOENT        ENOENT
@@ -65,7 +65,7 @@ typedef int               ngx_err_t;
 #endif
 
 
-#define ngx_errno                  errno
+#define ngx_errno                  errno 				/*错误码的定义*/
 #define ngx_socket_errno           errno
 #define ngx_set_errno(err)         errno = err
 #define ngx_set_socket_errno(err)  errno = err
