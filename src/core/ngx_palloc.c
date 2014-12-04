@@ -27,15 +27,15 @@ ngx_create_pool(size_t size, ngx_log_t *log)
         return NULL;
     }
 
-    p->d.last = (u_char *) p + sizeof(ngx_pool_t);  /*该内存池数据区域的最后地址*/
-    p->d.end = (u_char *) p + size;         /*分配的内存块的最后地址*/
-    p->d.next = NULL;   /*指向下一个节点*/
+    p->d.last = (u_char *) p + sizeof(ngx_pool_t);    /*该内存池数据区域的最后地址*/
+    p->d.end = (u_char *) p + size;                     /*分配的内存块的最后地址*/
+    p->d.next = NULL;                                   /*指向下一个节点*/
     p->d.failed = 0;
 
     size = size - sizeof(ngx_pool_t);
     p->max = (size < NGX_MAX_ALLOC_FROM_POOL) ? size : NGX_MAX_ALLOC_FROM_POOL; /*todo*/
 
-    p->current = p;     /*当前内存池的地址*/
+    p->current = p;     /*整个系统我们的内存池只有一个, 所以要知道内存池地址, 当前内存池的地址*/
     p->chain = NULL;
     p->large = NULL;
     p->cleanup = NULL;
@@ -105,21 +105,21 @@ ngx_reset_pool(ngx_pool_t *pool)
     /*释放大块存储区域*/
     for (l = pool->large; l; l = l->next) {
         if (l->alloc) {
-            ngx_free(l->alloc);
+            ngx_free(l->alloc);     /*大块内存, 就直接用ngx_free()释放*/
         }
     }
     /*内存池链中的每一个内存池节点都清零failed，并且last也复位，这个时候就没有数据区域了*/
     for (p = pool; p; p = p->d.next) {
-        p->d.last = (u_char *) p + sizeof(ngx_pool_t);
+        p->d.last = (u_char *) p + sizeof(ngx_pool_t);        /*清零*/
         p->d.failed = 0;
     }
 
-    pool->current = pool;
+    pool->current = pool;                                       /*当前内存池*/
     pool->chain = NULL;
     pool->large = NULL;
 }
 
-
+/*核心函数, 分配内存*/
 void *
 ngx_palloc(ngx_pool_t *pool, size_t size)   /*尝试从pool内存池里分配size大小的内存空间*/
 {
@@ -131,7 +131,7 @@ ngx_palloc(ngx_pool_t *pool, size_t size)   /*尝试从pool内存池里分配siz
         p = pool->current;
 
         do {
-            m = ngx_align_ptr(p->d.last, NGX_ALIGNMENT);
+            m = ngx_align_ptr(p->d.last, NGX_ALIGNMENT);        /*定义在ngx_config.h*/
 
             if ((size_t) (p->d.end - m) >= size) {
                 p->d.last = m + size;
@@ -258,7 +258,7 @@ ngx_palloc_large(ngx_pool_t *pool, size_t size)
     return p;
 }
 
-
+/*为什么这里也构造一个对齐分配的函数??todo*/
 void *
 ngx_pmemalign(ngx_pool_t *pool, size_t size, size_t alignment)
 {
@@ -289,8 +289,8 @@ ngx_pfree(ngx_pool_t *pool, void *p)
 {
     ngx_pool_large_t  *l;
 
-    for (l = pool->large; l; l = l->next) {
-        if (p == l->alloc) {
+    for (l = pool->large; l; l = l->next) {     /*大存储块*/
+        if (p == l->alloc) {                     /*TODO*/
             ngx_log_debug1(NGX_LOG_DEBUG_ALLOC, pool->log, 0,
                            "free: %p", l->alloc);
             ngx_free(l->alloc);
@@ -305,7 +305,7 @@ ngx_pfree(ngx_pool_t *pool, void *p)
 
 
 void *
-ngx_pcalloc(ngx_pool_t *pool, size_t size)
+ngx_pcalloc(ngx_pool_t *pool, size_t size) /*分配了, 还附带了清零*/
 {
     void *p;
 
@@ -355,8 +355,8 @@ ngx_pool_run_cleanup_file(ngx_pool_t *p, ngx_fd_t fd)
     ngx_pool_cleanup_t       *c;
     ngx_pool_cleanup_file_t  *cf;
 
-    for (c = p->cleanup; c; c = c->next) {
-        if (c->handler == ngx_pool_cleanup_file) {
+    for (c = p->cleanup; c; c = c->next) {               /*遍历清理函数*/
+        if (c->handler == ngx_pool_cleanup_file) {      /*关闭文件回调函数*/
 
             cf = c->data;
 

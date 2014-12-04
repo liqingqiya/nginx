@@ -154,7 +154,7 @@ CFLAGS="$CFLAGS -Wall -Wpointer-arith"
 
 case "$NGX_GCC_VER" in
     3.* | 4.* )
-        # we have a lot of the unused function arguments
+        # we have a lot of the unused function arguments, 没有使用的参数是不要的
         CFLAGS="$CFLAGS -Wno-unused-parameter"
         # 4.2.1 shows the warning in wrong places
         #CFLAGS="$CFLAGS -Wunreachable-code"
