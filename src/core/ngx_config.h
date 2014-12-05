@@ -93,7 +93,7 @@ typedef intptr_t        ngx_flag_t;	/*ngx_flag_t类型定义*/
 #ifndef NGX_ALIGNMENT
 #define NGX_ALIGNMENT   sizeof(unsigned long)    /* platform word */
 #endif
-
+/*计算地址的吗???todo*/
 #define ngx_align(d, a)     (((d) + (a - 1)) & ~(a - 1))
 #define ngx_align_ptr(p, a)                                                   \
     (u_char *) (((uintptr_t) (p) + ((uintptr_t) a - 1)) & ~((uintptr_t) a - 1))
