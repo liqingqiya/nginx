@@ -347,7 +347,7 @@ failed:
 
 
 static ngx_int_t
-ngx_http_init_phases(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf)
+ngx_http_init_phases(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf)   /*阶段初始化*/
 {
     if (ngx_array_init(&cmcf->phases[NGX_HTTP_POST_READ_PHASE].handlers,
                        cf->pool, 1, sizeof(ngx_http_handler_pt))
@@ -569,7 +569,7 @@ ngx_http_merge_servers(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf,
     ngx_http_core_loc_conf_t    *clcf;
     ngx_http_core_srv_conf_t   **cscfp;
 
-    cscfp = cmcf->servers.elts; /*从ngx_http_core_main_conf_t的servers动态数组中可以获取所有的ngx_http_core_srv_conf_t结构体*/
+    cscfp = cmcf->servers.elts;             /*从ngx_http_core_main_conf_t的servers动态数组中可以获取所有的ngx_http_core_srv_conf_t结构体*/
     ctx = (ngx_http_conf_ctx_t *) cf->ctx; /*注意，这个ctx是在http{}块下的全局ngx_http_conf_ctx_t的结构体*/
     saved = *ctx;
     rv = NGX_CONF_OK;

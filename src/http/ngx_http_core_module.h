@@ -174,12 +174,12 @@ typedef struct {
 
     ngx_hash_keys_arrays_t    *variables_keys;
 
-    ngx_array_t               *ports;
+    ngx_array_t               *ports;            /*监听端口数组,  成员类型为 ngx_http_conf_port_t */
 
     ngx_uint_t                 try_files;       /* unsigned  try_files:1 */
 
     ngx_http_phase_t           phases[NGX_HTTP_LOG_PHASE + 1];    /*结构体内嵌套数组*/
-} ngx_http_core_main_conf_t;                                        /*第一个http类型模块的配置上下文 main级别*/
+} ngx_http_core_main_conf_t;                                        /*第一个http类型模块的配置上下文 main级别, 可以认为代替了http{}*/
 
 
 typedef struct {
@@ -209,7 +209,7 @@ typedef struct {
 #endif
 
     ngx_http_core_loc_conf_t  **named_locations;
-} ngx_http_core_srv_conf_t;     /*第一个http类型模块的配置上下文 srv级别*/
+} ngx_http_core_srv_conf_t;     /*第一个http类型模块的配置上下文 srv级别, 可以认为该结构就代替了一个server{}配置块*/
 
 
 /* list of structures to find core_srv_conf quickly at run time */
@@ -272,10 +272,10 @@ typedef struct {
 
 
 typedef struct {
-    ngx_int_t                  family;
-    in_port_t                  port;
+    ngx_int_t                  family;        /*地址家族*/
+    in_port_t                  port;           /*监听端口*/
     ngx_array_t                addrs;     /* array of ngx_http_conf_addr_t */
-} ngx_http_conf_port_t;
+} ngx_http_conf_port_t;                     /*每监听一个TCP端口, 都会使用这个结构体来表示*/
 
 
 typedef struct {
@@ -314,7 +314,7 @@ typedef struct {
 } ngx_http_try_file_t;
 
 
-struct ngx_http_core_loc_conf_s { /*第一个http类型模块的配置上下文 loc级别*/
+struct ngx_http_core_loc_conf_s { /*第一个http类型模块的配置上下文 loc级别, 可以认为代替了location{}*/
     ngx_str_t     name;          /* location name */
 
 #if (NGX_PCRE)
@@ -342,7 +342,7 @@ struct ngx_http_core_loc_conf_s { /*第一个http类型模块的配置上下文 
 #endif
 
     /* pointer to the modules' loc_conf */
-    void        **loc_conf; /*这个字段应该是指向我们每个模块的独立的配置结构, todo */
+    void        **loc_conf;                     /*这个字段应该是指向我们每个模块的独立的配置结构*/
 
     uint32_t      limit_except;
     void        **limit_except_loc_conf;
@@ -445,7 +445,7 @@ struct ngx_http_core_loc_conf_s { /*第一个http类型模块的配置上下文 
     ngx_uint_t    types_hash_max_size;
     ngx_uint_t    types_hash_bucket_size;
 
-    ngx_queue_t  *locations;
+    ngx_queue_t  *locations;                    /*location配置块队列*/
 
 #if 0
     ngx_http_core_loc_conf_t  *prev_location;
@@ -461,7 +461,7 @@ typedef struct {
     u_char                          *file_name;
     ngx_uint_t                       line;
     ngx_queue_t                      list;
-} ngx_http_location_queue_t;
+} ngx_http_location_queue_t;                /*location队列*/
 
 /*静态二叉平衡树*/
 struct ngx_http_location_tree_node_s {
@@ -478,7 +478,7 @@ struct ngx_http_location_tree_node_s {
 };
 
 
-void ngx_http_core_run_phases(ngx_http_request_t *r);
+void ngx_http_core_run_phases(ngx_http_request_t *r);               /*运行阶段处理函数*/
 ngx_int_t ngx_http_core_generic_phase(ngx_http_request_t *r,
     ngx_http_phase_handler_t *ph);
 ngx_int_t ngx_http_core_rewrite_phase(ngx_http_request_t *r,

@@ -54,20 +54,20 @@ typedef struct {
 #define NGX_HTTP_SRV_CONF_OFFSET   offsetof(ngx_http_conf_ctx_t, srv_conf)
 #define NGX_HTTP_LOC_CONF_OFFSET   offsetof(ngx_http_conf_ctx_t, loc_conf)
 
-
+/*在处理request请求的时候, 定义的三个提取配置的宏*/
 #define ngx_http_get_module_main_conf(r, module)                             \
     (r)->main_conf[module.ctx_index]   /*todo,获得对应模块的配置结构体吗？*/
 #define ngx_http_get_module_srv_conf(r, module)  (r)->srv_conf[module.ctx_index]
 #define ngx_http_get_module_loc_conf(r, module)  (r)->loc_conf[module.ctx_index]    /*loc_conf取的是哪个值？？？todo*/
 
-
+/*在配置解析, 切换上下文的时候, 定义的三个宏*/
 #define ngx_http_conf_get_module_main_conf(cf, module)                        \
     ((ngx_http_conf_ctx_t *) cf->ctx)->main_conf[module.ctx_index]/*找到该模块对应的ngx_http_core_main_conf_t结构体*/
 #define ngx_http_conf_get_module_srv_conf(cf, module)                         \
     ((ngx_http_conf_ctx_t *) cf->ctx)->srv_conf[module.ctx_index]/*找到该模块对应的ngx_http_core_srv_conf_t结构体*/
 #define ngx_http_conf_get_module_loc_conf(cf, module)                         \
     ((ngx_http_conf_ctx_t *) cf->ctx)->loc_conf[module.ctx_index] /*找到该模块对应的ngx_http_core_loc_conf_t结构体*/
-
+/*从cycle结构提取http{}配置块main级别配置的宏, 由此可得所有的http{}配置*/
 #define ngx_http_cycle_get_module_main_conf(cycle, module)                    \
     (cycle->conf_ctx[ngx_http_module.index] ?                                 \
         ((ngx_http_conf_ctx_t *) cycle->conf_ctx[ngx_http_module.index])      \

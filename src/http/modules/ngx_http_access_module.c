@@ -130,7 +130,7 @@ ngx_http_access_handler(ngx_http_request_t *r)
     struct sockaddr_in6         *sin6;
 #endif
 
-    alcf = ngx_http_get_module_loc_conf(r, ngx_http_access_module);     /*？？？*/
+    alcf = ngx_http_get_module_loc_conf(r, ngx_http_access_module);     /*获取配置*/
 
     switch (r->connection->sockaddr->sa_family) {   /*根据客户端地址来选择ipv4或者ipv6的处理函数 或者unix的处理函数？*/
 
