@@ -274,7 +274,7 @@ ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) /*解析配置文
     }
 
 
-    /* create location trees */
+    /* create location trees */ /* location的结构虽然以双端队列关联起来, 但是如果找到server结构后, 直接遍历, 效率极低, 所以这里组织创建静态二叉树 */
 
     for (s = 0; s < cmcf->servers.nelts; s++) {  /*遍历各个server的location tree，开始修剪切并*/
 
@@ -668,7 +668,7 @@ ngx_http_merge_locations(ngx_conf_t *cf, ngx_queue_t *locations,
 
 static ngx_int_t
 ngx_http_init_locations(ngx_conf_t *cf, ngx_http_core_srv_conf_t *cscf,
-    ngx_http_core_loc_conf_t *pclcf)
+    ngx_http_core_loc_conf_t *pclcf)   /*locations结构块配置结构的初始化*/
 {
     ngx_uint_t                   n;
     ngx_queue_t                 *q, *locations, *named, tail;
@@ -797,7 +797,7 @@ ngx_http_init_locations(ngx_conf_t *cf, ngx_http_core_srv_conf_t *cscf,
 
 static ngx_int_t
 ngx_http_init_static_location_trees(ngx_conf_t *cf,
-    ngx_http_core_loc_conf_t *pclcf)
+    ngx_http_core_loc_conf_t *pclcf)                        /*locations构造静态二叉树*/
 {
     ngx_queue_t                *q, *locations;
     ngx_http_core_loc_conf_t   *clcf;
@@ -821,7 +821,7 @@ ngx_http_init_static_location_trees(ngx_conf_t *cf,
 
         clcf = lq->exact ? lq->exact : lq->inclusive;
 
-        if (ngx_http_init_static_location_trees(cf, clcf) != NGX_OK) {
+        if (ngx_http_init_static_location_trees(cf, clcf) != NGX_OK) {      /*递归的过程*/
             return NGX_ERROR;
         }
     }

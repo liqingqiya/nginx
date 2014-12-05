@@ -15,27 +15,27 @@
 
 typedef struct ngx_listening_s  ngx_listening_t;    /*代表一个监听端口*/
 
-struct ngx_listening_s {
-    ngx_socket_t        fd;     /*套接字句柄*/
+struct ngx_listening_s {                                     /*与一个监听地址对应起来*/
+    ngx_socket_t        fd;                                   /*套接字句柄*/
 
-    struct sockaddr    *sockaddr;   /*套接字地址*/
-    socklen_t           socklen;    /* size of sockaddr */
-    size_t              addr_text_max_len;/*存储IP地址的字符串addr_text最大长度，即它指定了addr_text所分配的内存大小*/
-    ngx_str_t           addr_text;  /*以字符串类型存储ip地址*/
+    struct sockaddr    *sockaddr;                            /*套接字地址*/
+    socklen_t           socklen;                              /* size of sockaddr */
+    size_t              addr_text_max_len;                    /*存储IP地址的字符串addr_text最大长度，即它指定了addr_text所分配的内存大小*/
+    ngx_str_t           addr_text;                           /*以字符串类型存储ip地址*/
 
-    int                 type;       /*套接字类型，比如SOCK_STREAM代表TCP*/
+    int                 type;                                 /*套接字类型，比如SOCK_STREAM代表TCP*/
 
-    int                 backlog;/*TCP实现监听时的backlog队列，表示允许正在通过三次握手建立TCP连接，但还没有任何进程开始处理的连接的最大个数*/
-    int                 rcvbuf;     /*内核中对于这个套接字的接收缓冲区的大小*/
-    int                 sndbuf;     /*内核中对于这个套接字的发送缓冲区的大小*/
+    int                 backlog;                              /*TCP实现监听时的backlog队列，表示允许正在通过三次握手建立TCP连接，但还没有任何进程开始处理的连接的最大个数*/
+    int                 rcvbuf;                                /*内核中对于这个套接字的接收缓冲区的大小*/
+    int                 sndbuf;                               /*内核中对于这个套接字的发送缓冲区的大小*/
 #if (NGX_HAVE_KEEPALIVE_TUNABLE)
-    int                 keepidle; /*长连接*/
+    int                 keepidle;                            /*长连接*/
     int                 keepintvl;
     int                 keepcnt;
 #endif
 
     /* handler of accepted connection */
-    ngx_connection_handler_pt   handler;    /*当新的TCP连接成功建立后的处理方法*/
+    ngx_connection_handler_pt   handler;                   /*ngx_http_init_connection 当新的TCP连接成功建立后的处理方法*/
 
     void               *servers;  /* array of ngx_http_in_addr_t, for example */
 
