@@ -133,25 +133,25 @@ typedef enum {                          /*状态机的定义*/
 typedef struct ngx_http_phase_handler_s  ngx_http_phase_handler_t;           /*状态机挂载函数*/
 
 typedef ngx_int_t (*ngx_http_phase_handler_pt)(ngx_http_request_t *r,
-    ngx_http_phase_handler_t *ph);
+    ngx_http_phase_handler_t *ph);         /*一个http处理阶段的checker检查方法, 仅可以由http框架实现, 来控制http请求流程*/
 
-struct ngx_http_phase_handler_s {
-    ngx_http_phase_handler_pt  checker;   /*回调函数*/
-    ngx_http_handler_pt        handler;    /**/
-    ngx_uint_t                 next;        /**/
+struct ngx_http_phase_handler_s {         /*对应一个处理方法*/
+    ngx_http_phase_handler_pt  checker;   /*在处理到一个http阶段的时候,http框架将会在checker方法已实现的前提首先调用checker方法来处理请求, 而不会直接调用任何阶段的handler方法, 在这个checker方法中才会去调用handler方法.*/
+    ngx_http_handler_pt        handler;    /*出ngx_http_more_module模块以外的http模块, 只能通过定义handler方法才能介入某一个http处理阶段来处理请求*/
+    ngx_uint_t                 next;         /*将要执行的下一个http处理阶段的序号*/
 };
 
 
 typedef struct {
-    ngx_http_phase_handler_t  *handlers;
+    ngx_http_phase_handler_t  *handlers;                   /*状态处理函数*/
     ngx_uint_t                 server_rewrite_index;
     ngx_uint_t                 location_rewrite_index;
-} ngx_http_phase_engine_t;              /*状态机器引擎*/
+} ngx_http_phase_engine_t;                                   /*状态机器引擎, 之后实际调用的*/
 
 
 typedef struct {
-    ngx_array_t                handlers;
-} ngx_http_phase_t;     /*为什么要单独的声明为一个结构体？ 就声明为一个ngx_array_t不久行了吗？*/
+    ngx_array_t                handlers;   /*某个阶段的handler*/
+} ngx_http_phase_t;           /*存放一个阶段的handler, nginx有十一个这样的ngx_http_phase_t数组*/
 
 
 typedef struct {
@@ -347,7 +347,7 @@ struct ngx_http_core_loc_conf_s { /*第一个http类型模块的配置上下文 
     uint32_t      limit_except;
     void        **limit_except_loc_conf;
 
-    ngx_http_handler_pt  handler;
+    ngx_http_handler_pt  handler;            /*第三方模块参与请求处理的第二种方式, 这样更具独特性*/
 
     /* location name length for inclusive location with inherited alias */
     size_t        alias;

@@ -887,7 +887,7 @@ ngx_http_core_run_phases(ngx_http_request_t *r) /*运行每个阶段的checker�
 
         rc = ph[r->phase_handler].checker(r, &ph[r->phase_handler]);
 
-        if (rc == NGX_OK) { /*处理完成，返回*/
+        if (rc == NGX_OK) { /*将控制权交换给事件模块*/
             return;
         }
     }
@@ -907,14 +907,14 @@ ngx_http_core_generic_phase(ngx_http_request_t *r, ngx_http_phase_handler_t *ph)
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "generic phase: %ui", r->phase_handler);
 
-    rc = ph->handler(r);
+    rc = ph->handler(r);                            /*调用这个阶段中各http模块添加的handler处理方法*/
 
     if (rc == NGX_OK) {                              /*NGX_OK: 表示该阶段已经处理完成，需要转入下一个阶段*/
         r->phase_handler = ph->next;
         return NGX_AGAIN;
     }
 
-    if (rc == NGX_DECLINED) {                        /*NG_DECLINED: 表示需要转入本阶段的下一个handler继续处理*/
+    if (rc == NGX_DECLINED) {                        /*NG_DECLINED: 表示需要转入下一个handler继续处理(可能是本阶段, 也可能是下一个阶段)*/
         r->phase_handler++;
         return NGX_AGAIN;
     }
@@ -960,7 +960,7 @@ ngx_http_core_rewrite_phase(ngx_http_request_t *r, ngx_http_phase_handler_t *ph)
 
 ngx_int_t
 ngx_http_core_find_config_phase(ngx_http_request_t *r,
-    ngx_http_phase_handler_t *ph)
+    ngx_http_phase_handler_t *ph)                           /*定位location的阶段, 非常关键*/
 {
     u_char                    *p;
     size_t                     len;
