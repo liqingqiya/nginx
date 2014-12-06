@@ -336,7 +336,7 @@ struct ngx_http_core_loc_conf_s { /*第一个http类型模块的配置上下文 
 #endif
 #endif
 
-    ngx_http_location_tree_node_t   *static_locations;
+    ngx_http_location_tree_node_t   *static_locations;        /*静态二叉树*/
 #if (NGX_PCRE)
     ngx_http_core_loc_conf_t       **regex_locations;
 #endif

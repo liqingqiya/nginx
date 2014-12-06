@@ -819,7 +819,7 @@ ngx_close_listening_sockets(ngx_cycle_t *cycle)
 
 
 ngx_connection_t *
-ngx_get_connection(ngx_socket_t s, ngx_log_t *log)
+ngx_get_connection(ngx_socket_t s, ngx_log_t *log)           /*获取一个连接*/
 {
     ngx_uint_t         instance;
     ngx_event_t       *rev, *wev;

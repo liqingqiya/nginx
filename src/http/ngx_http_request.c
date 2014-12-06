@@ -192,7 +192,7 @@ ngx_http_header_t  ngx_http_headers_in[] = {
 
 
 void
-ngx_http_init_connection(ngx_connection_t *c)
+ngx_http_init_connection(ngx_connection_t *c)     /*初始化一个连接*/
 {
     ngx_uint_t              i;
     ngx_event_t            *rev;
@@ -425,7 +425,7 @@ ngx_http_wait_request_handler(ngx_event_t *rev) /*step: 2*/
         b->end = b->last + size;
     }
 
-    n = c->recv(c, b->last, size); /*???*/
+    n = c->recv(c, b->last, size); /*接受套接字数据*/
 
     if (n == NGX_AGAIN) {
 
@@ -501,7 +501,7 @@ ngx_http_wait_request_handler(ngx_event_t *rev) /*step: 2*/
 
 
 ngx_http_request_t *
-ngx_http_create_request(ngx_connection_t *c) /**/
+ngx_http_create_request(ngx_connection_t *c) /*创建一个请求结构*/
 {
     ngx_pool_t                 *pool;
     ngx_time_t                 *tp;

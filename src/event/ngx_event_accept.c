@@ -16,7 +16,7 @@ static void ngx_close_accepted_connection(ngx_connection_t *c);
 
 
 void
-ngx_event_accept(ngx_event_t *ev) /*读事件的回调函数*/
+ngx_event_accept(ngx_event_t *ev) /*监听套接字读事件的回调函数*/
 {
     socklen_t          socklen;
     ngx_err_t          err;
