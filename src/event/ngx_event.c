@@ -277,7 +277,7 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle)   /* 等待事件发生的函�
     }
 }
 
-
+/**/
 ngx_int_t
 ngx_handle_read_event(ngx_event_t *rev, ngx_uint_t flags) /*将事件添加到事件驱动模块中，一旦出现了可读事件，就会调用对应的handler方法*/
 {

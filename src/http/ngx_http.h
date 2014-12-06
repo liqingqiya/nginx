@@ -76,8 +76,8 @@ typedef struct {
 } ngx_http_status_t;
 
 
-#define ngx_http_get_module_ctx(r, module)  (r)->ctx[module.ctx_index]
-#define ngx_http_set_ctx(r, c, module)      r->ctx[module.ctx_index] = c;
+#define ngx_http_get_module_ctx(r, module)  (r)->ctx[module.ctx_index]                  /*获取上下文*/
+#define ngx_http_set_ctx(r, c, module)      r->ctx[module.ctx_index] = c;                /*设置上下文*/
 
 
 ngx_int_t ngx_http_add_location(ngx_conf_t *cf, ngx_queue_t **locations,

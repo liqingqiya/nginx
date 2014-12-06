@@ -110,24 +110,24 @@ typedef struct {
 } ngx_http_listen_opt_t;
 
 
-typedef enum {                          /*状态机的定义*/
-    NGX_HTTP_POST_READ_PHASE = 0,      /*todo阶段*/
+typedef enum {                           /*状态机的定义*/
+    NGX_HTTP_POST_READ_PHASE = 0,       /*ngx_http_core_generic_phase*/
 
-    NGX_HTTP_SERVER_REWRITE_PHASE,    /*todo阶段*/
+    NGX_HTTP_SERVER_REWRITE_PHASE,     /*ngx_http_core_rewrite_phase*/
 
-    NGX_HTTP_FIND_CONFIG_PHASE,        /*todo阶段*/
-    NGX_HTTP_REWRITE_PHASE,             /*todo阶段*/
-    NGX_HTTP_POST_REWRITE_PHASE,      /*todo阶段*/
+    NGX_HTTP_FIND_CONFIG_PHASE,        /*ngx_http_core_find_config_phase*/
+    NGX_HTTP_REWRITE_PHASE,             /*ngx_http_core_rewrite_phase*/
+    NGX_HTTP_POST_REWRITE_PHASE,       /*ngx_http_core_post_rewrite_phase*/
 
-    NGX_HTTP_PREACCESS_PHASE,      /*todo阶段*/
+    NGX_HTTP_PREACCESS_PHASE,          /*ngx_http_core_generic_phase*/
 
-    NGX_HTTP_ACCESS_PHASE,          /*todo阶段*/
-    NGX_HTTP_POST_ACCESS_PHASE,      /*todo阶段*/
+    NGX_HTTP_ACCESS_PHASE,              /*ngx_http_core_access_phase*/
+    NGX_HTTP_POST_ACCESS_PHASE,        /*ngx_http_core_post_access_phase*/
 
-    NGX_HTTP_TRY_FILES_PHASE,      /*todo阶段*/
-    NGX_HTTP_CONTENT_PHASE,     /*内容产生阶段*/
+    NGX_HTTP_TRY_FILES_PHASE,          /*ngx_http_core_try_files_phase*/
+    NGX_HTTP_CONTENT_PHASE,            /*ngx_http_core_content_phase*/
 
-    NGX_HTTP_LOG_PHASE          /*todo阶段*/
+    NGX_HTTP_LOG_PHASE                 /*ngx_http_core_generic_phase*/
 } ngx_http_phases;
 
 typedef struct ngx_http_phase_handler_s  ngx_http_phase_handler_t;           /*状态机挂载函数*/

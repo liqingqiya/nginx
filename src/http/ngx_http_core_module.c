@@ -828,36 +828,36 @@ ngx_str_t  ngx_http_core_get_method = { 3, (u_char *) "GET " };
 
 
 void
-ngx_http_handler(ngx_http_request_t *r)       /*真正开始处理一个完整的http请求*/
+ngx_http_handler(ngx_http_request_t *r)          /*真正开始处理一个完整的http请求*/
 {
-    ngx_http_core_main_conf_t  *cmcf;          /*上下文结构*/
+    ngx_http_core_main_conf_t  *cmcf;             /*上下文结构*/
 
     r->connection->log->action = NULL;
 
     r->connection->unexpected_eof = 0;
 
-    if (!r->internal) { /*r->internal字段？？todo*/
+    if (!r->internal) {                             /*是否内部跳转*/
         switch (r->headers_in.connection_type) { /*此次请求的连接类型*/
         case 0:
             r->keepalive = (r->http_version > NGX_HTTP_VERSION_10); /*http1.1默认为长连接*/
             break;
 
-        case NGX_HTTP_CONNECTION_CLOSE: /*close*/
+        case NGX_HTTP_CONNECTION_CLOSE:                               /*close*/
             r->keepalive = 0;
             break;
 
-        case NGX_HTTP_CONNECTION_KEEP_ALIVE: /*keep alive*/
+        case NGX_HTTP_CONNECTION_KEEP_ALIVE:                         /*keep alive*/
             r->keepalive = 1;
             break;
         }
 
         r->lingering_close = (r->headers_in.content_length_n > 0
                               || r->headers_in.chunked);
-        r->phase_handler = 0;
+        r->phase_handler = 0;                                           /*从ngx_http_phase_engine_t指定数组第一个回调方法开始执行*/
 
     } else {
         cmcf = ngx_http_get_module_main_conf(r, ngx_http_core_module);
-        r->phase_handler = cmcf->phase_engine.server_rewrite_index;
+        r->phase_handler = cmcf->phase_engine.server_rewrite_index;         /*设置phase_handler的序号为server_rewrite_index*/
     }
 
     r->valid_location = 1; /*该请求连接有效，设置对应位域的值*/
@@ -867,8 +867,8 @@ ngx_http_handler(ngx_http_request_t *r)       /*真正开始处理一个完整�
     r->gzip_vary = 0;
 #endif
 
-    r->write_event_handler = ngx_http_core_run_phases; /*写事件回调函数*/
-    ngx_http_core_run_phases(r);  /*开始状态机阶段处理*/
+    r->write_event_handler = ngx_http_core_run_phases;          /*写事件回调函数, 在 ngx_http_request_handler()中调用 */
+    ngx_http_core_run_phases(r);                                  /*开始状态机阶段处理*/
 }
 
 
@@ -1405,7 +1405,7 @@ ngx_http_core_content_phase(ngx_http_request_t *r,
     ngx_int_t  rc;
     ngx_str_t  path;
 
-    if (r->content_handler) {         /*检查是否设置了r->content_handler??todo??content_handler是什么??*/
+    if (r->content_handler) {         /*检查是否设置了r->content_handler,这个是http挂载模块的第二种方法*/
         r->write_event_handler = ngx_http_request_empty_handler;
         ngx_http_finalize_request(r, r->content_handler(r));
         return NGX_OK;

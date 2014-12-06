@@ -192,7 +192,7 @@ ngx_http_header_t  ngx_http_headers_in[] = {
 
 
 void
-ngx_http_init_connection(ngx_connection_t *c)     /*初始化一个连接*/
+ngx_http_init_connection(ngx_connection_t *c)     /*初始化一个连接, 这个是发生在监听套接字发生可读事件, 创建新的套接字, 初始化连接的时机*/
 {
     ngx_uint_t              i;
     ngx_event_t            *rev;
@@ -363,7 +363,7 @@ ngx_http_init_connection(ngx_connection_t *c)     /*初始化一个连接*/
     ngx_add_timer(rev, c->listening->post_accept_timeout);
     ngx_reusable_connection(c, 1);
 
-    if (ngx_handle_read_event(rev, 0) != NGX_OK) { /**/
+    if (ngx_handle_read_event(rev, 0) != NGX_OK) { /*将该可读事件加入到我们的监听机制中*/
         ngx_http_close_connection(c);
         return;
     }
@@ -915,7 +915,7 @@ ngx_http_process_request_line(ngx_event_t *rev)     /*处理请求首部行*/
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, rev->log, 0,
                    "http process request line");
 
-    if (rev->timedout) { /*读事件超时*/
+    if (rev->timedout) {                        /*读事件超时*/
         ngx_log_error(NGX_LOG_INFO, c->log, NGX_ETIMEDOUT, "client timed out");
         c->timedout = 1;
         ngx_http_close_request(r, NGX_HTTP_REQUEST_TIME_OUT);
@@ -1824,7 +1824,7 @@ ngx_http_process_request_header(ngx_http_request_t *r)
 
 
 void
-ngx_http_process_request(ngx_http_request_t *r)             /*进入请求链的处理过程*/
+ngx_http_process_request(ngx_http_request_t *r)             /*异步处理请求过程*/
 {
     ngx_connection_t  *c;
 
@@ -1884,8 +1884,8 @@ ngx_http_process_request(ngx_http_request_t *r)             /*进入请求链的
 
 #endif
 
-    if (c->read->timer_set) {       /*定时器的设置吗？？todo*/
-        ngx_del_timer(c->read);     /*如果设置了定时器时间就删除？todo*/
+    if (c->read->timer_set) {       /*现在各个http模块已经准备处理请求了.不存在http请求头部超时的问题, 那么就需要从定时器中把当前连接的读事件移除*/
+        ngx_del_timer(c->read);     /*当前连接的读事件从定时器中移除*/
     }
 
 #if (NGX_STAT_STUB)
@@ -1894,10 +1894,10 @@ ngx_http_process_request(ngx_http_request_t *r)             /*进入请求链的
     (void) ngx_atomic_fetch_add(ngx_stat_writing, 1);
     r->stat_writing = 1;
 #endif
-
+    /*现在开始不会再需要接收http请求行或者头部, 所以需要重新设置当前连接读/写事件的回调函数*/
     c->read->handler = ngx_http_request_handler;        /*读事件的回调函数*/
     c->write->handler = ngx_http_request_handler;       /*写事件的回调函数*/
-    r->read_event_handler = ngx_http_block_reading;     /*??todo*/
+    r->read_event_handler = ngx_http_block_reading;     /*异步读取GET主体*/
 
     ngx_http_handler(r);                                  /*真正开始处理一个完整的http请求, 执行请求处理链模块*/
 
@@ -2182,7 +2182,7 @@ ngx_http_request_handler(ngx_event_t *ev)  /*写事件的回调函数，将响�
                    "http run request: \"%V?%V\"", &r->uri, &r->args);
 
     if (ev->write) {
-        r->write_event_handler(r);
+        r->write_event_handler(r);              /*ngx_http_core_run_phases???todo*/
 
     } else {
         r->read_event_handler(r);
@@ -2251,7 +2251,7 @@ ngx_http_post_request(ngx_http_request_t *r, ngx_http_posted_request_t *pr)
 
 
 void
-ngx_http_finalize_request(ngx_http_request_t *r, ngx_int_t rc)
+ngx_http_finalize_request(ngx_http_request_t *r, ngx_int_t rc)     /*清理请求*/
 {
     ngx_connection_t          *c;
     ngx_http_request_t        *pr;
@@ -3284,7 +3284,7 @@ ngx_http_lingering_close_handler(ngx_event_t *rev)
 
 
 void
-ngx_http_empty_handler(ngx_event_t *wev)
+ngx_http_empty_handler(ngx_event_t *wev)             /*可写事件的回调函数*/
 {
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, wev->log, 0, "http empty handler");
 
