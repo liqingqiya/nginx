@@ -148,7 +148,7 @@ ngx_http_header_out_t  ngx_http_headers_out[] = {
 
 
 static ngx_int_t
-ngx_http_header_filter(ngx_http_request_t *r)
+ngx_http_header_filter(ngx_http_request_t *r)        /*将headers_out的内容按照规则转化为字符串发出*/
 {
     u_char                    *p;
     size_t                     len;
@@ -167,13 +167,13 @@ ngx_http_header_filter(ngx_http_request_t *r)
 #endif
     u_char                     addr[NGX_SOCKADDR_STRLEN];
 
-    if (r->header_sent) {
+    if (r->header_sent) {                                  /*检查header_sent标志位*/
         return NGX_OK;
     }
 
     r->header_sent = 1;
 
-    if (r != r->main) {
+    if (r != r->main) {                                     /*检查当前请求是子请求还是原始请求*/
         return NGX_OK;
     }
 
@@ -620,12 +620,12 @@ ngx_http_header_filter(ngx_http_request_t *r)
     out.buf = b;
     out.next = NULL;
 
-    return ngx_http_write_filter(r, &out);
+    return ngx_http_write_filter(r, &out);                /*发送构造好的缓存*/
 }
 
 
 static ngx_int_t
-ngx_http_header_filter_init(ngx_conf_t *cf) /*nginx响应链的header处理最后一站*/
+ngx_http_header_filter_init(ngx_conf_t *cf)       /*nginx响应链的header处理最后一站*/
 {
     ngx_http_top_header_filter = ngx_http_header_filter;
 

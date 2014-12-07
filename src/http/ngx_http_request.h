@@ -278,15 +278,15 @@ typedef struct {
 typedef void (*ngx_http_client_body_handler_pt)(ngx_http_request_t *r);
 
 typedef struct {
-    ngx_temp_file_t                  *temp_file;
-    ngx_chain_t                      *bufs;
-    ngx_buf_t                        *buf;
-    off_t                             rest;
+    ngx_temp_file_t                  *temp_file;               /*存放http包体的临时文件*/
+    ngx_chain_t                      *bufs;                     /*接收http包体的缓冲区链表*/
+    ngx_buf_t                        *buf;                       /*直接接收包体的缓存*/
+    off_t                             rest;                      /*根据content-length头部和已接收到的包体长度, 计算还需要接收的包体长度*/
     ngx_chain_t                      *free;
     ngx_chain_t                      *busy;
     ngx_http_chunked_t               *chunked;
-    ngx_http_client_body_handler_pt   post_handler;
-} ngx_http_request_body_t;
+    ngx_http_client_body_handler_pt   post_handler;           /*http包体接收完毕后执行的回调方法*/
+} ngx_http_request_body_t;                                      /*保存http包体的结构体*/
 
 
 typedef struct ngx_http_addr_conf_s  ngx_http_addr_conf_t;
@@ -347,8 +347,8 @@ struct ngx_http_postponed_request_s {
 typedef struct ngx_http_posted_request_s  ngx_http_posted_request_t;
 
 struct ngx_http_posted_request_s {
-    ngx_http_request_t               *request;
-    ngx_http_posted_request_t        *next;
+    ngx_http_request_t               *request;      /* 指向当前待处理子请求的 ngx_http_request_t 结构体 */
+    ngx_http_posted_request_t        *next;         /* 指向下一个子请求, 如果没有则为NULL */
 };
 
 
@@ -406,7 +406,7 @@ struct ngx_http_request_s { /*表示一个客户端请求*/
     ngx_http_request_t               *parent;                /*指向当前请求的父请求*/
     ngx_http_postponed_request_t     *postponed;
     ngx_http_post_subrequest_t       *post_subrequest;
-    ngx_http_posted_request_t        *posted_requests;
+    ngx_http_posted_request_t        *posted_requests;     /*  */
 
     ngx_int_t                         phase_handler;          /*handler的计数*/
     ngx_http_handler_pt               content_handler;       /*表示NGX_HTTP_CONTENT_PHASE阶段提供给http模块处理请求的一种方式*/

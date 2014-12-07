@@ -2164,7 +2164,7 @@ ngx_http_find_virtual_server(ngx_connection_t *c,
     return NGX_DECLINED;
 }
 
-
+/*tcp连接上后续的事件触发时候,调用该函数进行处理*/
 static void
 ngx_http_request_handler(ngx_event_t *ev)  /*写事件的回调函数，将响应数据发回给客户端之后，将写事件的回调函数设置为ngx_http_empty_handler()*/
 {
@@ -2172,8 +2172,8 @@ ngx_http_request_handler(ngx_event_t *ev)  /*写事件的回调函数，将响�
     ngx_http_request_t  *r;
     ngx_http_log_ctx_t  *ctx;
 
-    c = ev->data;
-    r = c->data;
+    c = ev->data;                          /* ev为触发事件, 提取该事件对应的连接 connection */
+    r = c->data;                           /* 提取该事件对应的请求, 这个请求是经过异步多次调度处理, 现在还得处理一次 */
 
     ctx = c->log->data;
     ctx->current_request = r;
@@ -2201,20 +2201,20 @@ ngx_http_run_posted_requests(ngx_connection_t *c)
 
     for ( ;; ) {
 
-        if (c->destroyed) {
+        if (c->destroyed) {                            /*检查nginx与客户端的连接*/
             return;
         }
 
-        r = c->data;
-        pr = r->main->posted_requests;
+        r = c->data;                                    /*提取请求*/
+        pr = r->main->posted_requests;                /*原始请求的第一个post请求*/
 
-        if (pr == NULL) {
+        if (pr == NULL) {                               /*为空*/
             return;
         }
 
-        r->main->posted_requests = pr->next;
+        r->main->posted_requests = pr->next;          /*链表指向下一个*/
 
-        r = pr->request;
+        r = pr->request;                                /*当前子请求*/
 
         ctx = c->log->data;
         ctx->current_request = r;
@@ -2222,7 +2222,7 @@ ngx_http_run_posted_requests(ngx_connection_t *c)
         ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0,
                        "http posted request: \"%V?%V\"", &r->uri, &r->args);
 
-        r->write_event_handler(r);
+        r->write_event_handler(r);                     /*当前子请求的回调函数*/
     }
 }
 
@@ -2590,9 +2590,9 @@ ngx_http_set_write_handler(ngx_http_request_t *r)
     return NGX_OK;
 }
 
-
+/*ngx_http_writer方法仅仅用于在后台发送响应到客户端???todo*/
 static void
-ngx_http_writer(ngx_http_request_t *r)
+ngx_http_writer(ngx_http_request_t *r)               /*该方法对http模块是不可见的, 无论是ngx_http_send_header还是ngx_http_output_filter方法, 调用的时候一般都无法发送全部响应, 剩下的响应内容都得靠ngx_http_writer发送*/
 {
     int                        rc;
     ngx_event_t               *wev;
@@ -2607,7 +2607,7 @@ ngx_http_writer(ngx_http_request_t *r)
 
     clcf = ngx_http_get_module_loc_conf(r->main, ngx_http_core_module);
 
-    if (wev->timedout) {
+    if (wev->timedout) { /*检查写事件超时标志*/
         if (!wev->delayed) {
             ngx_log_error(NGX_LOG_INFO, c->log, NGX_ETIMEDOUT,
                           "client timed out");
@@ -3406,7 +3406,7 @@ ngx_http_close_request(ngx_http_request_t *r, ngx_int_t rc)
 
 
 void
-ngx_http_free_request(ngx_http_request_t *r, ngx_int_t rc)
+ngx_http_free_request(ngx_http_request_t *r, ngx_int_t rc)     /*释放ngx_http_request_t数据结构*/
 {
     ngx_log_t                 *log;
     ngx_pool_t                *pool;
@@ -3512,7 +3512,7 @@ ngx_http_log_request(ngx_http_request_t *r)
 
 
 void
-ngx_http_close_connection(ngx_connection_t *c)
+ngx_http_close_connection(ngx_connection_t *c)     /*关闭一个tcp连接*/
 {
     ngx_pool_t  *pool;
 

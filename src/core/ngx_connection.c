@@ -911,7 +911,7 @@ ngx_free_connection(ngx_connection_t *c)
 
 
 void
-ngx_close_connection(ngx_connection_t *c)
+ngx_close_connection(ngx_connection_t *c)   /*关闭一个tcp连接*/
 {
     ngx_err_t     err;
     ngx_uint_t    log_error, level;
@@ -922,12 +922,12 @@ ngx_close_connection(ngx_connection_t *c)
         return;
     }
 
-    if (c->read->timer_set) {
-        ngx_del_timer(c->read);
+    if (c->read->timer_set) {    /*检查读事件定时器标记*/
+        ngx_del_timer(c->read);  /*将该读事件从定时器从移除*/
     }
 
-    if (c->write->timer_set) {
-        ngx_del_timer(c->write);
+    if (c->write->timer_set) {   /*检查写事件定时器标记*/
+        ngx_del_timer(c->write); /*将该读事件从定时器从移除*/
     }
 
     if (ngx_del_conn) {
@@ -989,12 +989,12 @@ ngx_close_connection(ngx_connection_t *c)
 
     log_error = c->log_error;
 
-    ngx_free_connection(c);
+    ngx_free_connection(c);             /*调用ngx_free_connection方法把表示连接的ngx_connection_t结构体归还给ngx_cycle_t核心结构提的空闲连接池free_connections*/
 
     fd = c->fd;
     c->fd = (ngx_socket_t) -1;
 
-    if (ngx_close_socket(fd) == -1) {
+    if (ngx_close_socket(fd) == -1) {  /*系统调用(封装宏)关闭tcp连接套接字s*/
 
         err = ngx_socket_errno;
 

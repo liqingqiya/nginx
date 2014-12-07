@@ -45,7 +45,7 @@ ngx_module_t  ngx_http_write_filter_module = { /*每一个模块必须遵守的�
 
 
 ngx_int_t
-ngx_http_write_filter(ngx_http_request_t *r, ngx_chain_t *in)
+ngx_http_write_filter(ngx_http_request_t *r, ngx_chain_t *in)        /*发送响应包体*/
 {
     off_t                      size, sent, nsent, limit;
     ngx_uint_t                 last, flush;
@@ -56,7 +56,7 @@ ngx_http_write_filter(ngx_http_request_t *r, ngx_chain_t *in)
 
     c = r->connection;
 
-    if (c->error) {
+    if (c->error) {                       /*error*/
         return NGX_ERROR;
     }
 
@@ -66,7 +66,7 @@ ngx_http_write_filter(ngx_http_request_t *r, ngx_chain_t *in)
     ll = &r->out;
 
     /* find the size, the flush point and the last link of the saved chain */
-
+    /* 遍历out缓冲区计算剩余响应长度 */
     for (cl = r->out; cl; cl = cl->next) {
         ll = &cl->next;
 
@@ -111,7 +111,7 @@ ngx_http_write_filter(ngx_http_request_t *r, ngx_chain_t *in)
     }
 
     /* add the new chain to the existent one */
-
+    /* 将本次待发送的缓冲区添加到out尾部并计算总长度 */
     for (ln = in; ln; ln = ln->next) {
         cl = ngx_alloc_chain_link(r->pool);
         if (cl == NULL) {
@@ -178,7 +178,7 @@ ngx_http_write_filter(ngx_http_request_t *r, ngx_chain_t *in)
     if (!last && !flush && in && size < (off_t) clcf->postpone_output) {
         return NGX_OK;
     }
-
+    /*  */
     if (c->write->delayed) {
         c->buffered |= NGX_HTTP_WRITE_BUFFERED;
         return NGX_AGAIN;
@@ -283,7 +283,7 @@ ngx_http_write_filter(ngx_http_request_t *r, ngx_chain_t *in)
         && c->sent - sent >= limit - (off_t) (2 * ngx_pagesize))
     {
         c->write->delayed = 1;
-        ngx_add_timer(c->write, 1);
+        ngx_add_timer(c->write, 1);                                        /* 将写事件添加到定时器 */
     }
 
     for (cl = r->out; cl && cl != chain; /* void */) {

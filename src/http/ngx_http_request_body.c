@@ -30,7 +30,7 @@ static ngx_int_t ngx_http_request_body_save_filter(ngx_http_request_t *r,
 
 ngx_int_t
 ngx_http_read_client_request_body(ngx_http_request_t *r,
-    ngx_http_client_body_handler_pt post_handler)
+    ngx_http_client_body_handler_pt post_handler)             /*接收包体*/
 {
     size_t                     preread;
     ssize_t                    size;
@@ -40,7 +40,7 @@ ngx_http_read_client_request_body(ngx_http_request_t *r,
     ngx_http_request_body_t   *rb;
     ngx_http_core_loc_conf_t  *clcf;
 
-    r->main->count++;
+    r->main->count++;                             /*原始请求的引用计数加1*/
 
 #if (NGX_HTTP_SPDY)
     if (r->spdy_stream && r == r->main) {
@@ -59,7 +59,7 @@ ngx_http_read_client_request_body(ngx_http_request_t *r,
         goto done;
     }
 
-    rb = ngx_pcalloc(r->pool, sizeof(ngx_http_request_body_t));
+    rb = ngx_pcalloc(r->pool, sizeof(ngx_http_request_body_t));           /*分配包体结构*/
     if (rb == NULL) {
         rc = NGX_HTTP_INTERNAL_SERVER_ERROR;
         goto done;
@@ -76,7 +76,7 @@ ngx_http_read_client_request_body(ngx_http_request_t *r,
      */
 
     rb->rest = -1;
-    rb->post_handler = post_handler;
+    rb->post_handler = post_handler;                      /*设置回调函数*/
 
     r->request_body = rb;
 
@@ -225,7 +225,7 @@ done:
 
 
 static void
-ngx_http_read_client_request_body_handler(ngx_http_request_t *r)
+ngx_http_read_client_request_body_handler(ngx_http_request_t *r)     /*如果连接上再次接收到包体就被调用*/
 {
     ngx_int_t  rc;
 
