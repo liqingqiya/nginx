@@ -387,7 +387,7 @@ ngx_trylock_accept_mutex(ngx_cycle_t *cycle)
         }
         /*经过ngx_enable_accept_events()调用，当前进程的事件驱动模块已经开始监听所有的端口，这个时候需要吧ngx_accept_mutex_held设置为1,方便其他模块了解它目前已经获取到了锁*/
         ngx_accept_events = 0;
-        ngx_accept_mutex_held = 1;
+        ngx_accept_mutex_held = 1;      /*争锁成功*/
 
         return NGX_OK;
     }
@@ -395,12 +395,12 @@ ngx_trylock_accept_mutex(ngx_cycle_t *cycle)
     ngx_log_debug1(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
                    "accept mutex lock failed: %ui", ngx_accept_mutex_held);
 
-    if (ngx_accept_mutex_held) {
+    if (ngx_accept_mutex_held) {    /*争锁失败, 并且以前持有锁, 那么要把监听套接口从从自身的事件驱动机制中删除*/
         if (ngx_disable_accept_events(cycle) == NGX_ERROR) {
             return NGX_ERROR;
         }
 
-        ngx_accept_mutex_held = 0;
+        ngx_accept_mutex_held = 0;  /*并置ngx_accept_mutex_held为0*/
     }
 
     return NGX_OK;
@@ -408,7 +408,7 @@ ngx_trylock_accept_mutex(ngx_cycle_t *cycle)
 
 
 static ngx_int_t
-ngx_enable_accept_events(ngx_cycle_t *cycle)
+ngx_enable_accept_events(ngx_cycle_t *cycle)            /*将所有的监听套接口作为一个整体加入到自己的事件监听机制*/
 {
     ngx_uint_t         i;
     ngx_listening_t   *ls;
@@ -441,7 +441,7 @@ ngx_enable_accept_events(ngx_cycle_t *cycle)
 
 
 static ngx_int_t
-ngx_disable_accept_events(ngx_cycle_t *cycle)
+ngx_disable_accept_events(ngx_cycle_t *cycle)           /*将所有的监听套接口作为一个整体从自己的事件监听机制删除*/
 {
     ngx_uint_t         i;
     ngx_listening_t   *ls;

@@ -715,11 +715,11 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
                 wev->ready = 1;
             }
 
-            if (flags & NGX_POST_EVENTS) { /*获取到锁的进程，处理事件延后，事件缓存*/
-                ngx_locked_post_event(wev, &ngx_posted_events); /*事件缓存*/
+            if (flags & NGX_POST_EVENTS) {                                  /*获取到锁的进程，处理事件延后，事件缓存*/
+                ngx_locked_post_event(wev, &ngx_posted_events);           /*事件缓存*/
 
-            } else { /*直接处理,调用事件回调函数*/
-                wev->handler(wev); /*写事件的回调函数, handler->filter*/
+            } else {                                                          /*直接处理,调用事件回调函数*/
+                wev->handler(wev);                                           /*写事件的回调函数, handler->filter*/
             }
         }
     }

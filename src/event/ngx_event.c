@@ -231,13 +231,13 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle)   /* 等待事件发生的函�
             }
 
             if (ngx_accept_mutex_held) {                            /*当前进程获取到了锁*/
-                flags |= NGX_POST_EVENTS;                           /*标记当前到来的事件已经被该工作进程接收*/
+                flags |= NGX_POST_EVENTS;                           /*争取锁成功, 接收到的事件将打上延后处理的标记, 以便能够尽快的释放锁*/
 
             } else {
                 if (timer == NGX_TIMER_INFINITE
                     || timer > ngx_accept_mutex_delay)
                 {
-                    timer = ngx_accept_mutex_delay;                 /*推迟一段时间，再去抢锁*/
+                    timer = ngx_accept_mutex_delay;                 /*推迟一段时间，再去抢锁(epoll_wait()的阻塞超时时间)*/
                 }
             }
         }
@@ -252,12 +252,12 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle)   /* 等待事件发生的函�
     ngx_log_debug1(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
                    "timer delta: %M", delta);
 
-    if (ngx_posted_accept_events) {                  /*存放事件的队列*/
-        ngx_event_process_posted(cycle, &ngx_posted_accept_events); /*处理缓存队列事件,此时还不能释放锁，因为当前进程还在处理监听套接字接口上的事件，还要读取上面的请求，这个队列事件处理完了之后，就能够释放了*/
+    if (ngx_posted_accept_events) {                                      /*存放事件的队列*/
+        ngx_event_process_posted(cycle, &ngx_posted_accept_events);   /*处理缓存队列事件,此时还不能释放锁，因为当前进程还在处理监听套接字接口上的事件，还要读取上面的请求，这个队列事件处理完了之后，就能够释放了*/
     }
 
     if (ngx_accept_mutex_held) {
-        ngx_shmtx_unlock(&ngx_accept_mutex);        /*释放accept_mutex互斥量*/
+        ngx_shmtx_unlock(&ngx_accept_mutex);                             /*释放accept_mutex互斥量*/
     }
 
     if (delta) {
@@ -597,7 +597,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)          /**/
     ccf = (ngx_core_conf_t *) ngx_get_conf(cycle->conf_ctx, ngx_core_module);
     ecf = ngx_event_get_conf(cycle->conf_ctx, ngx_event_core_module);
 
-    if (ccf->master && ccf->worker_processes > 1 && ecf->accept_mutex) {    /*多进程/用户配置开启*/
+    if (ccf->master && ccf->worker_processes > 1 && ecf->accept_mutex) {    /*主进程/多进程/用户配置开启*/
         ngx_use_accept_mutex = 1;
         ngx_accept_mutex_held = 0;
         ngx_accept_mutex_delay = ecf->accept_mutex_delay;
@@ -617,7 +617,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)          /**/
 
 #endif
 
-#if (NGX_THREADS)
+#if (NGX_THREADS)  /*默认单进程的时候跳过*/
     ngx_posted_events_mutex = ngx_mutex_init(cycle->log, 0);
     if (ngx_posted_events_mutex == NULL) {
         return NGX_ERROR;
@@ -649,7 +649,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)          /**/
 
 #if !(NGX_WIN32)
 
-    if (ngx_timer_resolution && !(ngx_event_flags & NGX_USE_TIMER_EVENT)) {
+    if (ngx_timer_resolution && !(ngx_event_flags & NGX_USE_TIMER_EVENT)) { /*跳过*/
         struct sigaction  sa;
         struct itimerval  itv;
 
@@ -674,7 +674,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)          /**/
         }
     }
 
-    if (ngx_event_flags & NGX_USE_FD_EVENT) {
+    if (ngx_event_flags & NGX_USE_FD_EVENT) { /*跳过*/
         struct rlimit  rlmt;
 
         if (getrlimit(RLIMIT_NOFILE, &rlmt) == -1) {
@@ -695,7 +695,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)          /**/
 #endif
     /*数组大小取决于配置文件worker_connections参数*/
     cycle->connections =
-        ngx_alloc(sizeof(ngx_connection_t) * cycle->connection_n, cycle->log);
+        ngx_alloc(sizeof(ngx_connection_t) * cycle->connection_n, cycle->log);  /*预分配连接*/
     if (cycle->connections == NULL) {
         return NGX_ERROR;
     }
@@ -703,7 +703,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)          /**/
     c = cycle->connections;
 
     cycle->read_events = ngx_alloc(sizeof(ngx_event_t) * cycle->connection_n,
-                                   cycle->log);
+                                   cycle->log);  /*预分配读事件结构体*/
     if (cycle->read_events == NULL) {
         return NGX_ERROR;
     }
@@ -719,7 +719,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)          /**/
     }
 
     cycle->write_events = ngx_alloc(sizeof(ngx_event_t) * cycle->connection_n,
-                                    cycle->log);
+                                    cycle->log);  /*预分配写事件结构体*/
     if (cycle->write_events == NULL) {
         return NGX_ERROR;
     }
@@ -735,7 +735,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)          /**/
 
     i = cycle->connection_n;
     next = NULL;
-    /*初始化connections，为每个connection分配一个read event和一个write event,并且建立起connection的单向链表*/
+    /*初始化connections，为每个connection分配的read events和一个write events建立起connection的单向链表*/
     do {
         i--;
 
@@ -767,16 +767,16 @@ ngx_event_process_init(ngx_cycle_t *cycle)          /**/
 
         c->log = &ls[i].log;
 
-        c->listening = &ls[i];
+        c->listening = &ls[i];  /*赋值当前监听结构到连接结构上*/
         ls[i].connection = c;
 
         rev = c->read;
 
         rev->log = c->log;
-        rev->accept = 1; /* 标识此读事件为新请求连接事件 */
+        rev->accept = 1;        /* 标识此读事件为新请求连接事件 */
 
 #if (NGX_HAVE_DEFERRED_ACCEPT)
-        rev->deferred_accept = ls[i].deferred_accept;
+        rev->deferred_accept = ls[i].deferred_accept;   /*todo*/
 #endif
         /*将新生成的fd添加到events中*/
         if (!(ngx_event_flags & NGX_USE_IOCP_EVENT)) {
@@ -837,9 +837,9 @@ ngx_event_process_init(ngx_cycle_t *cycle)          /**/
 
 #else
 
-        rev->handler = ngx_event_accept; /*read事件的回调函数是ngx_event_accept()*/
+        rev->handler = ngx_event_accept;                                /*read事件的回调函数是ngx_event_accept()*/
 
-        if (ngx_use_accept_mutex) {
+        if (ngx_use_accept_mutex) {                                     /*如果开启了负载均衡锁, 那么所有的监听套接字在这里就不会加入到事件驱动机制中*/
             continue;
         }
 
@@ -849,7 +849,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)          /**/
             }
 
         } else {
-            if (ngx_add_event(rev, NGX_READ_EVENT, 0) == NGX_ERROR) { /*将read事件添加到事件监控机制中*/
+            if (ngx_add_event(rev, NGX_READ_EVENT, 0) == NGX_ERROR) {   /*将read事件添加到事件监控机制中*/
                 return NGX_ERROR;
             }
         }
